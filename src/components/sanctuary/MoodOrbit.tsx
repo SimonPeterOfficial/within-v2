@@ -1,39 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { applyMood, getMood, moods, onMoodChange, rgbString } from "@/lib/mood";
 
-const moods = [
-  { label: "Happy", emoji: "✨" },
-  { label: "Lost", emoji: "🌙" },
-  { label: "Inspired", emoji: "🚀" },
-  { label: "Calm", emoji: "🌊" },
-  { label: "Curious", emoji: "🔮" }
-];
-
-const moodLines: Record<string, string> = {
-  Happy: "Bright stories to keep the glow going.",
-  Lost: "Quiet stories for wandering hearts.",
-  Inspired: "Stories that spark your next big idea.",
-  Calm: "Slow, gentle stories to breathe with.",
-  Curious: "Stories that open new worlds."
-};
-
+/** Atmosphere shifter — touching a mood rewrites the whole sanctuary's color. */
 export default function MoodOrbit() {
   const [selected, setSelected] = useState<string | null>(null);
+  const [ripple, setRipple] = useState(0);
   const prefersReducedMotion = useReducedMotion();
 
+  const selectedMood = getMood(selected);
+
+  // Stay in sync when a mood is applied from elsewhere (e.g. Auri's quick chips)
+  useEffect(() => onMoodChange((id) => setSelected(id)), []);
+
+  const handleSelect = (id: string) => {
+    const next = selected === id ? null : id;
+    setSelected(next);
+    applyMood(next);
+    setRipple((count) => count + 1);
+  };
+
   return (
-    <section id="mood" className="scroll-mt-24 bg-black px-6 py-24 text-white">
+    <section id="mood" className="scroll-mt-24 px-6 py-24 text-white">
       <SectionHeader
         eyebrow="Your mood"
         title="Find the center of your universe"
-        subtitle="Touch a feeling and the orbit answers."
+        subtitle="Touch a feeling — the entire sanctuary responds."
       />
 
       <div className="relative mx-auto mt-12 h-[270px] w-[270px] sm:h-[380px] sm:w-[380px]">
+        {/* Emotional color-shift aura */}
+        <AnimatePresence>
+          {selected && (
+            <motion.span
+              key={selected}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              aria-hidden
+              className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.35)] blur-3xl"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Rotating orbit ring (static under reduced motion) */}
         <motion.div
           aria-hidden
@@ -41,45 +55,86 @@ export default function MoodOrbit() {
           transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
           className="absolute inset-0 rounded-full border border-white/10"
         >
-            <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/70" />
-            <span className="absolute bottom-0 left-1/2 h-1.5 w-1.5 -translate-x-1/2 translate-y-1/2 rounded-full bg-purple-400/70" />
-            <span className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-400/70" />
-            <span className="absolute right-0 top-1/2 h-2 w-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/70" />
+          <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/70" />
+          <span className="absolute bottom-0 left-1/2 h-1.5 w-1.5 -translate-x-1/2 translate-y-1/2 rounded-full bg-purple-400/70" />
+          <span className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-400/70" />
+          <span className="absolute right-0 top-1/2 h-2 w-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/70" />
         </motion.div>
 
-        {/* Pulsing core */}
+        {/* Pulsing core — breathes in the current mood color */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.div
-            animate={prefersReducedMotion ? undefined : { scale: [1, 1.06, 1] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 shadow-[0_0_60px_rgba(168,85,247,0.45)] md:h-28 md:w-28"
+            animate={prefersReducedMotion ? undefined : { scale: [1, 1.08, 1] }}
+            transition={{
+              duration: selected ? 2.5 : 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 30% 30%, rgba(var(--mood-rgb),1), rgba(var(--mood-rgb),0.55))",
+              boxShadow: "0 0 60px rgba(var(--mood-rgb),0.5)"
+            }}
+            className="relative flex h-24 w-24 items-center justify-center rounded-full md:h-28 md:w-28"
           >
-            <span className="text-3xl" aria-hidden>
-              {selected ? moods.find((mood) => mood.label === selected)?.emoji : "✦"}
-            </span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={selected ?? "default"}
+                initial={{ opacity: 0, scale: 0.5, rotate: -30 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.5, rotate: 30 }}
+                transition={{ duration: 0.25 }}
+                className="text-3xl"
+                aria-hidden
+              >
+                {selectedMood ? selectedMood.emoji : "✦"}
+              </motion.span>
+            </AnimatePresence>
           </motion.div>
         </div>
+
+        {/* Ripple feedback */}
+        {ripple > 0 && (
+          <motion.span
+            key={ripple}
+            aria-hidden
+            initial={{ opacity: 0.5, scale: 0.4, x: "-50%", y: "-50%" }}
+            animate={{ opacity: 0, scale: 1.9, x: "-50%", y: "-50%" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            onAnimationComplete={() => setRipple(0)}
+            className="absolute left-1/2 top-1/2 h-24 w-24 rounded-full border border-emerald-300/50 md:h-28 md:w-28"
+          />
+        )}
 
         {/* Mood chips around the orbit */}
         {moods.map((mood, index) => {
           const angle = (index / moods.length) * Math.PI * 2 - Math.PI / 2;
           const radius = 44;
-          const isSelected = selected === mood.label;
+          const isSelected = selected === mood.id;
           return (
             <motion.button
-              key={mood.label}
+              key={mood.id}
               style={{
                 left: `calc(50% + ${Math.cos(angle) * radius}%)`,
-                top: `calc(50% + ${Math.sin(angle) * radius}%)`
+                top: `calc(50% + ${Math.sin(angle) * radius}%)`,
+                borderColor: isSelected ? rgbString(mood.rgb, 0.7) : undefined,
+                backgroundColor: isSelected ? rgbString(mood.rgb, 0.14) : undefined,
+                boxShadow: isSelected ? `0 0 22px ${rgbString(mood.rgb, 0.45)}` : undefined
               }}
               initial={{ opacity: 0, x: "-50%", y: "-50%", scale: 0.7 }}
               animate={{ opacity: 1, x: "-50%", y: "-50%", scale: 1 }}
+              whileHover={
+                prefersReducedMotion
+                  ? undefined
+                  : { scale: 1.12, transition: { type: "spring", stiffness: 300, damping: 18 } }
+              }
+              whileTap={{ scale: 0.92, transition: { duration: 0.1 } }}
               transition={{ duration: 0.5, delay: 0.3 + index * 0.08 }}
-              onClick={() => setSelected(isSelected ? null : mood.label)}
+              onClick={() => handleSelect(mood.id)}
               aria-pressed={isSelected}
               className={`absolute rounded-full border px-3 py-1.5 text-xs backdrop-blur transition-colors duration-300 sm:px-4 sm:py-2 sm:text-sm ${
                 isSelected
-                  ? "border-emerald-400/60 bg-emerald-400/10 text-white shadow-[0_0_25px_rgba(52,211,153,0.3)]"
+                  ? "text-white"
                   : "border-white/10 bg-white/5 text-gray-300 hover:border-white/25 hover:bg-white/10"
               }`}
             >
@@ -93,22 +148,29 @@ export default function MoodOrbit() {
       </div>
 
       {/* Selected mood message */}
-      {selected && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="mx-auto mt-10 max-w-md"
-        >
-          <GlassCard className="p-5 text-center">
-            <p className="text-sm text-gray-300">
-              <span className="font-medium text-emerald-300">Feeling {selected}?</span>{" "}
-              {moodLines[selected] ?? "Auri is gathering stories to match."}
-            </p>
-            <p className="mt-2 text-xs text-gray-500">Auri is curating your universe… ✨</p>
-          </GlassCard>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {selectedMood && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35 }}
+            className="mx-auto mt-10 max-w-md"
+          >
+            <GlassCard className="p-5 text-center">
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-emerald-300">
+                  Feeling {selectedMood.label}?
+                </span>{" "}
+                {selectedMood.line}
+              </p>
+              <p className="mt-2 text-xs text-gray-500">
+                Auri is curating your universe… ✨
+              </p>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

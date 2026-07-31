@@ -1,9 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform
+} from "framer-motion";
 import GlowBackground from "@/components/effects/GlowBackground";
+import ParticleField from "@/components/effects/ParticleField";
+import StarField from "@/components/sanctuary/StarField";
+import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
+import { blurUp, staggerContainer } from "@/lib/motion";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -12,78 +23,137 @@ const getGreeting = () => {
   return "Good evening";
 };
 
-// Fixed star field positions (percentages) — deterministic to avoid hydration drift
-const stars = [
-  { x: 12, y: 22, size: 1 },
-  { x: 28, y: 14, size: 2 },
-  { x: 45, y: 8, size: 1 },
-  { x: 62, y: 18, size: 1.5 },
-  { x: 78, y: 12, size: 1 },
-  { x: 90, y: 30, size: 2 },
-  { x: 8, y: 60, size: 1.5 },
-  { x: 22, y: 75, size: 1 },
-  { x: 38, y: 68, size: 2 },
-  { x: 58, y: 82, size: 1 },
-  { x: 75, y: 72, size: 1.5 },
-  { x: 88, y: 58, size: 1 }
-];
+const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
 
+/** Cosmic entrance — mouse-parallax nebula, living starfield, magnetic CTAs. */
 export default function SanctuaryHero() {
   const prefersReducedMotion = useReducedMotion();
   const [greeting] = useState(getGreeting);
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const id = setInterval(() => setWordIndex((index) => (index + 1) % words.length), 2600);
+    return () => clearInterval(id);
+  }, [prefersReducedMotion]);
+
+  // Mouse parallax — each layer drifts at its own depth.
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const smx = useSpring(mx, { stiffness: 50, damping: 20 });
+  const smy = useSpring(my, { stiffness: 50, damping: 20 });
+  const nebulaX = useTransform(smx, [-0.5, 0.5], [36, -36]);
+  const nebulaY = useTransform(smy, [-0.5, 0.5], [24, -24]);
+  const starsX = useTransform(smx, [-0.5, 0.5], [14, -14]);
+  const starsY = useTransform(smy, [-0.5, 0.5], [10, -10]);
+  const coreX = useTransform(smx, [-0.5, 0.5], [8, -8]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
+    mx.set(event.clientX / window.innerWidth - 0.5);
+    my.set(event.clientY / window.innerHeight - 0.5);
+  };
 
   return (
     <section
       id="sanctuary"
-      className="relative flex min-h-screen scroll-mt-24 items-center justify-center overflow-hidden bg-black text-white"
+      onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
+      className="relative flex min-h-screen scroll-mt-24 items-center justify-center overflow-hidden text-white"
     >
       <GlowBackground variant="hero" />
 
-      {/* Twinkling star field */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        {stars.map((star, index) => (
-          <motion.span
-            key={index}
-            className="absolute rounded-full bg-emerald-300/70"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: star.size * 2,
-              height: star.size * 2
-            }}
-            animate={
-              prefersReducedMotion
-                ? undefined
-                : { opacity: [0.15, 0.9, 0.15], scale: [1, 1.5, 1] }
-            }
-            transition={{
-              duration: 3 + (index % 4),
-              repeat: Infinity,
-              delay: index * 0.35,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </div>
-
+      {/* Nebula layers — deepest parallax */}
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        aria-hidden
+        style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
+        className="pointer-events-none absolute inset-0"
+      >
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.22)] blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/15 blur-[110px]" />
+        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/10 blur-[100px]" />
+      </motion.div>
+
+      {/* Starfield — mid parallax */}
+      <motion.div
+        aria-hidden
+        style={{ x: prefersReducedMotion ? 0 : starsX, y: prefersReducedMotion ? 0 : starsY }}
+        className="pointer-events-none absolute inset-0"
+      >
+        <StarField count={70} seed={3} />
+      </motion.div>
+
+      <ParticleField count={18} seed={5} />
+
+      {/* Center stage */}
+      <motion.div
+        style={{ x: prefersReducedMotion ? 0 : coreX }}
         className="relative z-10 px-6 text-center"
       >
-        <p
-          suppressHydrationWarning
-          className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-400"
-        >
-          {greeting}
-        </p>
-        <h1 className="mt-6 text-6xl font-extrabold leading-[1.05] tracking-tight md:text-8xl">
-          Enter your <GradientText>sanctuary</GradientText>.
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-400">
-          A universe built from your feelings — quiet, glowing, always yours.
-        </p>
+        <motion.div variants={staggerContainer(0.14, 0.2)} initial="hidden" animate="show">
+          <motion.p
+            variants={blurUp}
+            suppressHydrationWarning
+            className="text-xs font-semibold uppercase tracking-[0.5em] text-emerald-400 md:text-sm"
+          >
+            {greeting}, explorer
+          </motion.p>
+
+          <motion.h1
+            variants={blurUp}
+            className="mt-8 text-[18vw] font-black leading-none tracking-tight md:text-[10rem]"
+          >
+            <GradientText className="drop-shadow-[0_0_45px_rgba(var(--mood-rgb),0.5)]">
+              WithIn
+            </GradientText>
+          </motion.h1>
+
+          {/* Rotating descriptor */}
+          <div className="relative mx-auto mt-6 min-h-[2.75rem] max-w-2xl md:min-h-[3rem]">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={wordIndex}
+                initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -14, filter: "blur(6px)" }}
+                transition={{ duration: 0.45 }}
+                className="text-lg text-gray-300 md:text-2xl"
+              >
+                {words[wordIndex]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+
+          <motion.p
+            variants={blurUp}
+            className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-gray-500 md:text-base"
+          >
+            A cinematic universe where stories, emotions, and people connect — and Auri
+            shapes it around how you feel.
+          </motion.p>
+
+          {/* Magnetic CTAs */}
+          <motion.div
+            variants={blurUp}
+            className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
+            <Magnetic>
+              <a
+                href="#mood"
+                className="inline-block rounded-full bg-[rgba(var(--mood-rgb),1)] px-9 py-4 text-sm font-bold text-black transition hover:scale-105"
+                style={{ boxShadow: "0 0 45px rgba(var(--mood-rgb),0.5)" }}
+              >
+                Shape your universe
+              </a>
+            </Magnetic>
+            <Magnetic>
+              <a
+                href="#originals"
+                className="inline-block rounded-full border border-white/15 bg-white/5 px-9 py-4 text-sm font-bold text-white backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              >
+                Explore originals
+              </a>
+            </Magnetic>
+          </motion.div>
+        </motion.div>
       </motion.div>
 
       {/* Scroll cue */}
