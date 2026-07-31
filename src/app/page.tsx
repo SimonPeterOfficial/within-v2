@@ -1,5 +1,6 @@
 import Hero from "@/components/home/Hero";
 import EmotionSection from "@/components/home/EmotionSection";
+import AuriSection from "@/components/home/AuriSection";
 import StoriesShowcase from "@/components/home/StoriesShowcase";
 import Originals from "@/components/home/Originals";
 import Features from "@/components/home/Features";
@@ -10,6 +11,7 @@ export default function Home() {
     <>
       <Hero />
       <EmotionSection />
+      <AuriSection />
       <StoriesShowcase />
       <Originals />
       <Features />
