@@ -16,39 +16,39 @@ export type Mood = {
 
 export const moods: Mood[] = [
   {
-    id: "happy",
-    label: "Happy",
-    emoji: "✨",
-    rgb: [251, 191, 36],
-    line: "Bright stories to keep the glow going."
-  },
-  {
     id: "lost",
     label: "Lost",
-    emoji: "🌙",
+    emoji: "🌧",
     rgb: [99, 102, 241],
-    line: "Quiet stories for wandering hearts."
+    line: "Rain-washed stories for wandering hearts."
+  },
+  {
+    id: "quiet",
+    label: "Quiet",
+    emoji: "🌙",
+    rgb: [147, 197, 253],
+    line: "Moonlit stories to breathe slowly with."
   },
   {
     id: "inspired",
     label: "Inspired",
-    emoji: "🚀",
-    rgb: [217, 70, 239],
-    line: "Stories that spark your next big idea."
+    emoji: "🔥",
+    rgb: [251, 113, 133],
+    line: "Stories that light your next fire."
   },
   {
-    id: "calm",
-    label: "Calm",
-    emoji: "🌊",
-    rgb: [34, 211, 238],
-    line: "Slow, gentle stories to breathe with."
-  },
-  {
-    id: "curious",
-    label: "Curious",
-    emoji: "🔮",
+    id: "growing",
+    label: "Growing",
+    emoji: "🌱",
     rgb: [52, 211, 153],
-    line: "Stories that open new worlds."
+    line: "Gentle stories for becoming."
+  },
+  {
+    id: "hopeful",
+    label: "Hopeful",
+    emoji: "✨",
+    rgb: [251, 191, 36],
+    line: "Bright stories to keep the glow going."
   }
 ];
 

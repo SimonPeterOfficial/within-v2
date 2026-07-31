@@ -1,26 +1,23 @@
 /**
- * Design tokens for the WithIn Sanctuary.
- * Single source of truth so the visual language stays consistent across components.
+ * WithIn design tokens — the TS side of the visual language.
+ *
+ * Class-level tokens (radius, blur, elevation, spacing) are declared in
+ * `src/app/globals.css` inside `@theme`, which generates utilities such as
+ * `rounded-card`, `blur-veil`, and `shadow-dock`. This module holds the
+ * values that must be referenced from JavaScript (inline styles, variants).
  */
 
-export const shadows = {
-  /** Floating dock shadow */
-  dock: "0 10px 40px rgba(0, 0, 0, 0.4)",
-  /** Purple bloom for primary brand elements */
-  glowPurple: "0 0 60px rgba(168, 85, 247, 0.45)",
-  /** Bloom behind the primary CTA */
-  glowCTA: "0 0 45px rgba(168, 85, 247, 0.45)",
-  /** Bloom behind the Auri orb */
-  glowOrb: "0 0 40px rgba(168, 85, 247, 0.45)",
-  /** Hover bloom for glass cards */
-  cardHover: "0 0 50px rgba(168, 85, 247, 0.25)"
+/** Brand palette — the two lights every gradient is built from. */
+export const colors = {
+  purple: "#a78bfa",
+  emerald: "#34d399"
 } as const;
 
 export const gradients = {
   /** Brand gradient — purple to emerald (horizontal) */
-  brand: "linear-gradient(90deg, #a78bfa 0%, #34d399 100%)",
-  /** Soft orb gradient for the Auri core (bottom-right) */
-  orb: "linear-gradient(135deg, #a78bfa 0%, #34d399 100%)"
+  brand: `linear-gradient(90deg, ${colors.purple} 0%, ${colors.emerald} 100%)`,
+  /** Soft orb gradient for glowing cores (bottom-right) */
+  orb: `linear-gradient(135deg, ${colors.purple} 0%, ${colors.emerald} 100%)`
 } as const;
 
 export const ease: {
@@ -37,4 +34,15 @@ export const durations = {
   fast: 0.2,
   base: 0.4,
   slow: 0.7
+} as const;
+
+/** Builds an rgba() string from the live mood color (alpha 0–1). */
+export function moodGlow(alpha: number): string {
+  return `rgba(var(--mood-rgb), ${alpha})`;
+}
+
+/** Typography recipes shared across sections (eyebrow + headings). */
+export const typography = {
+  eyebrow: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-400",
+  sectionTitle: "text-4xl font-bold tracking-tight md:text-5xl"
 } as const;

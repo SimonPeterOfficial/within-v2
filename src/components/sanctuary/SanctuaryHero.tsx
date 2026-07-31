@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   AnimatePresence,
   motion,
@@ -12,9 +12,10 @@ import {
 import GlowBackground from "@/components/effects/GlowBackground";
 import ParticleField from "@/components/effects/ParticleField";
 import StarField from "@/components/sanctuary/StarField";
+import Button from "@/components/ui/Button";
 import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
-import { blurUp, staggerContainer } from "@/lib/motion";
+import { blurUp, staggerContainer } from "@/lib/animations";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -23,12 +24,18 @@ const getGreeting = () => {
   return "Good evening";
 };
 
+// Subscribed store for time-of-day — renders a stable value on the server and
+// in the first client pass, then swaps to the live greeting. No hydration flash.
+const subscribe = () => () => {};
+const getClientGreeting = () => getGreeting();
+const getServerGreeting = () => "Welcome";
+
 const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
 
-/** Cosmic entrance — mouse-parallax nebula, living starfield, magnetic CTAs. */
+/** Cinematic opening — layered nebula, living starfield, emotional welcome. */
 export default function SanctuaryHero() {
   const prefersReducedMotion = useReducedMotion();
-  const [greeting] = useState(getGreeting);
+  const greeting = useSyncExternalStore(subscribe, getClientGreeting, getServerGreeting);
   const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
@@ -67,9 +74,9 @@ export default function SanctuaryHero() {
         style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
         className="pointer-events-none absolute inset-0"
       >
-        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.22)] blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/15 blur-[110px]" />
-        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/10 blur-[100px]" />
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.22)] blur-veil" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/15 blur-veil" />
+        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/10 blur-haze" />
       </motion.div>
 
       {/* Starfield — mid parallax */}
@@ -78,10 +85,10 @@ export default function SanctuaryHero() {
         style={{ x: prefersReducedMotion ? 0 : starsX, y: prefersReducedMotion ? 0 : starsY }}
         className="pointer-events-none absolute inset-0"
       >
-        <StarField count={70} seed={3} />
+        <StarField count={40} seed={3} />
       </motion.div>
 
-      <ParticleField count={18} seed={5} />
+      <ParticleField count={12} seed={5} />
 
       {/* Center stage */}
       <motion.div
@@ -91,10 +98,9 @@ export default function SanctuaryHero() {
         <motion.div variants={staggerContainer(0.14, 0.2)} initial="hidden" animate="show">
           <motion.p
             variants={blurUp}
-            suppressHydrationWarning
             className="text-xs font-semibold uppercase tracking-[0.5em] text-emerald-400 md:text-sm"
           >
-            {greeting}, explorer
+            {greeting}, soul
           </motion.p>
 
           <motion.h1
@@ -124,10 +130,10 @@ export default function SanctuaryHero() {
 
           <motion.p
             variants={blurUp}
-            className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-gray-500 md:text-base"
+            className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-gray-400 md:text-base"
           >
-            A cinematic universe where stories, emotions, and people connect — and Auri
-            shapes it around how you feel.
+            Welcome back. Your sanctuary has been waiting — Auri shaped it around the way
+            you&apos;ve been feeling, and every corner glows softly with it.
           </motion.p>
 
           {/* Magnetic CTAs */}
@@ -136,21 +142,14 @@ export default function SanctuaryHero() {
             className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Magnetic>
-              <a
-                href="#mood"
-                className="inline-block rounded-full bg-[rgba(var(--mood-rgb),1)] px-9 py-4 text-sm font-bold text-black transition hover:scale-105"
-                style={{ boxShadow: "0 0 45px rgba(var(--mood-rgb),0.5)" }}
-              >
+              <Button href="#mood" variant="primary" size="xl">
                 Shape your universe
-              </a>
+              </Button>
             </Magnetic>
             <Magnetic>
-              <a
-                href="#originals"
-                className="inline-block rounded-full border border-white/15 bg-white/5 px-9 py-4 text-sm font-bold text-white backdrop-blur transition hover:border-white/30 hover:bg-white/10"
-              >
+              <Button href="#originals" variant="outline" size="xl">
                 Explore originals
-              </a>
+              </Button>
             </Magnetic>
           </motion.div>
         </motion.div>

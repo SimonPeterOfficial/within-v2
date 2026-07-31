@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Film, LogOut, Moon, Sparkles } from "lucide-react";
+import { BookOpen, Compass, Film, Home, LogOut, User } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Logo from "@/components/ui/Logo";
-import { shadows } from "@/lib/design";
-import { spring } from "@/lib/motion";
+import { spring } from "@/lib/animations";
 
 const links = [
-  { label: "Sanctuary", href: "#sanctuary", icon: Sparkles },
-  { label: "Mood", href: "#mood", icon: Moon },
-  { label: "Originals", href: "#originals", icon: Film },
-  { label: "Memories", href: "#memories", icon: BookOpen }
+  { label: "Home", href: "#sanctuary", icon: Home, route: false },
+  { label: "Discover", href: "#mood", icon: Compass, route: false },
+  { label: "Stories", href: "#memories", icon: BookOpen, route: false },
+  { label: "Originals", href: "#originals", icon: Film, route: false },
+  { label: "Profile", href: "/login", icon: User, route: true }
 ];
 
 export default function DashboardNav() {
@@ -32,9 +32,10 @@ export default function DashboardNav() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  // Scroll-spy: highlight the section currently in view
+  // Scroll-spy: highlight the section currently in view (hash links only)
   useEffect(() => {
     const sections = links
+      .filter((link) => !link.route)
       .map((link) => document.querySelector<HTMLElement>(link.href))
       .filter((section): section is HTMLElement => Boolean(section));
     const observer = new IntersectionObserver(
@@ -62,26 +63,17 @@ export default function DashboardNav() {
       )}
 
       {/* Floating glass dock */}
-      <div
-        style={{ boxShadow: shadows.dock }}
-        className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-2.5 backdrop-blur-xl sm:px-5"
-      >
+      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-2.5 shadow-dock backdrop-blur-xl sm:px-5">
         <Link href="/home" className="shrink-0" onClick={closeMenu}>
-          <Logo size="sm" />
+          <Logo />
         </Link>
 
         {/* Desktop dock links */}
         <div className="hidden items-center gap-1 md:flex">
           {links.map((link) => {
             const isActive = active === link.href;
-            return (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`relative rounded-full px-4 py-2 text-sm transition-colors ${
-                  isActive ? "text-white" : "text-gray-300 hover:text-white"
-                }`}
-              >
+            const inner = (
+              <>
                 {isActive && (
                   <motion.span
                     layoutId="dock-active"
@@ -102,12 +94,33 @@ export default function DashboardNav() {
                   </motion.span>
                   {link.label}
                 </span>
+              </>
+            );
+            const classes = `relative rounded-full px-4 py-2 text-sm transition-colors ${
+              isActive ? "text-white" : "text-gray-300 hover:text-white"
+            }`;
+            return link.route ? (
+              <Link key={link.label} href={link.href} className={classes}>
+                {inner}
               </Link>
+            ) : (
+              <a key={link.label} href={link.href} className={classes}>
+                {inner}
+              </a>
             );
           })}
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Avatar chip */}
+          <Link
+            href="/login"
+            aria-label="Your profile"
+            className="hidden h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 text-xs font-bold text-black ring-2 ring-white/20 transition hover:ring-emerald-300/50 md:flex"
+          >
+            S
+          </Link>
+
           <Link
             href="/"
             className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/10"
@@ -159,23 +172,39 @@ export default function DashboardNav() {
             className="relative z-10 mx-auto mt-2 max-w-6xl md:hidden"
           >
             <div className="rounded-3xl border border-white/10 bg-black/70 p-4 backdrop-blur-xl">
-              {links.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={closeMenu}
-                  className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                    active === link.href
-                      ? "bg-white/10 text-white"
-                      : "text-gray-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <span aria-hidden className="inline-flex">
-                    <link.icon className="h-4 w-4" />
-                  </span>
-                  {link.label}
-                </a>
-              ))}
+              {links.map((link) => {
+                const isActive = active === link.href;
+                const classes = `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? "bg-white/10 text-white"
+                    : "text-gray-300 hover:bg-white/5 hover:text-white"
+                }`;
+                return link.route ? (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={closeMenu}
+                    className={classes}
+                  >
+                    <span aria-hidden className="inline-flex">
+                      <link.icon className="h-4 w-4" />
+                    </span>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={closeMenu}
+                    className={classes}
+                  >
+                    <span aria-hidden className="inline-flex">
+                      <link.icon className="h-4 w-4" />
+                    </span>
+                    {link.label}
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
         )}

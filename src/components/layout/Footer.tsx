@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Button from "@/components/ui/Button";
 import Logo from "@/components/ui/Logo";
 import GradientText from "@/components/ui/GradientText";
 
@@ -70,12 +71,9 @@ export default function Footer() {
                 placeholder="you@example.com"
                 className="flex-1 rounded-full border border-white/10 bg-black/40 px-6 py-3 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition focus:border-emerald-400/50"
               />
-              <button
-                type="submit"
-                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-105"
-              >
+              <Button type="submit" variant="light" size="md">
                 Subscribe
-              </button>
+              </Button>
             </form>
           )}
         </div>
@@ -85,7 +83,7 @@ export default function Footer() {
       <div className="mx-auto mt-20 max-w-6xl">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <Logo size="sm" />
+            <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500">
               A universe where stories, emotions, and people connect.
             </p>

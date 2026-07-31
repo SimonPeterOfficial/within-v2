@@ -6,7 +6,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { applyMood, getMood, moods, onMoodChange, rgbString } from "@/lib/mood";
 
-/** Atmosphere shifter — touching a mood rewrites the whole sanctuary's color. */
+/** Atmosphere shifter — a floating orbit of moods that rewrite the sanctuary. */
 export default function MoodOrbit() {
   const [selected, setSelected] = useState<string | null>(null);
   const [ripple, setRipple] = useState(0);
@@ -38,10 +38,10 @@ export default function MoodOrbit() {
           {selected && (
             <motion.span
               key={selected}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.15 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               aria-hidden
               className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.35)] blur-3xl"
             />
@@ -64,7 +64,11 @@ export default function MoodOrbit() {
         {/* Pulsing core — breathes in the current mood color */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.div
-            animate={prefersReducedMotion ? undefined : { scale: [1, 1.08, 1] }}
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : { scale: [1, 1.08, 1], y: [0, -8, 0] }
+            }
             transition={{
               duration: selected ? 2.5 : 4,
               repeat: Infinity,
@@ -72,10 +76,9 @@ export default function MoodOrbit() {
             }}
             style={{
               backgroundImage:
-                "radial-gradient(circle at 30% 30%, rgba(var(--mood-rgb),1), rgba(var(--mood-rgb),0.55))",
-              boxShadow: "0 0 60px rgba(var(--mood-rgb),0.5)"
+                "radial-gradient(circle at 30% 30%, rgba(var(--mood-rgb),1), rgba(var(--mood-rgb),0.55))"
             }}
-            className="relative flex h-24 w-24 items-center justify-center rounded-full md:h-28 md:w-28"
+            className="relative flex h-24 w-24 items-center justify-center rounded-full shadow-orb md:h-28 md:w-28"
           >
             <AnimatePresence mode="wait">
               <motion.span
@@ -83,7 +86,7 @@ export default function MoodOrbit() {
                 initial={{ opacity: 0, scale: 0.5, rotate: -30 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 exit={{ opacity: 0, scale: 0.5, rotate: 30 }}
-                transition={{ duration: 0.25 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="text-3xl"
                 aria-hidden
               >
@@ -106,7 +109,7 @@ export default function MoodOrbit() {
           />
         )}
 
-        {/* Mood chips around the orbit */}
+        {/* Mood chips floating around the orbit — spring in */}
         {moods.map((mood, index) => {
           const angle = (index / moods.length) * Math.PI * 2 - Math.PI / 2;
           const radius = 44;
@@ -122,14 +125,24 @@ export default function MoodOrbit() {
                 boxShadow: isSelected ? `0 0 22px ${rgbString(mood.rgb, 0.45)}` : undefined
               }}
               initial={{ opacity: 0, x: "-50%", y: "-50%", scale: 0.7 }}
-              animate={{ opacity: 1, x: "-50%", y: "-50%", scale: 1 }}
+              animate={{
+                opacity: 1,
+                x: "-50%",
+                y: "-50%",
+                scale: isSelected ? 1.12 : 1
+              }}
               whileHover={
                 prefersReducedMotion
                   ? undefined
-                  : { scale: 1.12, transition: { type: "spring", stiffness: 300, damping: 18 } }
+                  : { scale: isSelected ? 1.18 : 1.1, transition: { type: "spring", stiffness: 300, damping: 18 } }
               }
               whileTap={{ scale: 0.92, transition: { duration: 0.1 } }}
-              transition={{ duration: 0.5, delay: 0.3 + index * 0.08 }}
+              transition={{
+                type: "spring",
+                stiffness: 240,
+                damping: 20,
+                delay: 0.3 + index * 0.09
+              }}
               onClick={() => handleSelect(mood.id)}
               aria-pressed={isSelected}
               className={`absolute rounded-full border px-3 py-1.5 text-xs backdrop-blur transition-colors duration-300 sm:px-4 sm:py-2 sm:text-sm ${
@@ -154,13 +167,13 @@ export default function MoodOrbit() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.35 }}
+            transition={{ type: "spring", stiffness: 260, damping: 24 }}
             className="mx-auto mt-10 max-w-md"
           >
             <GlassCard className="p-5 text-center">
               <p className="text-sm text-gray-300">
                 <span className="font-medium text-emerald-300">
-                  Feeling {selectedMood.label}?
+                  Feeling {selectedMood.label.toLowerCase()}?
                 </span>{" "}
                 {selectedMood.line}
               </p>

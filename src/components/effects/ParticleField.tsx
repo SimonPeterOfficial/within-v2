@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 type Particle = {
@@ -46,7 +47,8 @@ type ParticleFieldProps = {
 /** Floating ambient particles that drift upward and fade — pure transform/opacity. */
 export default function ParticleField({ count = 30, seed = 7, className = "" }: ParticleFieldProps) {
   const prefersReducedMotion = useReducedMotion();
-  const particles = generateParticles(count, seed);
+  // Stable across re-renders — identical on server and client thanks to the LCG.
+  const particles = useMemo(() => generateParticles(count, seed), [count, seed]);
 
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>

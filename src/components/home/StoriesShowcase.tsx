@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
 import GlassCard from "@/components/ui/GlassCard";
 import GlowBackground from "@/components/effects/GlowBackground";
+import { slideUp, staggerContainer } from "@/lib/animations";
 
 const stories = [
   {
@@ -55,16 +56,15 @@ export default function StoriesShowcase() {
           subtitle="Hand-picked tales across every emotion. Find one that mirrors how you feel right now."
         />
 
-        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stories.map((story, index) => (
-            <motion.article
-              key={story.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-              className="group h-full"
-            >
+        <motion.div
+          variants={staggerContainer(0.08, 0)}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4"
+        >
+          {stories.map((story) => (
+            <motion.article key={story.title} variants={slideUp} className="group h-full">
               <GlassCard hoverLift className="h-full overflow-hidden">
                 <div
                   className={`h-36 bg-linear-to-br ${story.gradient} transition-transform duration-500 group-hover:scale-105`}
@@ -87,7 +87,7 @@ export default function StoriesShowcase() {
               </GlassCard>
             </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

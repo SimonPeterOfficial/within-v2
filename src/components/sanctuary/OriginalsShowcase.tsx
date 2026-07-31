@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
 import TiltCard from "@/components/ui/TiltCard";
 import StarField from "@/components/sanctuary/StarField";
 
@@ -101,13 +102,14 @@ export default function OriginalsShowcase() {
               Shot entirely within the sanctuary — every frame responds to how you feel right
               now.
             </p>
-            <a
+            <Button
               href="#memories"
-              className="mt-auto w-fit rounded-full bg-[rgba(var(--mood-rgb),1)] px-7 py-3 text-sm font-bold text-black transition hover:scale-105"
-              style={{ boxShadow: "0 0 35px rgba(var(--mood-rgb),0.5)" }}
+              variant="primary"
+              size="md"
+              className="mt-auto w-fit"
             >
               Watch the trailer
-            </a>
+            </Button>
           </div>
         </div>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Button from "@/components/ui/Button";
 import Logo from "@/components/ui/Logo";
 
 const navLinks = [
@@ -43,7 +44,7 @@ export default function Navbar() {
       {/* Glass pill */}
       <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-3 backdrop-blur-xl sm:px-6">
         <a href="#top" className="shrink-0" onClick={closeMenu}>
-          <Logo size="sm" />
+          <Logo />
         </a>
 
         {/* Desktop links */}
@@ -56,12 +57,9 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#join"
-            className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:scale-105"
-          >
+          <Button href="#join" variant="light" size="sm">
             Enter
-          </a>
+          </Button>
 
           {/* Mobile menu toggle */}
           <button
@@ -118,13 +116,15 @@ export default function Navbar() {
               ))}
 
               <div className="mt-2 border-t border-white/10 pt-3">
-                <a
+                <Button
                   href="#join"
+                  variant="light"
+                  size="md"
                   onClick={closeMenu}
-                  className="block rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-black transition hover:scale-[1.02]"
+                  className="w-full"
                 >
                   Enter WithIn
-                </a>
+                </Button>
               </div>
             </div>
           </motion.div>

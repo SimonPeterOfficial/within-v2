@@ -3,25 +3,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
-
-const emotions = [
-  { label: "Happy", emoji: "✨" },
-  { label: "Lost", emoji: "🌙" },
-  { label: "Inspired", emoji: "🚀" },
-  { label: "Calm", emoji: "🌊" },
-  { label: "Curious", emoji: "🔮" }
-];
-
-const moodLines: Record<string, string> = {
-  Happy: "Bright stories to keep the glow going.",
-  Lost: "Quiet stories for wandering hearts.",
-  Inspired: "Stories that spark your next big idea.",
-  Calm: "Slow, gentle stories to breathe with.",
-  Curious: "Stories that open new worlds."
-};
+import Button from "@/components/ui/Button";
+import { applyMood, getMood, moods } from "@/lib/mood";
 
 export default function EmotionSection() {
   const [selected, setSelected] = useState<string | null>(null);
+  const selectedMood = getMood(selected);
+
+  const handleSelect = (id: string) => {
+    const next = selected === id ? null : id;
+    setSelected(next);
+    applyMood(next);
+  };
 
   return (
     <section id="emotions" className="scroll-mt-24 bg-black px-6 py-24 text-white">
@@ -34,33 +27,33 @@ export default function EmotionSection() {
       </p>
 
       <div className="mt-10 flex flex-wrap justify-center gap-4">
-        {emotions.map((emotion, index) => {
-          const isSelected = selected === emotion.label;
+        {moods.map((mood, index) => {
+          const isSelected = selected === mood.id;
           return (
             <motion.button
-              key={emotion.label}
+              key={mood.id}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.4, delay: index * 0.05 }}
-              onClick={() => setSelected(isSelected ? null : emotion.label)}
+              onClick={() => handleSelect(mood.id)}
               aria-pressed={isSelected}
               className={`rounded-full border px-6 py-3 backdrop-blur transition-all duration-300 ${
                 isSelected
-                  ? "border-emerald-400/60 bg-emerald-400/10 text-white shadow-[0_0_30px_rgba(52,211,153,0.25)]"
+                  ? "border-emerald-400/60 bg-emerald-400/10 text-white shadow-emerald"
                   : "border-white/10 bg-white/5 text-gray-300 hover:border-white/25 hover:bg-white/10"
               }`}
             >
               <span className="mr-2" aria-hidden>
-                {emotion.emoji}
+                {mood.emoji}
               </span>
-              {emotion.label}
+              {mood.label}
             </motion.button>
           );
         })}
       </div>
 
-      {selected && (
+      {selectedMood && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -69,14 +62,11 @@ export default function EmotionSection() {
         >
           <GlassCard className="p-6 text-center">
             <p className="text-sm font-medium text-emerald-300">
-              Feeling {selected}? {moodLines[selected] ?? "We'll find something that fits."}
+              Feeling {selectedMood.label.toLowerCase()}? {selectedMood.line}
             </p>
-            <a
-              href="#stories"
-              className="mt-3 inline-block text-sm font-semibold text-white underline decoration-emerald-400/60 underline-offset-4 transition hover:decoration-emerald-400"
-            >
-              Find my story →
-            </a>
+            <Button href="#stories" variant="outline" size="sm" className="mt-4">
+              Find my story
+            </Button>
           </GlassCard>
         </motion.div>
       )}

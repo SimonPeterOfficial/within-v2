@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 
 type AuthInputProps = {
   id: string;
@@ -12,6 +14,8 @@ type AuthInputProps = {
   autoComplete?: string;
   required?: boolean;
   toggle?: boolean;
+  /** Inline validation message — turns the field rose and announces the error */
+  error?: string;
 };
 
 export default function AuthInput({
@@ -23,7 +27,8 @@ export default function AuthInput({
   placeholder,
   autoComplete,
   required = false,
-  toggle = false
+  toggle = false,
+  error
 }: AuthInputProps) {
   const [revealed, setRevealed] = useState(false);
   const inputType = type === "password" && revealed ? "text" : type;
@@ -42,19 +47,37 @@ export default function AuthInput({
           placeholder={placeholder}
           autoComplete={autoComplete}
           required={required}
-          className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 pr-14 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition focus:border-emerald-400/50 focus:bg-white/10"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={`w-full rounded-full border bg-white/5 px-5 py-3 pr-14 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition focus:bg-white/10 ${
+            error
+              ? "border-rose-400/60 focus:border-rose-400/70"
+              : "border-white/10 focus:border-emerald-400/50"
+          }`}
         />
         {toggle && (
           <button
             type="button"
             onClick={() => setRevealed((current) => !current)}
             aria-label={revealed ? "Hide password" : "Show password"}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-xs font-medium text-gray-400 transition hover:text-white"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/5 hover:text-white"
           >
-            {revealed ? "Hide" : "Show"}
+            {revealed ? <EyeOff className="h-4 w-4" aria-hidden /> : <Eye className="h-4 w-4" aria-hidden />}
           </button>
         )}
       </span>
+      {error && (
+        <motion.p
+          id={`${id}-error`}
+          role="alert"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="mt-2 px-3 text-xs text-rose-300"
+        >
+          {error}
+        </motion.p>
+      )}
     </div>
   );
 }

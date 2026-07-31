@@ -1,16 +1,9 @@
-import type { Metadata } from "next";
-import AuthLayout from "@/components/auth/AuthLayout";
-import SignupForm from "@/components/auth/SignupForm";
-
-export const metadata: Metadata = {
-  title: "Sign up — WithIn",
-  description: "Start your story inside the universe within.",
-};
-
-export default function SignupPage() {
+export default function Home() {
   return (
-    <AuthLayout>
-      <SignupForm />
-    </AuthLayout>
+    <div className="min-h-screen bg-red-500 flex items-center justify-center">
+      <h1 className="text-white text-5xl">
+        WithIn Works
+      </h1>
+    </div>
   );
 }

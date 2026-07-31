@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 type Star = {
@@ -42,7 +43,8 @@ export default function StarField({
   className = ""
 }: StarFieldProps) {
   const prefersReducedMotion = useReducedMotion();
-  const stars = generateStars(count, seed);
+  // Stable across re-renders — identical on server and client thanks to the LCG.
+  const stars = useMemo(() => generateStars(count, seed), [count, seed]);
 
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 ${className}`}>

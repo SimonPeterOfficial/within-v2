@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
 import GlassCard from "@/components/ui/GlassCard";
 import GlowBackground from "@/components/effects/GlowBackground";
+import { slideUp, staggerContainer } from "@/lib/animations";
 
 const originals = [
   {
@@ -65,16 +66,15 @@ export default function Originals() {
           subtitle="Films, series, books, and podcasts you won't find anywhere else."
         />
 
-        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {originals.map((original, index) => (
-            <motion.article
-              key={original.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: index * 0.06 }}
-              className="group h-full"
-            >
+        <motion.div
+          variants={staggerContainer(0.06, 0)}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {originals.map((original) => (
+            <motion.article key={original.title} variants={slideUp} className="group h-full">
               <GlassCard hoverLift className="h-full overflow-hidden">
                 <div className={`relative h-44 bg-linear-to-br ${original.gradient}`}>
                   <span className="absolute left-4 top-4 rounded-full bg-black/40 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
@@ -97,7 +97,7 @@ export default function Originals() {
               </GlassCard>
             </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

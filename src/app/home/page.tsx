@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import GlowBackground from "@/components/effects/GlowBackground";
-import AuroraBackground from "@/components/effects/AuroraBackground";
-import ParticleField from "@/components/effects/ParticleField";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import DepthLayers from "@/components/effects/DepthLayers";
+import CinematicIntro from "@/components/effects/CinematicIntro";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import SanctuaryHero from "@/components/sanctuary/SanctuaryHero";
+import QuickActions from "@/components/sanctuary/QuickActions";
 import MoodOrbit from "@/components/sanctuary/MoodOrbit";
 import MemoryCards from "@/components/sanctuary/MemoryCards";
-import OriginalsShowcase from "@/components/sanctuary/OriginalsShowcase";
-import FinaleCTA from "@/components/sanctuary/FinaleCTA";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
+
+// Below-the-fold sections are code-split so the first paint stays lean.
+const OriginalsShowcase = dynamic(() => import("@/components/sanctuary/OriginalsShowcase"));
+const FinaleCTA = dynamic(() => import("@/components/sanctuary/FinaleCTA"));
 
 export const metadata: Metadata = {
   title: "WithIn — A universe within you",
@@ -19,19 +23,25 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Ambient world: glow + aurora + particles */}
-      <GlowBackground variant="ambient" />
-      <AuroraBackground />
-      <ParticleField count={22} seed={11} />
+      {/* One living atmosphere: glow → aurora → light rays → particles → stars */}
+      <DepthLayers />
+
+      {/* Cinematic veil on entry */}
+      <CinematicIntro />
 
       <DashboardNav />
 
-      <main className="relative z-10">
+      <main id="main" className="relative z-10">
         <SanctuaryHero />
+        <QuickActions />
         <MoodOrbit />
         <MemoryCards />
-        <OriginalsShowcase />
-        <FinaleCTA />
+        <Suspense fallback={null}>
+          <OriginalsShowcase />
+        </Suspense>
+        <Suspense fallback={null}>
+          <FinaleCTA />
+        </Suspense>
       </main>
 
       <AuriOrb />

@@ -1,19 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import GlowBackground from "@/components/effects/GlowBackground";
+import LightRays from "@/components/effects/LightRays";
 import Navbar from "@/components/layout/Navbar";
+import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
-
-const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
-};
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
-};
+import { blurUp, staggerContainer } from "@/lib/animations";
 
 export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
@@ -24,23 +17,24 @@ export default function Hero() {
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white"
     >
       <GlowBackground variant="hero" />
+      <LightRays intensity={0.3} />
       <Navbar />
 
       <motion.div
-        variants={container}
+        variants={staggerContainer(0.15, 0.2)}
         initial="hidden"
         animate="show"
         className="relative z-10 px-6 text-center"
       >
         <motion.p
-          variants={item}
+          variants={blurUp}
           className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-400"
         >
           A cinematic universe of stories
         </motion.p>
 
         <motion.h1
-          variants={item}
+          variants={blurUp}
           className="mt-6 text-6xl font-extrabold leading-[1.05] tracking-tight md:text-8xl"
         >
           Feel <GradientText>everything</GradientText>.
@@ -49,7 +43,7 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          variants={item}
+          variants={blurUp}
           className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-400"
         >
           WithIn is where stories, emotions, and people connect — a universe built around how
@@ -57,21 +51,15 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          variants={item}
+          variants={blurUp}
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-          <a
-            href="#emotions"
-            className="rounded-full bg-linear-to-r from-purple-500 to-emerald-400 px-8 py-3.5 text-sm font-bold text-black transition hover:scale-105 hover:shadow-[0_0_45px_rgba(168,85,247,0.45)]"
-          >
+          <Button href="#emotions" variant="gradient" size="lg">
             Begin your journey
-          </a>
-          <a
-            href="#originals"
-            className="rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:border-white/30 hover:bg-white/10"
-          >
+          </Button>
+          <Button href="#originals" variant="outline" size="lg">
             Explore Originals
-          </a>
+          </Button>
         </motion.div>
       </motion.div>
 

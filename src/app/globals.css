@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   WithIn design tokens
+   The visual language lives here. Radius, blur, and elevation
+   generate utilities: rounded-card, blur-veil, shadow-dock, etc.
+   Spacing uses the Tailwind scale (4px base); typography recipes
+   live in src/lib/design.ts.
+   ───────────────────────────────────────────────────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Border radii */
+  --radius-card: 1.5rem; /* rounded-card  — primary surfaces */
+  --radius-modal: 2rem; /* rounded-modal — overlays/dialogs */
+
+  /* Blur levels */
+  --blur-soft: 40px; /* blur-soft — tight glows  */
+  --blur-haze: 100px; /* blur-haze — broad washes  */
+  --blur-veil: 120px; /* blur-veil — aurora fields */
+  --blur-glow: 140px; /* blur-glow — deepest light */
+
+  /* Elevation */
+  --shadow-dock: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 0 40px rgba(var(--mood-rgb), 0.18);
+  --shadow-mood: 0 0 35px rgba(var(--mood-rgb), 0.5);
+  --shadow-mood-lg: 0 0 45px rgba(var(--mood-rgb), 0.5);
+  --shadow-orb: 0 0 60px rgba(var(--mood-rgb), 0.5);
+  --shadow-brand: 0 0 60px rgba(168, 85, 247, 0.45);
+  --shadow-brand-cta: 0 0 45px rgba(168, 85, 247, 0.45);
+  --shadow-emerald: 0 0 30px rgba(52, 211, 153, 0.25);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -10,13 +44,6 @@ html {
   --foreground: #ededed;
   /* Emotional theme — "R, G, B" triple. Mood selections overwrite this live. */
   --mood-rgb: 168, 85, 247;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 body {
@@ -30,12 +57,10 @@ body {
   color: #ffffff;
 }
 
-/* Purple → emerald gradient text */
-.text-gradient {
-  background-image: linear-gradient(90deg, #a78bfa 0%, #34d399 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Keyboard focus — the premium outline that follows the mood */
+:focus-visible {
+  outline: 2px solid rgba(var(--mood-rgb), 0.7);
+  outline-offset: 2px;
 }
 
 /* Cinematic vignette */

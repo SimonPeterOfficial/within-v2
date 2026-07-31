@@ -1,6 +1,7 @@
 "use client";
 
 import { MotionConfig, motion, useReducedMotion } from "framer-motion";
+import { fadeIn, pageTransition } from "@/lib/animations";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const prefersReducedMotion = useReducedMotion();
@@ -8,9 +9,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
       <motion.div
-        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        variants={prefersReducedMotion ? fadeIn : pageTransition}
+        initial={prefersReducedMotion ? { opacity: 0 } : "hidden"}
+        animate="show"
       >
         {children}
       </motion.div>

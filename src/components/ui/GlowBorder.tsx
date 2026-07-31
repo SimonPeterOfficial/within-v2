@@ -15,7 +15,7 @@ export default function GlowBorder({ children, className = "" }: GlowBorderProps
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div className={`group/glow relative overflow-hidden rounded-3xl p-px ${className}`}>
+    <div className={`group/glow relative overflow-hidden rounded-card p-px ${className}`}>
       <motion.div
         aria-hidden
         animate={prefersReducedMotion ? undefined : { rotate: 360 }}

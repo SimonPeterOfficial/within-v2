@@ -3,8 +3,10 @@
 import { motion, useReducedMotion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
 import GlassCard from "@/components/ui/GlassCard";
+import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
 import GlowBackground from "@/components/effects/GlowBackground";
+import Parallax from "@/components/effects/Parallax";
 
 const auriTraits = [
   {
@@ -39,47 +41,49 @@ export default function AuriSection() {
         />
 
         <div className="mx-auto mt-14 grid max-w-6xl items-center gap-10 lg:grid-cols-2">
-          {/* Auri orb + chat card */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
+          {/* Auri orb + chat card — drifts at its own parallax depth */}
+          <Parallax offset={36} className="relative">
             <motion.div
-              animate={
-                prefersReducedMotion
-                  ? undefined
-                  : { y: [0, -12, 0], scale: [1, 1.03, 1] }
-              }
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="mx-auto flex h-32 w-32 items-center justify-center"
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6 }}
+              className="relative"
             >
-              <div className="absolute h-32 w-32 rounded-full bg-linear-to-br from-purple-500/40 to-emerald-400/40 blur-2xl" />
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 shadow-[0_0_60px_rgba(168,85,247,0.45)]">
-                <span className="text-4xl" aria-hidden>
-                  ✦
-                </span>
-              </div>
-            </motion.div>
+              <motion.div
+                animate={
+                  prefersReducedMotion
+                    ? undefined
+                    : { y: [0, -12, 0], scale: [1, 1.03, 1] }
+                }
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="mx-auto flex h-32 w-32 items-center justify-center"
+              >
+                <div className="absolute h-32 w-32 rounded-full bg-linear-to-br from-purple-500/40 to-emerald-400/40 blur-soft" />
+                <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 shadow-brand">
+                  <span className="text-4xl" aria-hidden>
+                    ✦
+                  </span>
+                </div>
+              </motion.div>
 
-            <GlassCard className="mx-auto mt-10 max-w-md p-6">
-              <p className="text-sm leading-relaxed text-gray-300">
-                “Hey, I&apos;m <GradientText>Auri</GradientText>. Tell me how you&apos;re
-                feeling — I&apos;ll keep your story close.”
-              </p>
-              <div className="mt-4 flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-500">
-                Type a feeling…
-                <motion.span
-                  animate={prefersReducedMotion ? undefined : { opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="ml-1 inline-block h-4 w-0.5 rounded-full bg-emerald-400"
-                  aria-hidden
-                />
-              </div>
-            </GlassCard>
-          </motion.div>
+              <GlassCard className="mx-auto mt-10 max-w-md p-6">
+                <p className="text-sm leading-relaxed text-gray-300">
+                  “Hey, I&apos;m <GradientText>Auri</GradientText>. Tell me how you&apos;re
+                  feeling — I&apos;ll keep your story close.”
+                </p>
+                <div className="mt-4 flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-500">
+                  Type a feeling…
+                  <motion.span
+                    animate={prefersReducedMotion ? undefined : { opacity: [1, 0, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="ml-1 inline-block h-4 w-0.5 rounded-full bg-emerald-400"
+                    aria-hidden
+                  />
+                </div>
+              </GlassCard>
+            </motion.div>
+          </Parallax>
 
           {/* Auri traits */}
           <div className="space-y-4">
@@ -105,12 +109,9 @@ export default function AuriSection() {
         </div>
 
         <div className="mt-12 text-center">
-          <a
-            href="#join"
-            className="inline-block rounded-full bg-linear-to-r from-purple-500 to-emerald-400 px-8 py-3.5 text-sm font-bold text-black transition hover:scale-105 hover:shadow-[0_0_45px_rgba(168,85,247,0.45)]"
-          >
+          <Button href="#join" variant="gradient" size="lg">
             Come say hi
-          </a>
+          </Button>
         </div>
       </div>
     </section>

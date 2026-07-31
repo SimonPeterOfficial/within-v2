@@ -2,19 +2,22 @@
 
 import { motion } from "framer-motion";
 import StarField from "@/components/sanctuary/StarField";
+import LightRays from "@/components/effects/LightRays";
+import Button from "@/components/ui/Button";
 import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
-import { blurUp, staggerContainer } from "@/lib/motion";
+import { blurUp, staggerContainer } from "@/lib/animations";
 
 /** Closing cinematic moment — a door left open. */
 export default function FinaleCTA() {
   return (
     <section className="relative overflow-hidden px-6 py-32 text-center text-white">
-      {/* Central mood glow */}
+      {/* Central mood glow + closing light rays */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.18)] blur-[140px]"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.18)] blur-glow"
       />
+      <LightRays intensity={0.35} />
       <StarField count={40} seed={13} />
 
       <motion.div
@@ -50,21 +53,14 @@ export default function FinaleCTA() {
           className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
           <Magnetic>
-            <a
-              href="/login"
-              className="inline-block rounded-full bg-[rgba(var(--mood-rgb),1)] px-9 py-4 text-sm font-bold text-black transition hover:scale-105"
-              style={{ boxShadow: "0 0 45px rgba(var(--mood-rgb),0.5)" }}
-            >
+            <Button href="/login" variant="primary" size="xl">
               Enter WithIn
-            </a>
+            </Button>
           </Magnetic>
           <Magnetic>
-            <a
-              href="/signup"
-              className="inline-block rounded-full border border-white/15 bg-white/5 px-9 py-4 text-sm font-bold text-white backdrop-blur transition hover:border-white/30 hover:bg-white/10"
-            >
+            <Button href="/signup" variant="outline" size="xl">
               Create your sanctuary
-            </a>
+            </Button>
           </Magnetic>
         </motion.div>
       </motion.div>

@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
 import GlowBorder from "@/components/ui/GlowBorder";
 import Reveal from "@/components/ui/Reveal";
 import TiltCard from "@/components/ui/TiltCard";
 import MemoryCardSkeleton from "@/components/dashboard/MemoryCardSkeleton";
-import { shadows } from "@/lib/design";
 
 const memories = [
   {
@@ -131,8 +132,7 @@ export default function MemoryCards() {
                 <GlowBorder className="h-full">
                   <GlassCard
                     hoverLift
-                    style={{ "--glow-hover": shadows.cardHover } as React.CSSProperties}
-                    className="relative h-full overflow-hidden group-hover:shadow-[var(--glow-hover)]"
+                    className="relative h-full overflow-hidden"
                   >
                     {/* Ambient portal glow */}
                     <span
@@ -145,6 +145,11 @@ export default function MemoryCards() {
                     <div
                       className={`relative h-40 overflow-hidden bg-linear-to-br ${memory.gradient} transition-transform duration-500 group-hover:scale-105`}
                     >
+                      {/* Cinematic depth — soft underglow that follows the mood */}
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent"
+                      />
                       <motion.div
                         layoutId={`memory-cover-${memory.id}`}
                         className="absolute inset-0"
@@ -169,8 +174,9 @@ export default function MemoryCards() {
                       </h3>
                       <div className="mt-3 flex items-center justify-between">
                         <p className="text-xs text-gray-500">{memory.meta}</p>
-                        <span className="text-xs font-semibold text-emerald-400 opacity-0 transition group-hover:opacity-100">
-                          Enter →
+                        <span className="flex items-center gap-1 text-xs font-semibold text-emerald-400 opacity-0 transition group-hover:opacity-100">
+                          Enter
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                         </span>
                       </div>
                     </div>
@@ -209,7 +215,7 @@ export default function MemoryCards() {
               aria-modal="true"
               aria-label={active.title}
               tabIndex={-1}
-              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0c] shadow-2xl outline-none"
+              className="relative w-full max-w-lg overflow-hidden rounded-modal border border-white/10 bg-[#0a0a0c] shadow-2xl outline-none"
               initial={{ scale: 0.92, y: 24 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.92, y: 24 }}
@@ -237,20 +243,12 @@ export default function MemoryCards() {
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-gray-400">{active.synopsis}</p>
                 <div className="mt-7 flex items-center gap-3">
-                  <button
-                    type="button"
-                    className="rounded-full bg-[rgba(var(--mood-rgb),1)] px-7 py-3 text-sm font-bold text-black transition hover:scale-105"
-                    style={{ boxShadow: "0 0 35px rgba(var(--mood-rgb),0.5)" }}
-                  >
+                  <Button variant="primary" size="md" className="shadow-mood">
                     Begin story
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closePortal}
-                    className="rounded-full border border-white/15 bg-white/5 px-7 py-3 text-sm font-semibold text-gray-300 transition hover:bg-white/10 hover:text-white"
-                  >
+                  </Button>
+                  <Button variant="outline" size="md" onClick={closePortal}>
                     Close
-                  </button>
+                  </Button>
                 </div>
               </div>
             </motion.div>
