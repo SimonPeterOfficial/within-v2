@@ -1,29 +1,38 @@
+"use client";
+
+import { motion } from "framer-motion";
+import GlowBackground from "@/components/effects/GlowBackground";
+import Navbar from "@/components/layout/Navbar";
 import Logo from "@/components/ui/Logo";
-import Button from "@/components/ui/Button";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen bg-black text-white flex items-center justify-center px-6 relative overflow-hidden">
+    <section id="top" className="relative min-h-screen overflow-hidden bg-black text-white">
 
-      <div className="absolute w-96 h-96 bg-purple-700/30 rounded-full blur-3xl animate-glow" />
+      <GlowBackground />
 
-      <div className="relative z-10 text-center">
+      <Navbar />
 
-        <Logo />
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
 
-        <h1 className="mt-8 text-6xl md:text-7xl font-bold">
-          A universe within you.
-        </h1>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="text-center"
+        >
 
-        <p className="mt-5 text-gray-300 text-xl max-w-xl mx-auto">
-          Stories, emotions, and people connecting in one place.
-        </p>
+          <Logo />
 
-        <div className="mt-8">
-          <Button>
-            Enter WithIn
-          </Button>
-        </div>
+          <h1 className="mt-8 text-6xl font-bold md:text-8xl">
+            WithIn
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-xl text-lg text-gray-400">
+            A universe where stories, emotions, and people connect.
+          </p>
+
+        </motion.div>
 
       </div>
 
