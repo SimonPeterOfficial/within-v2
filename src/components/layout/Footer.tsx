@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Logo from "@/components/ui/Logo";
+import GradientText from "@/components/ui/GradientText";
 
 const exploreLinks = [
   { label: "Stories", href: "#stories" },
@@ -48,7 +49,7 @@ export default function Footer() {
             Join WithIn
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-4xl font-bold md:text-5xl">
-            Your story starts within.
+            Your story starts <GradientText>within</GradientText>.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-gray-400">
             Get the newest stories, originals, and community news — delivered gently, once a week.

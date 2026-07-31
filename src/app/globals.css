@@ -5,8 +5,9 @@ html {
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --background: #050505;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -16,35 +17,70 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.4);
+  color: #ffffff;
+}
+
+/* Purple → emerald gradient text */
+.text-gradient {
+  background-image: linear-gradient(90deg, #a78bfa 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Cinematic vignette */
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
 }
 
 @keyframes floatGlow {
-
-  0%{
-    transform:translateY(0px) scale(1);
+  0% {
+    transform: translateY(0px) scale(1);
   }
-
-  50%{
-    transform:translateY(-30px) scale(1.1);
+  50% {
+    transform: translateY(-30px) scale(1.1);
   }
-
-  100%{
-    transform:translateY(0px) scale(1);
+  100% {
+    transform: translateY(0px) scale(1);
   }
-
 }
 
-.animate-glow{
-  animation:floatGlow 8s ease-in-out infinite;
+.animate-glow {
+  animation: floatGlow 8s ease-in-out infinite;
+}
+
+@keyframes grainShift {
+  0%, 100% { background-position: 0 0; }
+  10% { background-position: -5% -10%; }
+  20% { background-position: -15% 5%; }
+  30% { background-position: 7% -25%; }
+  40% { background-position: -5% 15%; }
+  50% { background-position: -15% 10%; }
+  60% { background-position: 15% 0%; }
+  70% { background-position: 0% 15%; }
+  80% { background-position: 3% 35%; }
+  90% { background-position: -10% 10%; }
+}
+
+.animate-grain {
+  animation: grainShift 0.7s steps(10) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-glow,
+  .animate-grain {
+    animation: none;
+  }
 }
