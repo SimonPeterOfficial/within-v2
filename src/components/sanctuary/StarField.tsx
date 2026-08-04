@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 type Star = {
   x: number;
@@ -42,7 +43,7 @@ export default function StarField({
   seed = 7,
   className = ""
 }: StarFieldProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
   // Stable across re-renders — identical on server and client thanks to the LCG.
   const stars = useMemo(() => generateStars(count, seed), [count, seed]);
 

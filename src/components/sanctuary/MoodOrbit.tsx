@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlassCard from "@/components/ui/GlassCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { applyMood, getMood, moods, onMoodChange, rgbString } from "@/lib/mood";
@@ -10,7 +11,7 @@ import { applyMood, getMood, moods, onMoodChange, rgbString } from "@/lib/mood";
 export default function MoodOrbit() {
   const [selected, setSelected] = useState<string | null>(null);
   const [ripple, setRipple] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   const selectedMood = getMood(selected);
 

@@ -5,10 +5,10 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
-  useReducedMotion,
   useSpring,
   useTransform
 } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlowBackground from "@/components/effects/GlowBackground";
 import ParticleField from "@/components/effects/ParticleField";
 import StarField from "@/components/sanctuary/StarField";
@@ -34,7 +34,7 @@ const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
 
 /** Cinematic opening — layered nebula, living starfield, emotional welcome. */
 export default function SanctuaryHero() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
   const greeting = useSyncExternalStore(subscribe, getClientGreeting, getServerGreeting);
   const [wordIndex, setWordIndex] = useState(0);
 
@@ -74,9 +74,9 @@ export default function SanctuaryHero() {
         style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
         className="pointer-events-none absolute inset-0"
       >
-        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.22)] blur-veil" />
-        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/15 blur-veil" />
-        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/10 blur-haze" />
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-veil" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.06] blur-veil" />
+        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/[0.04] blur-haze" />
       </motion.div>
 
       {/* Starfield — mid parallax */}

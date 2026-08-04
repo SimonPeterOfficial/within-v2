@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import Button from "@/components/ui/Button";
 import Logo from "@/components/ui/Logo";
 
@@ -13,7 +14,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   const closeMenu = () => setIsOpen(false);
 
@@ -42,7 +43,7 @@ export default function Navbar() {
       )}
 
       {/* Glass pill */}
-      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-3 backdrop-blur-xl sm:px-6">
+      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-3 backdrop-blur-sm sm:px-6">
         <a href="#top" className="shrink-0" onClick={closeMenu}>
           <Logo />
         </a>
@@ -103,7 +104,7 @@ export default function Navbar() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="relative z-10 mx-auto mt-2 max-w-6xl md:hidden"
           >
-            <div className="rounded-3xl border border-white/10 bg-black/70 p-4 backdrop-blur-xl">
+            <div className="rounded-3xl border border-white/10 bg-black/70 p-4 backdrop-blur-sm">
               {navLinks.map((link) => (
                 <a
                   key={link.label}

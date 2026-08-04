@@ -36,17 +36,6 @@ export const blurUp: Variants = {
   }
 };
 
-/** Route-change veil — blur-rise reveal (used by app/template.tsx) */
-export const pageTransition: Variants = {
-  hidden: { opacity: 0, y: 12, filter: "blur(6px)" },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: durations.base, ease: ease.emphasized }
-  }
-};
-
 /** Infinite gentle bob — use with animate="show" */
 export const floating = (distance = 12, duration = 4): Variants => ({
   hidden: { y: 0 },

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { applyMood, getMood, moods, onMoodChange, type Mood } from "@/lib/mood";
 import { gradients, moodGlow } from "@/lib/design";
 
@@ -19,7 +20,7 @@ type AuriBubbleProps = {
 /** Auri's reply bubble — mounts fresh each time, "thinks" before answering. */
 function AuriBubble({ mood, onSelect }: AuriBubbleProps) {
   const [thinking, setThinking] = useState(true);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   useEffect(() => {
     const timer = setTimeout(() => setThinking(false), 1100);
@@ -36,7 +37,7 @@ function AuriBubble({ mood, onSelect }: AuriBubbleProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="w-72 rounded-3xl border border-white/10 bg-black/70 p-5 backdrop-blur-xl"
+      className="w-72 rounded-3xl border border-white/10 bg-black/70 p-5 backdrop-blur-sm"
     >
       <p className="text-sm leading-relaxed text-gray-300">
         <span className="font-semibold text-emerald-300">Auri:</span>{" "}
@@ -101,7 +102,7 @@ export default function AuriOrb() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [whisperIndex, setWhisperIndex] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   // Stay in sync with moods chosen anywhere (e.g. the MoodOrbit)
   useEffect(() => onMoodChange((id) => setSelected(id)), []);

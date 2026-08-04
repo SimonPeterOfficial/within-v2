@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import GlowBackground from "@/components/effects/GlowBackground";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import LightRays from "@/components/effects/LightRays";
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
@@ -9,7 +10,7 @@ import GradientText from "@/components/ui/GradientText";
 import { blurUp, staggerContainer } from "@/lib/animations";
 
 export default function Hero() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <section

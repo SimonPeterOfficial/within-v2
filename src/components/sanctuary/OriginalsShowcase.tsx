@@ -1,7 +1,7 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import Button from "@/components/ui/Button";
 import TiltCard from "@/components/ui/TiltCard";
 import StarField from "@/components/sanctuary/StarField";
@@ -55,7 +55,7 @@ const featured = originals[0];
 
 /** Cinematic Originals showcase — a spotlight feature + living film marquee. */
 export default function OriginalsShowcase() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <section

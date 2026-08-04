@@ -12,13 +12,13 @@ export default function GlowBackground({
       aria-hidden
       className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
     >
-      <div className="animate-glow absolute -top-24 left-[15%] h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.3)] blur-3xl" />
+      <div className="animate-glow absolute -top-24 left-[15%] h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.12)] blur-3xl" />
       <div
-        className="animate-glow absolute right-[5%] top-1/3 h-80 w-80 rounded-full bg-pink-600/25 blur-3xl"
+        className="animate-glow absolute right-[5%] top-1/3 h-80 w-80 rounded-full bg-pink-600/10 blur-3xl"
         style={{ animationDelay: "2.5s" }}
       />
       <div
-        className="animate-glow absolute bottom-0 left-[10%] h-72 w-72 rounded-full bg-emerald-600/20 blur-3xl"
+        className="animate-glow absolute bottom-0 left-[10%] h-72 w-72 rounded-full bg-emerald-600/[0.08] blur-3xl"
         style={{ animationDelay: "5s" }}
       />
 

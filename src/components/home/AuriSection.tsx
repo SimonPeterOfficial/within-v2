@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
@@ -24,7 +25,7 @@ const auriTraits = [
 ];
 
 export default function AuriSection() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <section

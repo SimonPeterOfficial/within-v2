@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import DepthLayers from "@/components/effects/DepthLayers";
-import CinematicIntro from "@/components/effects/CinematicIntro";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import SanctuaryHero from "@/components/sanctuary/SanctuaryHero";
 import QuickActions from "@/components/sanctuary/QuickActions";
@@ -25,9 +24,6 @@ export default function HomePage() {
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* One living atmosphere: glow → aurora → light rays → particles → stars */}
       <DepthLayers />
-
-      {/* Cinematic veil on entry */}
-      <CinematicIntro />
 
       <DashboardNav />
 

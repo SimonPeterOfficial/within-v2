@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import GradientText from "@/components/ui/GradientText";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 /** Cinematic loading veil for the sanctuary route. */
 export default function Loading() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-black text-white">
@@ -18,7 +19,7 @@ export default function Loading() {
               : { scale: [1, 1.35, 1], opacity: [0.45, 0.85, 0.45] }
           }
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 rounded-full bg-[rgba(var(--mood-rgb),0.25)] blur-soft"
+          className="absolute inset-0 rounded-full bg-[rgba(var(--mood-rgb),0.10)] blur-soft"
         />
         <motion.span
           aria-hidden

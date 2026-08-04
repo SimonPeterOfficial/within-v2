@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 type LightRaysProps = {
   /** Ray intensity 0–1 */
@@ -11,9 +12,9 @@ type LightRaysProps = {
 const RAY_GRADIENT =
   "repeating-conic-gradient(" +
   "from 0deg, " +
-  "rgba(var(--mood-rgb),0.10) 0deg 10deg, " +
+  "rgba(var(--mood-rgb),0.06) 0deg 10deg, " +
   "transparent 10deg 28deg, " +
-  "rgba(52,211,153,0.08) 28deg 38deg, " +
+  "rgba(52,211,153,0.05) 28deg 38deg, " +
   "transparent 38deg 60deg)";
 
 const RAY_MASK =
@@ -25,8 +26,8 @@ const RAY_MASK =
  * remains legible; the rays shift with the live mood color. Pure transform
  * rotation, so it stays on the compositor thread.
  */
-export default function LightRays({ intensity = 0.5, className = "" }: LightRaysProps) {
-  const prefersReducedMotion = useReducedMotion();
+export default function LightRays({ intensity = 0.3, className = "" }: LightRaysProps) {
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <div
@@ -58,7 +59,7 @@ export default function LightRays({ intensity = 0.5, className = "" }: LightRays
           background: RAY_GRADIENT,
           WebkitMaskImage: RAY_MASK,
           maskImage: RAY_MASK,
-          opacity: 0.6,
+          opacity: 0.45,
           maxWidth: "2400px",
           maxHeight: "2400px"
         }}

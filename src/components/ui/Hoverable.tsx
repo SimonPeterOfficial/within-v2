@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { hoverGlow, hoverLift } from "@/lib/animations";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 type HoverableProps = {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export default function Hoverable({
   lift = 5,
   glow = true
 }: HoverableProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;

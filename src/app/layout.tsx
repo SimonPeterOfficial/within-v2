@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import FilmGrain from "@/components/effects/FilmGrain";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -56,7 +55,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <FilmGrain />
         {children}
       </body>
     </html>

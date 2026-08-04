@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BookOpen, Compass, Film, Home, LogOut, User } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import Logo from "@/components/ui/Logo";
 import { spring } from "@/lib/animations";
 
@@ -18,7 +19,7 @@ const links = [
 export default function DashboardNav() {
   const [active, setActive] = useState("#sanctuary");
   const [isOpen, setIsOpen] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   const closeMenu = () => setIsOpen(false);
 
@@ -63,7 +64,7 @@ export default function DashboardNav() {
       )}
 
       {/* Floating glass dock */}
-      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-2.5 shadow-dock backdrop-blur-xl sm:px-5">
+      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-3 py-2.5 shadow-dock backdrop-blur-sm sm:px-5">
         <Link href="/home" className="shrink-0" onClick={closeMenu}>
           <Logo />
         </Link>
@@ -171,7 +172,7 @@ export default function DashboardNav() {
             transition={{ duration: 0.2 }}
             className="relative z-10 mx-auto mt-2 max-w-6xl md:hidden"
           >
-            <div className="rounded-3xl border border-white/10 bg-black/70 p-4 backdrop-blur-xl">
+            <div className="rounded-3xl border border-white/10 bg-black/70 p-4 backdrop-blur-sm">
               {links.map((link) => {
                 const isActive = active === link.href;
                 const classes = `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${

@@ -15,9 +15,9 @@ export default function FinaleCTA() {
       {/* Central mood glow + closing light rays */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.18)] blur-glow"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-glow"
       />
-      <LightRays intensity={0.35} />
+      <LightRays intensity={0.22} />
       <StarField count={40} seed={13} />
 
       <motion.div

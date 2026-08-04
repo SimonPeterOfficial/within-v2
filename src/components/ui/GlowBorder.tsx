@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 type GlowBorderProps = {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ type GlowBorderProps = {
  * and awakens when the wrapped content is hovered, creating a premium portal edge.
  */
 export default function GlowBorder({ children, className = "" }: GlowBorderProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <div className={`group/glow relative overflow-hidden rounded-card p-px ${className}`}>

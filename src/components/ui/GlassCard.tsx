@@ -10,9 +10,9 @@ type GlassCardProps = {
 };
 
 const tones: Record<GlassTone, string> = {
-  soft: "border-white/5 bg-white/[0.03] backdrop-blur-md",
-  default: "border-white/10 bg-white/5 backdrop-blur-xl",
-  strong: "border-white/15 bg-white/[0.08] backdrop-blur-2xl"
+  soft: "border-white/5 bg-white/[0.03] backdrop-blur-sm",
+  default: "border-white/10 bg-white/5 backdrop-blur-sm",
+  strong: "border-white/15 bg-white/[0.08] backdrop-blur"
 };
 
 /**

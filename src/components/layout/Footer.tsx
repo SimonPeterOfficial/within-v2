@@ -37,11 +37,11 @@ export default function Footer() {
       {/* Call to action */}
       <div
         id="join"
-        className="relative mx-auto max-w-6xl scroll-mt-24 overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-8 py-16 text-center backdrop-blur-xl"
+        className="relative mx-auto max-w-6xl scroll-mt-24 overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-8 py-16 text-center backdrop-blur-sm"
       >
-        <div className="animate-glow pointer-events-none absolute -top-24 left-1/4 h-64 w-64 rounded-full bg-purple-700/30 blur-3xl" />
+        <div className="animate-glow pointer-events-none absolute -top-24 left-1/4 h-64 w-64 rounded-full bg-purple-700/15 blur-3xl" />
         <div
-          className="animate-glow pointer-events-none absolute -bottom-24 right-1/5 h-64 w-64 rounded-full bg-emerald-600/25 blur-3xl"
+          className="animate-glow pointer-events-none absolute -bottom-24 right-1/5 h-64 w-64 rounded-full bg-emerald-600/10 blur-3xl"
           style={{ animationDelay: "3s" }}
         />
 
