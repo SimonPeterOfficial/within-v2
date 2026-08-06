@@ -22,6 +22,7 @@
   --blur-haze: 100px; /* blur-haze — broad washes  */
   --blur-veil: 120px; /* blur-veil — aurora fields */
   --blur-glow: 140px; /* blur-glow — deepest light */
+  --blur-smoke: 60px; /* blur-smoke — cinematic dissolve */
 
   /* Elevation */
   --shadow-dock: 0 10px 40px rgba(0, 0, 0, 0.4);
@@ -29,9 +30,20 @@
   --shadow-mood: 0 0 35px rgba(var(--mood-rgb), 0.5);
   --shadow-mood-lg: 0 0 45px rgba(var(--mood-rgb), 0.5);
   --shadow-orb: 0 0 60px rgba(var(--mood-rgb), 0.5);
+  --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.35); /* shadow-soft — floating layers */
   --shadow-brand: 0 0 60px rgba(168, 85, 247, 0.45);
   --shadow-brand-cta: 0 0 45px rgba(168, 85, 247, 0.45);
   --shadow-emerald: 0 0 30px rgba(52, 211, 153, 0.25);
+
+  /* Responsive spacing system — section rhythm scales with the viewport */
+  --spacing-section: 6rem; /* py-section — the default section cadence */
+  --spacing-section-sm: 3.5rem; /* py-section-sm — tighter cadence */
+
+  /* Semantic surface tokens — drive the theme engine (bg-surface, border-line…) */
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--foreground);
+  --color-ink-muted: var(--ink-muted);
 }
 
 html {
@@ -42,14 +54,30 @@ html {
   color-scheme: dark;
   --background: #050505;
   --foreground: #ededed;
+  /* Theme-aware surfaces — flipped by [data-theme] on <html> */
+  --surface: rgba(255, 255, 255, 0.05);
+  --line: rgba(255, 255, 255, 0.1);
+  --ink-muted: #9ca3af;
   /* Emotional theme — "R, G, B" triple. Mood selections overwrite this live. */
   --mood-rgb: 168, 85, 247;
+}
+
+/* Light theme — the same universe, a brighter room */
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f6f6f8;
+  --foreground: #17171a;
+  --surface: rgba(0, 0, 0, 0.04);
+  --line: rgba(0, 0, 0, 0.12);
+  --ink-muted: #52525b;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* The theme engine swaps surfaces with a dreamy crossfade */
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 ::selection {
@@ -97,8 +125,20 @@ body {
   animation: marquee 45s linear infinite;
 }
 
-/* Premium thin scrollbar */
-::-webkit-scrollbar {
+/* Section rhythm — mobile-first spacing cadence */
+.section {
+  padding-block: var(--spacing-section-sm);
+}
+.section-sm {
+  padding-block: 2.5rem;
+}
+@media (min-width: 768px) {
+  .section {
+    padding-block: var(--spacing-section);
+  }
+}
+
+/* Premium thin scrollbar */::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {

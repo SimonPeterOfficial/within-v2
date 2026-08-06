@@ -1,36 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import AuthInput from "@/components/auth/AuthInput";
+import FormStatus from "@/components/auth/FormStatus";
+import PasswordStrength from "@/components/auth/PasswordStrength";
 import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
+import Icon from "@/components/ui/Icon";
+import { useSession } from "@/lib/auth/session";
 
 type Errors = { name?: string; email?: string; password?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Create an account — validation, strength feedback, then straight to onboarding. */
 export default function SignupForm() {
-  const mounted = useRef(true);
+  const router = useRouter();
+  const { signUp } = useSession();
+  const errorRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
 
   const clearError = (field: keyof Errors) =>
     setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError(null);
 
     const nextErrors: Errors = {};
     if (name.trim().length < 2) nextErrors.name = "Tell us a name (at least 2 characters).";
@@ -39,13 +42,16 @@ export default function SignupForm() {
     setErrors(nextErrors);
     if (nextErrors.name || nextErrors.email || nextErrors.password) return;
 
-    // Simulated account creation — swap for the real API.
     setLoading(true);
-    window.setTimeout(() => {
-      if (!mounted.current) return;
-      setLoading(false);
-      setSubmitted(true);
-    }, 1100);
+    const result = await signUp({ name, email, password });
+    setLoading(false);
+
+    if (!result.ok) {
+      setFormError(result.error);
+      requestAnimationFrame(() => errorRef.current?.focus());
+      return;
+    }
+    router.push("/onboarding");
   };
 
   return (
@@ -57,6 +63,14 @@ export default function SignupForm() {
         <p className="mt-2 text-sm text-gray-400">Start your story in under a minute.</p>
       </div>
 
+      <AnimatePresence>
+        {formError && (
+          <div ref={errorRef} tabIndex={-1} className="outline-none">
+            <FormStatus variant="error">{formError}</FormStatus>
+          </div>
+        )}
+      </AnimatePresence>
+
       <AuthInput
         id="signup-name"
         label="Name"
@@ -67,6 +81,7 @@ export default function SignupForm() {
         onChange={(value) => {
           setName(value);
           clearError("name");
+          setFormError(null);
         }}
         error={errors.name}
       />
@@ -81,55 +96,40 @@ export default function SignupForm() {
         onChange={(value) => {
           setEmail(value);
           clearError("email");
+          setFormError(null);
         }}
         error={errors.email}
       />
-      <AuthInput
-        id="signup-password"
-        label="Password"
-        type="password"
-        autoComplete="new-password"
-        placeholder="Create a password"
-        required
-        value={password}
-        onChange={(value) => {
-          setPassword(value);
-          clearError("password");
-        }}
-        error={errors.password}
-        toggle
-      />
+      <div className="space-y-3">
+        <AuthInput
+          id="signup-password"
+          label="Password"
+          type="password"
+          autoComplete="new-password"
+          placeholder="Create a password"
+          required
+          value={password}
+          onChange={(value) => {
+            setPassword(value);
+            clearError("password");
+            setFormError(null);
+          }}
+          error={errors.password}
+          toggle
+        />
+        <PasswordStrength value={password} />
+      </div>
 
       <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-            Creating your sanctuary…
-          </>
-        ) : (
-          "Create account"
-        )}
+        {loading && <Icon name="loader" size={15} className="mr-2 animate-spin" />}
+        {loading ? "Creating your sanctuary…" : "Create account"}
       </Button>
-
-      <AnimatePresence>
-        {submitted && (
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-center text-sm text-emerald-300"
-          >
-            Backend coming soon — this is just the front end. ✨
-          </motion.p>
-        )}
-      </AnimatePresence>
 
       <p className="text-center text-sm text-gray-400">
         Already have an account?{" "}
-        <a href="/login" className="font-semibold text-white transition hover:text-emerald-300">
+        <Link href="/login" className="font-semibold text-white transition hover:text-emerald-300">
           Log in
-        </a>
+        </Link>
       </p>
     </form>
   );

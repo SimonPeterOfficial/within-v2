@@ -1,6 +1,6 @@
 type GlassTone = "default" | "soft" | "strong";
 
-type GlassCardProps = {
+export type GlassCardProps = {
   children: React.ReactNode;
   className?: string;
   hoverLift?: boolean;

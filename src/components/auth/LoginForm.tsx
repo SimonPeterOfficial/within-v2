@@ -1,35 +1,38 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import AuthInput from "@/components/auth/AuthInput";
+import FormStatus from "@/components/auth/FormStatus";
 import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
+import Icon from "@/components/ui/Icon";
+import { useSession } from "@/lib/auth/session";
 
 type Errors = { email?: string; password?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Log in — field validation, service round-trip, and a gentle way home. */
 export default function LoginForm() {
-  const mounted = useRef(true);
+  const router = useRouter();
+  const { signIn } = useSession();
+  const errorRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
 
   const clearError = (field: keyof Errors) =>
     setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError(null);
 
     const nextErrors: Errors = {};
     if (!EMAIL_RE.test(email)) nextErrors.email = "Enter a valid email address.";
@@ -37,13 +40,17 @@ export default function LoginForm() {
     setErrors(nextErrors);
     if (nextErrors.email || nextErrors.password) return;
 
-    // Simulated authentication round-trip — swap for the real API.
     setLoading(true);
-    window.setTimeout(() => {
-      if (!mounted.current) return;
-      setLoading(false);
-      setSubmitted(true);
-    }, 1100);
+    const result = await signIn({ email, password, remember });
+    setLoading(false);
+
+    if (!result.ok) {
+      setFormError(result.error);
+      // Move focus to the banner so screen readers announce the failure.
+      requestAnimationFrame(() => errorRef.current?.focus());
+      return;
+    }
+    router.push("/home");
   };
 
   return (
@@ -54,6 +61,14 @@ export default function LoginForm() {
         </h1>
         <p className="mt-2 text-sm text-gray-400">Log in to continue your story.</p>
       </div>
+
+      <AnimatePresence>
+        {formError && (
+          <div ref={errorRef} tabIndex={-1} className="outline-none">
+            <FormStatus variant="error">{formError}</FormStatus>
+          </div>
+        )}
+      </AnimatePresence>
 
       <AuthInput
         id="login-email"
@@ -66,6 +81,7 @@ export default function LoginForm() {
         onChange={(value) => {
           setEmail(value);
           clearError("email");
+          setFormError(null);
         }}
         error={errors.email}
       />
@@ -80,49 +96,40 @@ export default function LoginForm() {
         onChange={(value) => {
           setPassword(value);
           clearError("password");
+          setFormError(null);
         }}
         error={errors.password}
         toggle
       />
 
-      <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-400">
-        <input
-          type="checkbox"
-          className="h-4 w-4 rounded border-white/10 bg-white/5 accent-emerald-400"
-        />
-        Remember me
-      </label>
+      <div className="flex items-center justify-between gap-3">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-400">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(event) => setRemember(event.target.checked)}
+            className="h-4 w-4 rounded border-white/10 bg-white/5 accent-emerald-400"
+          />
+          Remember me
+        </label>
+        <Link
+          href="/forgot-password"
+          className="text-sm font-medium text-gray-400 transition hover:text-emerald-300"
+        >
+          Forgot password?
+        </Link>
+      </div>
 
       <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-            Entering…
-          </>
-        ) : (
-          "Log in"
-        )}
+        {loading && <Icon name="loader" size={15} className="mr-2 animate-spin" />}
+        {loading ? "Entering…" : "Log in"}
       </Button>
-
-      <AnimatePresence>
-        {submitted && (
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-center text-sm text-emerald-300"
-          >
-            Backend coming soon — this is just the front end. ✨
-          </motion.p>
-        )}
-      </AnimatePresence>
 
       <p className="text-center text-sm text-gray-400">
         New to WithIn?{" "}
-        <a href="/signup" className="font-semibold text-white transition hover:text-emerald-300">
+        <Link href="/signup" className="font-semibold text-white transition hover:text-emerald-300">
           Create an account
-        </a>
+        </Link>
       </p>
     </form>
   );

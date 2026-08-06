@@ -46,6 +46,10 @@ type ParticleFieldProps = {
 };
 
 /** Floating ambient particles that drift upward and fade — pure transform/opacity. */
+
+/** Canonical alias — the floating-particles system goes by both names. */
+export { ParticleField as FloatingParticles };
+
 export default function ParticleField({ count = 30, seed = 7, className = "" }: ParticleFieldProps) {
   const prefersReducedMotion = useReducedMotionSafe();
   // Stable across re-renders — identical on server and client thanks to the LCG.

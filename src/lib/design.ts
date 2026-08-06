@@ -41,8 +41,24 @@ export function moodGlow(alpha: number): string {
   return `rgba(var(--mood-rgb), ${alpha})`;
 }
 
-/** Typography recipes shared across sections (eyebrow + headings). */
+/** Typography recipes — the type system.
+ * Every text style in the universe comes from here so headlines never drift
+ * between sections. Consume via the <Text> primitive or directly. */
 export const typography = {
+  /** Largest statement — landing heroes */
+  display: "text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl",
+  /** Page-level hero heading */
+  hero: "text-4xl font-bold tracking-tight md:text-6xl",
+  /** Section headings */
+  sectionTitle: "text-4xl font-bold tracking-tight md:text-5xl",
+  /** Supportive subheadings */
+  subtitle: "text-lg text-gray-400",
+  /** Default body copy */
+  body: "text-base leading-relaxed",
+  /** Small auxiliary text */
+  caption: "text-sm text-gray-500",
+  /** Uppercase kicker above titles */
   eyebrow: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-400",
-  sectionTitle: "text-4xl font-bold tracking-tight md:text-5xl"
+  /** Compact labels (chips, form labels) */
+  label: "text-xs font-medium uppercase tracking-widest"
 } as const;

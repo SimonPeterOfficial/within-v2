@@ -1,14 +1,12 @@
 "use client";
 
-import { MotionConfig, motion } from "framer-motion";
-import { fadeIn } from "@/lib/animations";
+import { MotionConfig } from "framer-motion";
+import PageTransition from "@/components/ui/PageTransition";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <motion.div variants={fadeIn} initial="hidden" animate="show">
-        {children}
-      </motion.div>
+      <PageTransition>{children}</PageTransition>
     </MotionConfig>
   );
 }

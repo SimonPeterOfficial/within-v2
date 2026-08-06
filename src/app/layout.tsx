@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AuthProvider } from "@/lib/auth/session";
+import { ThemeProvider } from "@/lib/theme";
+import CustomCursor from "@/components/effects/CustomCursor";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,13 +52,18 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
-        >
-          Skip to content
-        </a>
-        {children}
+        <ThemeProvider>
+          <AuthProvider>
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
+            >
+              Skip to content
+            </a>
+            {children}
+            <CustomCursor />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
