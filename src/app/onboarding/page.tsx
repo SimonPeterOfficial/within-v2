@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function OnboardingPage() {
   return (
     <RequireAuth>
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-16 text-white">
+      <main id="main" className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-16 text-white">
         <GlowBackground variant="hero" />
         <ParticleField count={18} seed={4} />
         <div className="relative z-10 w-full max-w-lg">

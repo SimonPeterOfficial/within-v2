@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import GlowBackground from "@/components/effects/GlowBackground";
+import ParticleField from "@/components/effects/ParticleField";
 import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
 import Logo from "@/components/ui/Logo";
@@ -18,6 +19,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-16 text-white"
     >
       <GlowBackground variant="hero" />
+      {/* Drifting dust keeps the auth surfaces alive, never static */}
+      <ParticleField count={14} seed={9} />
 
       <Button
         href="/"

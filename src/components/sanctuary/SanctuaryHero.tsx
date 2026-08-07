@@ -15,6 +15,7 @@ import StarField from "@/components/sanctuary/StarField";
 import Button from "@/components/ui/Button";
 import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
+import { useSession } from "@/lib/auth/session";
 import { blurUp, staggerContainer } from "@/lib/animations";
 
 const getGreeting = () => {
@@ -35,8 +36,12 @@ const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
 /** Cinematic opening — layered nebula, living starfield, emotional welcome. */
 export default function SanctuaryHero() {
   const prefersReducedMotion = useReducedMotionSafe();
+  const { user } = useSession();
   const greeting = useSyncExternalStore(subscribe, getClientGreeting, getServerGreeting);
   const [wordIndex, setWordIndex] = useState(0);
+  // Personalization resolves after hydration — guests see the gentle default.
+  const firstName = user?.name.trim().split(/\s+/)[0];
+  const salutation = greeting + (firstName ? `, ${firstName}` : ", soul");
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -100,7 +105,7 @@ export default function SanctuaryHero() {
             variants={blurUp}
             className="text-xs font-semibold uppercase tracking-[0.5em] text-emerald-400 md:text-sm"
           >
-            {greeting}, soul
+            {salutation}
           </motion.p>
 
           <motion.h1
@@ -132,8 +137,8 @@ export default function SanctuaryHero() {
             variants={blurUp}
             className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-gray-400 md:text-base"
           >
-            Welcome back. Your sanctuary has been waiting — Auri shaped it around the way
-            you&apos;ve been feeling, and every corner glows softly with it.
+            Your sanctuary has been waiting — Auri shaped it around the way you&apos;ve been
+            feeling, and tonight it has a few quiet corners picked just for you.
           </motion.p>
 
           {/* Magnetic CTAs */}

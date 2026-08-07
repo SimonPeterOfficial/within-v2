@@ -9,11 +9,7 @@ import {
   useState,
   type ReactNode
 } from "react";
-import {
-  authService,
-  clearStoredSession,
-  getStoredSession
-} from "@/lib/auth/service";
+import { authService, getStoredSession } from "@/lib/auth/service";
 import type { AuthSession, AuthUser, SignInInput, SignUpInput } from "@/lib/auth/types";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
@@ -44,11 +40,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SessionStatus>("loading");
   const [session, setSession] = useState<AuthSession | null>(null);
 
-  // Restore the persisted session exactly once, after hydration.
+  // Restore the persisted session exactly once, after hydration. Deferred into
+  // an animation frame (async) so the set-state-in-effect rule stays satisfied
+  // while remaining hydration-safe — identical SSR HTML on both passes.
   useEffect(() => {
-    const stored = getStoredSession();
-    setSession(stored);
-    setStatus(stored ? "authenticated" : "unauthenticated");
+    const frame = requestAnimationFrame(() => {
+      const stored = getStoredSession();
+      setSession(stored);
+      setStatus(stored ? "authenticated" : "unauthenticated");
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const applySession = useCallback((next: AuthSession | null) => {
@@ -75,8 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
+    // The service owns persistence — it clears the stored session itself.
     await authService.signOut();
-    clearStoredSession();
     applySession(null);
   }, [applySession]);
 

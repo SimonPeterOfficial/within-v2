@@ -3,6 +3,7 @@ import AuroraBackground from "@/components/effects/AuroraBackground";
 import LightRays from "@/components/effects/LightRays";
 import ParticleField from "@/components/effects/ParticleField";
 import StarField from "@/components/sanctuary/StarField";
+import FogLayer from "@/components/effects/FogLayer";
 
 type DepthLayersProps = {
   /** How many drifting particles (lower = quieter) */
@@ -11,6 +12,8 @@ type DepthLayersProps = {
   stars?: number;
   /** Whether the volumetric light rays should play */
   rays?: boolean;
+  /** Fog density 0–1 (a whisper by default) */
+  fog?: number;
   className?: string;
 };
 
@@ -24,11 +27,13 @@ export default function DepthLayers({
   particles = 12,
   stars = 24,
   rays = true,
+  fog = 0.6,
   className = ""
 }: DepthLayersProps) {
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
       <GlowBackground variant="ambient" />
+      <FogLayer intensity={fog} />
       <AuroraBackground />
       {rays && <LightRays />}
       <ParticleField count={particles} seed={11} />

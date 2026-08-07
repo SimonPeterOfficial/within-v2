@@ -58,7 +58,7 @@ export default function Button({
 }: ButtonProps) {
   const isGradient = variant === "gradient";
   const classes = clsx(
-    "inline-flex select-none items-center justify-center rounded-full transition duration-300",
+    "inline-flex select-none items-center justify-center rounded-full transition duration-300 active:scale-[0.98]",
     sizes[size],
     variants[variant],
     disabled && "pointer-events-none opacity-60",

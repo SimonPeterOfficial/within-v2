@@ -45,8 +45,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   // Resolve the user's stored/system preference once, after hydration.
+  // Deferred into an animation frame (async) to keep the effect body free of
+  // synchronous setState while staying hydration-safe.
   useEffect(() => {
-    setThemeState(resolveInitialTheme());
+    const frame = requestAnimationFrame(() => setThemeState(resolveInitialTheme()));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   // Apply + persist whenever the theme changes.

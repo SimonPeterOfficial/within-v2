@@ -1,8 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 import TiltCard from "@/components/ui/TiltCard";
 import StarField from "@/components/sanctuary/StarField";
 
@@ -53,8 +55,15 @@ const originals = [
 
 const featured = originals[0];
 
+const FEATURED_PROGRESS = 0.42;
+
+type OriginalsShowcaseProps = {
+  /** Where the featured "play"/trailer actions lead (sanctuary: #memories, landing: /signup) */
+  trailerHref?: string;
+};
+
 /** Cinematic Originals showcase — a spotlight feature + living film marquee. */
-export default function OriginalsShowcase() {
+export default function OriginalsShowcase({ trailerHref = "#memories" }: OriginalsShowcaseProps) {
   const prefersReducedMotion = useReducedMotionSafe();
 
   return (
@@ -71,14 +80,34 @@ export default function OriginalsShowcase() {
           subtitle="Films, series, and books crafted for the way you feel."
         />
 
-        {/* Featured spotlight */}
+        {/* Featured spotlight — the huge cinematic card */}
         <div className="mx-auto mt-12 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
           <TiltCard maxTilt={5} className="group">
             <div
-              className={`relative h-72 overflow-hidden rounded-3xl bg-linear-to-br ${featured.gradient} p-8`}
+              className={`relative h-72 overflow-hidden rounded-3xl bg-linear-to-br ${featured.gradient} p-8 md:h-80`}
             >
               <div className="absolute inset-0 bg-black/30" />
               <StarField count={24} seed={9} />
+
+              {/* Play — the door into the original */}
+              <a
+                href={trailerHref}
+                aria-label={`Play ${featured.title}`}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              >
+                <motion.span
+                  aria-hidden
+                  animate={
+                    prefersReducedMotion ? undefined : { scale: [1, 1.18, 1], opacity: [0.45, 0.12, 0.45] }
+                  }
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -inset-4 rounded-full bg-white/25 blur-sm"
+                />
+                <span className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-orb backdrop-blur-md transition duration-300 group-hover:scale-110 group-hover:border-white/40">
+                  <Icon name="play" size={22} className="ml-0.5" />
+                </span>
+              </a>
+
               <div className="relative flex h-full flex-col justify-between">
                 <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
                   Featured original
@@ -88,6 +117,21 @@ export default function OriginalsShowcase() {
                   <p className="mt-2 text-sm text-white/70">
                     {featured.type} · {featured.duration}
                   </p>
+                  {/* Progress indicator */}
+                  <div className="mt-5 max-w-xs">
+                    <div className="flex items-center justify-between text-[11px] text-white/70">
+                      <span className="font-medium text-white">
+                        {Math.round(FEATURED_PROGRESS * 100)}% watched
+                      </span>
+                      <span>{featured.duration}</span>
+                    </div>
+                    <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/20">
+                      <div
+                        className="h-full rounded-full bg-linear-to-r from-purple-300 to-emerald-300"
+                        style={{ width: `${FEATURED_PROGRESS * 100}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -102,12 +146,7 @@ export default function OriginalsShowcase() {
               Shot entirely within the sanctuary — every frame responds to how you feel right
               now.
             </p>
-            <Button
-              href="#memories"
-              variant="primary"
-              size="md"
-              className="mt-auto w-fit"
-            >
+            <Button href={trailerHref} variant="primary" size="md" className="mt-auto w-fit">
               Watch the trailer
             </Button>
           </div>

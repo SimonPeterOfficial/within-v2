@@ -16,25 +16,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WithIn — A universe within you",
+  title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
   description:
-    "Stories, emotions, and people connecting in one place. A cinematic universe where every feeling has a home.",
+    "A home for stories, emotions, creators and meaningful connections — a universe built around how you feel right now.",
   applicationName: "WithIn",
   openGraph: {
-    title: "WithIn — A universe within you",
+    title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
     description:
-      "A cinematic sanctuary where stories, emotions, and people connect. Every feeling has a home.",
+      "A home for stories, emotions, creators and meaningful connections — a universe built around how you feel.",
     type: "website",
     siteName: "WithIn",
     locale: "en_US"
   },
   twitter: {
     card: "summary",
-    title: "WithIn — A universe within you",
+    title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
     description:
-      "A cinematic sanctuary where stories, emotions, and people connect."
+      "A home for stories, emotions, creators and meaningful connections."
   },
-  keywords: ["stories", "emotions", "sanctuary", "community", "originals"]
+  keywords: ["stories", "emotions", "creators", "sanctuary", "community", "originals", "music"]
 };
 
 export const viewport: Viewport = {

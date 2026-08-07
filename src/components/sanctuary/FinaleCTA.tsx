@@ -8,8 +8,13 @@ import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
 import { blurUp, staggerContainer } from "@/lib/animations";
 
+type FinaleCTAProps = {
+  /** Landing funnels guests straight into signup; the sanctuary sends them to log in */
+  primaryHref?: string;
+};
+
 /** Closing cinematic moment — a door left open. */
-export default function FinaleCTA() {
+export default function FinaleCTA({ primaryHref = "/login" }: FinaleCTAProps) {
   return (
     <section className="relative overflow-hidden px-6 py-32 text-center text-white">
       {/* Central mood glow + closing light rays */}
@@ -53,7 +58,7 @@ export default function FinaleCTA() {
           className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
           <Magnetic>
-            <Button href="/login" variant="primary" size="xl">
+            <Button href={primaryHref} variant="primary" size="xl">
               Enter WithIn
             </Button>
           </Magnetic>

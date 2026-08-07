@@ -7,6 +7,7 @@ import AuthInput from "@/components/auth/AuthInput";
 import FormStatus from "@/components/auth/FormStatus";
 import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
+import SuccessState from "@/components/ui/states/SuccessState";
 import { useSession } from "@/lib/auth/session";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,17 +62,16 @@ export default function ForgotPasswordForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="space-y-5"
           >
-            <FormStatus variant="success">
-              If an account exists, a reset link is on its way.
-            </FormStatus>
-            <p className="text-center text-sm text-gray-400">
-              Take your time — it usually arrives within a minute.
-            </p>
-            <Button href="/login" variant="outline" size="lg" className="w-full">
-              Back to log in
-            </Button>
+            <SuccessState
+              title="Check your inbox"
+              description="If an account exists, a reset link is on its way — usually within a minute."
+              action={
+                <Button href="/login" variant="outline" size="lg" className="w-full">
+                  Back to log in
+                </Button>
+              }
+            />
           </motion.div>
         ) : (
           <motion.form

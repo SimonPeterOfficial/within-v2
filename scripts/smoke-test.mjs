@@ -17,10 +17,12 @@
 const BASE_URL = (process.argv[2] || "http://localhost:3000").replace(/\/$/, "");
 
 const ROUTES = [
-  { path: "/", markers: ["Begin your journey"] },
+  { path: "/", markers: ["Feel Seen", "Enter WithIn", "Explore Originals"] },
   { path: "/home", markers: ["Welcome", "sanctuary"] },
-  { path: "/login", markers: ["Welcome", "Log in"] },
-  { path: "/signup", markers: ["Enter WithIn"] },
+  { path: "/login", markers: ["Welcome", "Log in", "Forgot password?"] },
+  { path: "/signup", markers: ["Join the world", "Create account"] },
+  { path: "/forgot-password", markers: ["Find your way", "Send reset link"] },
+  { path: "/onboarding", markers: ["Entering your sanctuary"] },
   { path: "/icon.svg", markers: ["<svg"] }
 ];
 

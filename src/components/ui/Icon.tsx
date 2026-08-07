@@ -2,14 +2,19 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Book,
   BookOpen,
+  Camera,
   Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Compass,
   Eye,
   EyeOff,
   Film,
+  Headphones,
+  Heart,
   Home,
   Inbox,
   Loader2,
@@ -18,12 +23,16 @@ import {
   Mail,
   Menu,
   Moon,
+  Music,
+  Pause,
+  Play,
   Plus,
   RefreshCw,
   Search,
   Sparkles,
   Sun,
   User,
+  Users,
   X
 } from "lucide-react";
 
@@ -58,7 +67,17 @@ export const icons = {
   search: Search,
   plus: Plus,
   chevronRight: ChevronRight,
-  chevronLeft: ChevronLeft
+  chevronLeft: ChevronLeft,
+  /* ── Home experience ── */
+  music: Music,
+  headphones: Headphones,
+  play: Play,
+  pause: Pause,
+  camera: Camera,
+  users: Users,
+  heart: Heart,
+  clock: Clock,
+  book: Book
 } as const;
 
 export type IconName = keyof typeof icons;

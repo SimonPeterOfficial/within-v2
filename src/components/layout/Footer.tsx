@@ -6,10 +6,10 @@ import Logo from "@/components/ui/Logo";
 import GradientText from "@/components/ui/GradientText";
 
 const exploreLinks = [
-  { label: "Stories", href: "#stories" },
+  { label: "Continue", href: "#continue" },
   { label: "Originals", href: "#originals" },
-  { label: "Emotions", href: "#emotions" },
-  { label: "Community", href: "#community" }
+  { label: "Music", href: "#music" },
+  { label: "Communities", href: "#communities" }
 ];
 
 const companyLinks = [
@@ -33,7 +33,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-black px-6 pb-10 pt-24 text-white">
+    <footer className="relative overflow-hidden px-6 pb-10 pt-24 text-white">
       {/* Call to action */}
       <div
         id="join"
@@ -79,8 +79,13 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Footer body */}
-      <div className="mx-auto mt-20 max-w-6xl">
+      {/* Footer body */}        {/* Ambient glow pool so the footer never sits on flat black */}
+        <div
+          aria-hidden
+          className="animate-glow pointer-events-none absolute -bottom-40 left-1/2 h-96 w-[60rem] max-w-full -translate-x-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.06)] blur-glow"
+        />
+
+        <div className="relative mx-auto mt-20 max-w-6xl">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <Logo />

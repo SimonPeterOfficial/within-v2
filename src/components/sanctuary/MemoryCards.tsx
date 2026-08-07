@@ -10,6 +10,7 @@ import GlowBorder from "@/components/ui/GlowBorder";
 import Reveal from "@/components/ui/Reveal";
 import TiltCard from "@/components/ui/TiltCard";
 import MemoryCardSkeleton from "@/components/dashboard/MemoryCardSkeleton";
+import EmptyState from "@/components/ui/states/EmptyState";
 
 const memories = [
   {
@@ -119,6 +120,18 @@ export default function MemoryCards() {
             <MemoryCardSkeleton key={index} />
           ))}
         </div>
+      ) : memories.length === 0 ? (
+        <EmptyState
+          className="mt-12"
+          icon="sparkles"
+          title="No memories yet"
+          description="Stories you save will gather here, kept safe for when you need them."
+          action={
+            <Button href="#originals" variant="outline" size="md">
+              Discover originals
+            </Button>
+          }
+        />
       ) : (
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {memories.map((memory, index) => (

@@ -91,6 +91,12 @@ body {
   outline-offset: 2px;
 }
 
+/* Native cursor affordance — Tailwind v4 preflight leaves buttons on default */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
 /* Cinematic vignette */
 .vignette {
   background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);

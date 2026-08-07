@@ -31,7 +31,10 @@ export default function CustomCursor() {
   useEffect(() => {
     if (prefersReducedMotion) return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
-    setEnabled(true);
+    // Deferred (async) so the set-state-in-effect rule stays satisfied while
+    // keeping SSR HTML identical to the first client pass.
+    const frame = requestAnimationFrame(() => setEnabled(true));
+    return () => cancelAnimationFrame(frame);
   }, [prefersReducedMotion]);
 
   useEffect(() => {
@@ -64,6 +67,15 @@ export default function CustomCursor() {
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-[999]">
+      {/* Soft glow halo — a pool of mood light that trails the ring */}
+      <motion.div style={{ x: ringX, y: ringY }} className="absolute left-0 top-0">
+        <motion.div
+          animate={{ scale: hovering ? 1.5 : 1, opacity: visible ? 0.22 : 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 22 }}
+          className="-ml-10 -mt-10 h-20 w-20 rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.5),transparent_65%)] blur-sm"
+        />
+      </motion.div>
+
       {/* Trailing ring */}
       <motion.div style={{ x: ringX, y: ringY }} className="absolute left-0 top-0">
         <motion.div

@@ -48,10 +48,13 @@ export default function Sidebar({ items }: SidebarProps) {
   const isAuthenticated = status === "authenticated";
   const initial = user?.name.trim().charAt(0).toUpperCase() ?? "G";
 
-  // Route links: highlight the matching pathname.
+  // Route links: highlight the matching pathname (deferred, per the
+  // set-state-in-effect rule — section scroll-spy owns the rest of the time).
   useEffect(() => {
     const routeItem = items.find((item) => item.route && item.href === pathname);
-    if (routeItem) setActive(routeItem.href);
+    if (!routeItem) return;
+    const frame = requestAnimationFrame(() => setActive(routeItem.href));
+    return () => cancelAnimationFrame(frame);
   }, [pathname, items]);
 
   // Section links: scroll-spy highlights the section in view.
@@ -133,11 +136,11 @@ export default function Sidebar({ items }: SidebarProps) {
   return (
     <>
       {/* ── Desktop rail ─────────────────────────────────────────────── */}
-      <aside
+      <nav
         aria-label="Primary"
         className="fixed left-5 top-1/2 z-50 hidden -translate-y-1/2 lg:block"
       >
-        <div className="group/rail flex w-16 flex-col items-center gap-1.5 overflow-hidden rounded-full border border-white/10 bg-white/5 p-3 shadow-dock backdrop-blur-sm transition-[width] duration-500 ease-out hover:w-60">
+        <div className="group/rail max-h-[calc(100dvh-4rem)] w-16 overflow-y-auto overflow-x-hidden rounded-full border border-white/10 bg-white/5 p-3 shadow-dock backdrop-blur-sm transition-[width] duration-500 ease-out [scrollbar-width:none] hover:w-60 [&::-webkit-scrollbar]:hidden">
           <Link
             href="/"
             aria-label="WithIn home"
@@ -163,11 +166,11 @@ export default function Sidebar({ items }: SidebarProps) {
             </span>
           ))}
         </div>
-      </aside>
+      </nav>
 
       {/* ── Desktop corner cluster: session + theme ─────────────────── */}
       <div className="fixed bottom-6 left-6 z-50 hidden items-center gap-3 lg:flex">
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <button
             type="button"
             onClick={handleSignOut}
@@ -176,22 +179,14 @@ export default function Sidebar({ items }: SidebarProps) {
           >
             <Icon name="logout" size={16} />
           </button>
-        ) : (
-          <Link
-            href="/login"
-            aria-label="Log in"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 shadow-dock backdrop-blur-sm transition hover:border-white/25 hover:text-white"
-          >
-            <Icon name="profile" size={16} />
-          </Link>
         )}
 
         <Link
-          href="/login"
-          aria-label="Your profile"
+          href={isAuthenticated ? "/home" : "/login"}
+          aria-label={isAuthenticated ? "Your profile" : "Log in"}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 text-xs font-bold text-black shadow-dock ring-2 ring-white/20 transition hover:ring-emerald-300/50"
         >
-          {initial}
+          {isAuthenticated ? initial : <Icon name="profile" size={16} />}
         </Link>
 
         <ThemeToggle />
@@ -250,7 +245,7 @@ export default function Sidebar({ items }: SidebarProps) {
                 </button>
               </div>
 
-              <nav className="mt-10 flex flex-1 flex-col gap-1.5">
+              <nav className="mt-10 flex max-h-full flex-1 flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {items.map((item) => {
                   const isActive = active === item.href;
                   const classes = `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${

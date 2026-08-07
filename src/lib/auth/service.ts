@@ -1,11 +1,4 @@
-import type {
-  AuthResult,
-  AuthService,
-  AuthSession,
-  ResetResult,
-  SignInInput,
-  SignUpInput
-} from "./types";
+import type { AuthResult, AuthService, AuthSession, ResetResult } from "./types";
 
 /**
  * Demo auth service — localStorage-backed, latency-simulated.
@@ -146,11 +139,12 @@ export const authService: AuthService = {
 
   async requestPasswordReset(email: string): Promise<ResetResult> {
     await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
-    const exists = readUsers().some(
-      (user) => user.email === email.trim().toLowerCase()
-    );
-    // Always report success — never reveal whether an email is registered.
-    return exists ? { ok: true } : { ok: true };
+    // Validate like a real pipeline would, but always report success — never
+    // reveal whether an email is registered.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return { ok: false, error: "Enter a valid email address." };
+    }
+    return { ok: true };
   },
 
   async signOut(): Promise<void> {

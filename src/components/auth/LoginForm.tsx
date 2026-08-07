@@ -50,7 +50,15 @@ export default function LoginForm() {
       requestAnimationFrame(() => errorRef.current?.focus());
       return;
     }
-    router.push("/home");
+
+    // Honor a ?next= redirect (set by RequireAuth) — never an external target.
+    // Read from window.location at submit time: useSearchParams would defer the
+    // whole form during static prerender, hiding it from SSR HTML and screen
+    // readers until hydration. This keeps the form fully server-rendered.
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next");
+    const target = next && next.startsWith("/") && !next.startsWith("//") ? next : "/home";
+    router.push(target);
   };
 
   return (

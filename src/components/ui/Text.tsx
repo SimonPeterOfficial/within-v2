@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { clsx } from "clsx";
 import { typography } from "@/lib/design";
 
@@ -31,5 +32,5 @@ const tags: Record<TextTag, string> = {
  * and heading speaks the same visual language.
  */
 export default function Text({ children, variant = "body", as = "p", className = "" }: TextProps) {
-  return React.createElement(tags[as], { className: clsx(typography[variant], className) }, children);
+  return createElement(tags[as], { className: clsx(typography[variant], className) }, children);
 }
