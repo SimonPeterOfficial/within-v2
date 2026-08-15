@@ -4,8 +4,11 @@ import LightRays from "@/components/effects/LightRays";
 import ParticleField from "@/components/effects/ParticleField";
 import StarField from "@/components/sanctuary/StarField";
 import FogLayer from "@/components/effects/FogLayer";
+import MeshGradient, { type MeshPreset } from "@/components/effects/MeshGradient";
 
 type DepthLayersProps = {
+  /** Which room's mesh atmosphere this world carries */
+  preset?: MeshPreset;
   /** How many drifting particles (lower = quieter) */
   particles?: number;
   /** How many twinkling stars (lower = quieter) */
@@ -24,6 +27,7 @@ type DepthLayersProps = {
  * everywhere and never distracts.
  */
 export default function DepthLayers({
+  preset = "home",
   particles = 12,
   stars = 24,
   rays = true,
@@ -34,10 +38,14 @@ export default function DepthLayers({
     <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
       <GlowBackground variant="ambient" />
       <FogLayer intensity={fog} />
+      <MeshGradient preset={preset} />
       <AuroraBackground />
       {rays && <LightRays />}
       <ParticleField count={particles} seed={11} />
       <StarField count={stars} seed={3} />
+      {/* Time atmosphere — Auri sets html[data-time] and the hour answers
+          with a whisper of light (dawn warmth, deep night) over the whole world */}
+      <div aria-hidden className="time-glow" />
     </div>
   );
 }

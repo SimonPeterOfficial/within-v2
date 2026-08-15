@@ -57,10 +57,12 @@ export default function SignupForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
-          Join the world <GradientText>within</GradientText>.
+        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
+          Find a place for the things that <GradientText>make you, you</GradientText>.
         </h1>
-        <p className="mt-2 text-sm text-gray-400">Start your story in under a minute.</p>
+        <p className="mt-2 text-sm text-gray-400">
+          A few quiet questions, then the world tunes itself to you.
+        </p>
       </div>
 
       <AnimatePresence>
@@ -122,7 +124,7 @@ export default function SignupForm() {
 
       <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
         {loading && <Icon name="loader" size={15} className="mr-2 animate-spin" />}
-        {loading ? "Creating your sanctuary…" : "Create account"}
+        {loading ? "Creating your sanctuary…" : "Enter WithIn"}
       </Button>
 
       <p className="text-center text-sm text-gray-400">

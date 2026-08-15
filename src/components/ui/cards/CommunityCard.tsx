@@ -61,7 +61,7 @@ export default function CommunityCard({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={spring}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-gray-300 backdrop-blur"
+                  className="neo-chip rounded-full px-3 py-1.5 text-[11px] text-white"
                 >
                   {count.toLocaleString()} souls
                 </motion.span>

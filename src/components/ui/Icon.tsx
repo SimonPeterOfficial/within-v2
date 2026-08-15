@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Book,
   BookOpen,
+  Bookmark,
   Camera,
   Check,
   ChevronLeft,
@@ -22,6 +23,7 @@ import {
   LogOut,
   Mail,
   Menu,
+  Mic,
   Moon,
   Music,
   Pause,
@@ -29,7 +31,11 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Send,
+  Settings,
+  SlidersHorizontal,
   Sparkles,
+  Star,
   Sun,
   User,
   Users,
@@ -77,7 +83,15 @@ export const icons = {
   users: Users,
   heart: Heart,
   clock: Clock,
-  book: Book
+  book: Book,
+  /* ── Universe ── */
+  settings: Settings,
+  star: Star,
+  bookmark: Bookmark,
+  sliders: SlidersHorizontal,
+  /* ── Auri ── */
+  mic: Mic,
+  send: Send
 } as const;
 
 export type IconName = keyof typeof icons;

@@ -18,7 +18,7 @@ export default function AuroraBackground({ className = "" }: AuroraBackgroundPro
   return (
     <div
       aria-hidden
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+      className={`aurora-root pointer-events-none absolute inset-0 overflow-hidden ${className}`}
     >
       {/* Mood veil — the dominant color, breathes wide */}
       <motion.div

@@ -16,14 +16,14 @@ type World = {
 };
 
 const worlds: World[] = [
-  { label: "Poetry", icon: "sparkles", href: "#memories", count: 48 },
-  { label: "Calm sounds", icon: "headphones", href: "#music", count: 32 },
-  { label: "Films", icon: "originals", href: "#originals", count: 21 },
-  { label: "Books", icon: "book", href: "#books", count: 27 },
-  { label: "Photography", icon: "camera", href: "#photography", count: 40 },
-  { label: "Communities", icon: "users", href: "#communities", count: 18 },
-  { label: "Love & longing", icon: "heart", href: "#memories", count: 56 },
-  { label: "Growth", icon: "discover", href: "#mood", count: 33 }
+  { label: "Discover", icon: "discover", href: "/discover", count: 41 },
+  { label: "Stories", icon: "stories", href: "/home#memories", count: 48 },
+  { label: "Films", icon: "originals", href: "/originals", count: 21 },
+  { label: "Music", icon: "headphones", href: "/music", count: 32 },
+  { label: "Books", icon: "book", href: "/books", count: 27 },
+  { label: "Photography", icon: "camera", href: "/photography", count: 40 },
+  { label: "Communities", icon: "users", href: "/communities", count: 18 },
+  { label: "Creators", icon: "sparkles", href: "/creators", count: 14 }
 ];
 
 const openAuri = () => window.dispatchEvent(new Event(AURI_OPEN_EVENT));
@@ -51,7 +51,7 @@ export default function DiscoverSection() {
             <motion.div key={world.label} variants={slideUp}>
               <a
                 href={world.href}
-                className="group flex items-center justify-between rounded-card border border-white/10 bg-white/5 px-5 py-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[rgba(var(--mood-rgb),0.4)] hover:bg-white/10 hover:shadow-card-hover"
+                className="group flex items-center justify-between rounded-card border border-white/10 bg-white/5 px-5 py-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[rgba(var(--mood-rgb),0.4)] hover:bg-white/10 hover:shadow-card-hover focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:outline-none"
               >
                 <span className="flex items-center gap-3">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-emerald-300 transition group-hover:border-[rgba(var(--mood-rgb),0.4)]">

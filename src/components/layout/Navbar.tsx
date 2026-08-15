@@ -113,7 +113,7 @@ export default function Navbar() {
                 {isActive && (
                   <motion.span
                     layoutId="nav-active"
-                    className="absolute inset-0 rounded-full border border-white/10 bg-white/10"
+                    className="absolute inset-0 rounded-full border border-white/10 bg-white/10 shadow-[0_0_18px_rgba(var(--mood-rgb),0.28)]"
                     transition={spring}
                   />
                 )}

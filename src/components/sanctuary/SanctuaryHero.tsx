@@ -16,19 +16,13 @@ import Button from "@/components/ui/Button";
 import Magnetic from "@/components/ui/Magnetic";
 import GradientText from "@/components/ui/GradientText";
 import { useSession } from "@/lib/auth/session";
+import { TIME_GREETINGS, getTimePeriod } from "@/lib/auri";
 import { blurUp, staggerContainer } from "@/lib/animations";
-
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-};
 
 // Subscribed store for time-of-day — renders a stable value on the server and
 // in the first client pass, then swaps to the live greeting. No hydration flash.
 const subscribe = () => () => {};
-const getClientGreeting = () => getGreeting();
+const getClientGreeting = () => TIME_GREETINGS[getTimePeriod()];
 const getServerGreeting = () => "Welcome";
 
 const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
@@ -110,7 +104,7 @@ export default function SanctuaryHero() {
 
           <motion.h1
             variants={blurUp}
-            className="mt-8 text-[18vw] font-black leading-none tracking-tight md:text-[10rem]"
+            className="mt-8 font-display text-[18vw] font-medium leading-none tracking-[-0.03em] md:text-[10rem]"
           >
             <GradientText className="drop-shadow-[0_0_45px_rgba(var(--mood-rgb),0.5)]">
               WithIn

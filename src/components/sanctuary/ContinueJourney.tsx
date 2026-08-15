@@ -4,42 +4,7 @@ import Container from "@/components/ui/Container";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
 import ContentCard from "@/components/ui/cards/ContentCard";
-
-const journey = [
-  {
-    id: "lighthouse",
-    title: "The Lighthouse Keeper",
-    kind: "Story · Chapter 4",
-    progress: 0.62,
-    meta: "12 min left",
-    gradient: "from-purple-600 to-indigo-600",
-    emoji: "🌊",
-    badge: { label: "Resume", tone: "mood" as const },
-    href: "#memories"
-  },
-  {
-    id: "horizon",
-    title: "Horizon",
-    kind: "Original film · 1h 42m",
-    progress: 0.4,
-    meta: "1h 02m left",
-    gradient: "from-amber-500 to-orange-600",
-    emoji: "🌅",
-    badge: { label: "Watching", tone: "warm" as const },
-    href: "#originals"
-  },
-  {
-    id: "rainfall",
-    title: "Rainfall Studies",
-    kind: "Album · Track 6 of 14",
-    progress: 0.46,
-    meta: "8 tracks left",
-    gradient: "from-cyan-600 to-blue-700",
-    emoji: "🌧",
-    badge: { label: "Listening", tone: "emerald" as const },
-    href: "#music"
-  }
-];
+import { MOCK_JOURNEY } from "@/lib/journey";
 
 type ContinueJourneyProps = {
   /** Where story cards lead (sanctuary: #memories, landing: #continue) */
@@ -72,7 +37,7 @@ export default function ContinueJourney({
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {journey.map((item, index) => (
+          {MOCK_JOURNEY.map((item, index) => (
             <ContentCard
               key={item.id}
               delay={index * 0.1}

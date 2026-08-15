@@ -7,42 +7,9 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import ContentCard from "@/components/ui/cards/ContentCard";
+import MeshGradient from "@/components/effects/MeshGradient";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
-
-const albums = [
-  {
-    id: "tide",
-    title: "Tide & Silence",
-    artist: "Lumen",
-    tracks: 12,
-    gradient: "from-cyan-500 to-blue-700",
-    emoji: "🌊"
-  },
-  {
-    id: "embers",
-    title: "Embers",
-    artist: "Nocturne",
-    tracks: 9,
-    gradient: "from-orange-500 to-rose-700",
-    emoji: "🔥"
-  },
-  {
-    id: "rainfall",
-    title: "Rainfall Studies",
-    artist: "Aster",
-    tracks: 14,
-    gradient: "from-indigo-500 to-slate-700",
-    emoji: "🌧"
-  },
-  {
-    id: "garden",
-    title: "Night Garden",
-    artist: "Mira",
-    tracks: 10,
-    gradient: "from-emerald-500 to-teal-700",
-    emoji: "🌱"
-  }
-];
+import { ALBUMS } from "@/lib/content";
 
 /** Equalizer bars — three hairs that dance while a track "plays". */
 function Equalizer({ playing }: { playing: boolean }) {
@@ -74,13 +41,17 @@ type MusicSectionProps = {
 export default function MusicSection({ actionHref = "#discover" }: MusicSectionProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotionSafe();
-  const nowPlaying = albums.find((album) => album.id === playingId) ?? null;
+  const nowPlaying = ALBUMS.find((album) => album.id === playingId) ?? null;
 
   const toggle = (id: string) => setPlayingId((current) => (current === id ? null : id));
 
   return (
-    <section id="music" className="scroll-mt-24 py-24 text-white">
-      <Container>
+    <section id="music" className="relative scroll-mt-24 py-24 text-white">
+      {/* Rhythmic room — violet + cyan light, low and slow */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <MeshGradient preset="music" />
+      </div>
+      <Container className="relative">
         <SectionHeader
           align="left"
           eyebrow="Music"
@@ -117,7 +88,7 @@ export default function MusicSection({ actionHref = "#discover" }: MusicSectionP
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {albums.map((album, index) => {
+          {ALBUMS.map((album, index) => {
             const playing = playingId === album.id;
             return (
               <ContentCard
@@ -126,9 +97,10 @@ export default function MusicSection({ actionHref = "#discover" }: MusicSectionP
                 title={album.title}
                 creator={album.artist}
                 meta={`Album · ${album.tracks} tracks`}
+                tone={playing ? "clay" : "tactile"}
                 cover={{
-                  gradient: album.gradient,
-                  emoji: album.emoji,
+                  gradient: album.cover.gradient,
+                  emoji: album.cover.emoji,
                   className: "aspect-square h-auto"
                 }}
                 action={

@@ -6,10 +6,13 @@ import Logo from "@/components/ui/Logo";
 import GradientText from "@/components/ui/GradientText";
 
 const exploreLinks = [
-  { label: "Continue", href: "#continue" },
-  { label: "Originals", href: "#originals" },
-  { label: "Music", href: "#music" },
-  { label: "Communities", href: "#communities" }
+  { label: "Discover", href: "/discover" },
+  { label: "Originals", href: "/originals" },
+  { label: "Music", href: "/music" },
+  { label: "Books", href: "/books" },
+  { label: "Photography", href: "/photography" },
+  { label: "Communities", href: "/communities" },
+  { label: "Creators", href: "/creators" }
 ];
 
 const companyLinks = [

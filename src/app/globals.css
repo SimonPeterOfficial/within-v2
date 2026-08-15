@@ -12,6 +12,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces); /* font-display — the editorial serif face */
 
   /* Border radii */
   --radius-card: 1.5rem; /* rounded-card  — primary surfaces */
@@ -60,6 +61,27 @@ html {
   --ink-muted: #9ca3af;
   /* Emotional theme — "R, G, B" triple. Mood selections overwrite this live. */
   --mood-rgb: 168, 85, 247;
+
+  /* ── Dreamscape semantic tokens ──────────────────────────────────────
+     The named vocabulary of the visual engine. New surfaces speak in
+     --within-* so the whole universe stays tuned from one room. */
+  --within-bg: var(--background);
+  --within-surface: var(--surface);
+  --within-surface-elevated: rgba(255, 255, 255, 0.09);
+  --within-text: var(--foreground);
+  --within-text-muted: var(--ink-muted);
+  --within-purple: #a78bfa;
+  --within-emerald: #34d399;
+  --within-cyan: #22d3ee;
+  --within-border: rgba(255, 255, 255, 0.1);
+  --within-glow: rgba(168, 85, 247, 0.45);
+  --within-grain-opacity: 0.05;
+
+  /* Atmosphere intensity — time of day tunes these; the aurora and mesh
+     read them so the world breathes with the hour. */
+  --atmos-mesh: 1;
+  --atmos-aurora: 1;
+  --atmos-grain: 1;
 }
 
 /* Light theme — the same universe, a brighter room */
@@ -70,6 +92,8 @@ html {
   --surface: rgba(0, 0, 0, 0.04);
   --line: rgba(0, 0, 0, 0.12);
   --ink-muted: #52525b;
+  /* Grain quiets down in daylight */
+  --within-grain-opacity: 0.03;
 }
 
 body {
@@ -100,6 +124,314 @@ button:not(:disabled),
 /* Cinematic vignette */
 .vignette {
   background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Time atmosphere — Auri sets data-time on <html> (morning /
+   afternoon / evening / night) and the living background answers
+   with a whisper of the hour: warm dawn light, cool deep night.
+   Pure overlay — content and contrast are untouched.
+   ───────────────────────────────────────────────────────────── */
+.time-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+html[data-time="morning"] .time-glow {
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 90% 55% at 30% 12%, rgba(255, 196, 118, 0.10), transparent 60%),
+    linear-gradient(to top, rgba(251, 191, 36, 0.04), transparent 45%);
+}
+
+html[data-time="afternoon"] .time-glow {
+  opacity: 0.4;
+  background: radial-gradient(ellipse 90% 55% at 50% 8%, rgba(180, 214, 255, 0.07), transparent 60%);
+}
+
+html[data-time="evening"] .time-glow {
+  opacity: 0.5;
+  background:
+    radial-gradient(ellipse 90% 55% at 66% 8%, rgba(255, 158, 118, 0.09), transparent 60%),
+    linear-gradient(to top, rgba(168, 85, 247, 0.05), transparent 45%);
+}
+
+html[data-time="night"] .time-glow {
+  opacity: 0.65;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 6%, rgba(120, 140, 255, 0.07), transparent 60%),
+    linear-gradient(to top, rgba(90, 110, 255, 0.05), transparent 55%);
+}
+
+/* Time tunes the whole engine — morning softens, night deepens */
+html[data-time="morning"] {
+  --atmos-mesh: 0.7;
+  --atmos-aurora: 0.75;
+  --atmos-grain: 0.8;
+}
+html[data-time="evening"] {
+  --atmos-mesh: 1.08;
+  --atmos-aurora: 1.05;
+}
+html[data-time="night"] {
+  --atmos-mesh: 1.25;
+  --atmos-aurora: 1.2;
+  --atmos-grain: 0.7;
+}
+
+/* The aurora reads the atmosphere intensity — slow crossfade, no snap */
+.aurora-root {
+  opacity: var(--atmos-aurora, 1);
+  transition: opacity 1.6s ease;
+}
+
+/* ── Pointer light — light follows the hand. One halo trails the cursor and
+   wakes only over interactive surfaces, so hovering a card reads as light
+   moving across glass. Pure transform (GPU-friendly), driven by CSS vars set
+   from PointerLight. Off on touch and under Reduced Motion. */
+.pointer-light {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.pointer-light[data-active] {
+  opacity: 1;
+}
+
+.pointer-light__halo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 560px;
+  height: 560px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--mood-rgb), 0.1) 0%,
+    rgba(var(--mood-rgb), 0.045) 35%,
+    transparent 70%
+  );
+  transform: translate3d(var(--pl-x, 0px), var(--pl-y, 0px), 0) translate(-50%, -50%);
+  will-change: transform;
+}
+
+/* ── Grain — the film over the dream. One feather-light SVG noise, blended
+   soft-light so it adds material without ever reading as static. It sits
+   above backgrounds and below chrome (nav/cursor outrank it). */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc(var(--within-grain-opacity, 0.05) * var(--atmos-grain, 1));
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.6'/></svg>");
+  background-size: 160px 160px;
+}
+
+/* ── Mesh engine — multiple blurred light sources, drifting like northern
+   lights seen through deep water. Opacity is tuned by --atmos-mesh so the
+   hour (and future weather) can reshape the room. */
+.mesh-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: var(--atmos-mesh, 1);
+  transition: opacity 1.6s ease;
+}
+
+.mesh-gradient::before,
+.mesh-gradient::after {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  filter: blur(70px);
+}
+
+.mesh-gradient::before {
+  animation: meshDrift 72s ease-in-out infinite;
+}
+.mesh-gradient::after {
+  animation: meshDrift 96s ease-in-out infinite reverse;
+}
+
+@keyframes meshDrift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3%, -2%) scale(1.07);
+  }
+}
+
+/* Environment presets — each room of WithIn has its own atmosphere */
+.mesh-home::before {
+  background:
+    radial-gradient(32% 42% at 18% 22%, rgba(168, 85, 247, 0.14), transparent 70%),
+    radial-gradient(34% 44% at 82% 18%, rgba(52, 211, 153, 0.09), transparent 70%),
+    radial-gradient(42% 50% at 62% 82%, rgba(49, 58, 140, 0.14), transparent 70%);
+}
+.mesh-home::after {
+  background:
+    radial-gradient(30% 38% at 70% 60%, rgba(34, 211, 238, 0.05), transparent 70%),
+    radial-gradient(36% 42% at 30% 70%, rgba(88, 66, 160, 0.1), transparent 70%);
+}
+
+.mesh-sanctuary::before {
+  background:
+    radial-gradient(32% 42% at 22% 20%, rgba(139, 92, 246, 0.11), transparent 70%),
+    radial-gradient(36% 46% at 80% 30%, rgba(96, 130, 200, 0.1), transparent 70%),
+    radial-gradient(40% 48% at 55% 85%, rgba(190, 200, 225, 0.05), transparent 70%);
+}
+.mesh-sanctuary::after {
+  background:
+    radial-gradient(30% 40% at 40% 60%, rgba(120, 110, 180, 0.08), transparent 70%);
+}
+
+.mesh-music::before {
+  background:
+    radial-gradient(32% 42% at 20% 25%, rgba(139, 92, 246, 0.12), transparent 70%),
+    radial-gradient(36% 46% at 78% 40%, rgba(34, 211, 238, 0.09), transparent 70%);
+}
+.mesh-music::after {
+  background:
+    radial-gradient(30% 40% at 60% 75%, rgba(34, 211, 238, 0.05), transparent 70%);
+}
+
+.mesh-books::before {
+  background:
+    radial-gradient(32% 42% at 25% 20%, rgba(139, 92, 246, 0.1), transparent 70%),
+    radial-gradient(36% 46% at 75% 60%, rgba(217, 176, 120, 0.06), transparent 70%);
+}
+
+.mesh-communities::before {
+  background:
+    radial-gradient(32% 42% at 20% 30%, rgba(52, 211, 153, 0.12), transparent 70%),
+    radial-gradient(36% 46% at 80% 60%, rgba(139, 92, 246, 0.1), transparent 70%);
+}
+.mesh-communities::after {
+  background:
+    radial-gradient(30% 40% at 55% 25%, rgba(52, 211, 153, 0.06), transparent 70%);
+}
+
+.mesh-originals::before {
+  background:
+    radial-gradient(34% 44% at 20% 20%, rgba(109, 40, 217, 0.16), transparent 70%),
+    radial-gradient(38% 48% at 80% 55%, rgba(37, 99, 235, 0.1), transparent 70%);
+}
+.mesh-originals::after {
+  background:
+    radial-gradient(32% 42% at 60% 85%, rgba(76, 29, 149, 0.12), transparent 70%);
+}
+
+/* ── Weather-ready + special-day hooks ────────────────────────────────
+   Dormant by design: no live weather is claimed, no holidays are forced.
+   The moment a real source exists, set data-weather / data-theme-day on
+   <html> (see src/lib/atmosphere.ts) and the room will answer here. */
+html[data-weather] .time-glow {
+  opacity: 0.75;
+}
+html[data-weather="rain"] .time-glow,
+html[data-weather="storm"] .time-glow {
+  --atmos-aurora: 0.7;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(110, 130, 180, 0.06), transparent 60%),
+    linear-gradient(to top, rgba(90, 110, 140, 0.06), transparent 55%);
+}
+/* The sky — live weather states tune the engine softly (set by lib/weather.ts) */
+html[data-weather="clear"] {
+  --atmos-aurora: 1.08;
+}
+html[data-weather="cloudy"] {
+  --atmos-mesh: 0.85;
+  --atmos-aurora: 0.9;
+}
+html[data-weather="rain"] {
+  --atmos-mesh: 0.9;
+}
+html[data-weather="snow"] .time-glow {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(200, 220, 255, 0.09), transparent 60%),
+    linear-gradient(to top, rgba(180, 200, 240, 0.06), transparent 55%);
+}
+html[data-theme-day] {
+  --atmos-mesh: 1.12;
+}
+html[data-theme-day="birthday"] .time-glow {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 10%, rgba(255, 180, 220, 0.08), transparent 60%),
+    radial-gradient(ellipse 70% 45% at 30% 30%, rgba(255, 220, 130, 0.06), transparent 65%);
+}
+
+/* ── Material system — the tactile language of the dream ───────────────
+   Each material says what the surface is for. Applied via GlassCard tones
+   or directly. Restraint is the rule: material communicates purpose. */
+@utility material-aurora-glass {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+@utility material-tactile-glass {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+@utility material-soft-clay {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, #2d2350, #171127);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.5),
+    0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+@utility material-cinematic {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(15, 10, 30, 0.7), rgba(5, 3, 12, 0.9));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@utility material-paper {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(165deg, #1a1532, #120f24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+@utility material-dark-tactile {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(22, 17, 40, 0.92), rgba(10, 8, 20, 0.95));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Neobrutalist accent — rare, confident, discoverable (communities etc.) */
+@utility neo-chip {
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  background: rgba(13, 10, 26, 0.85);
+  box-shadow: 4px 4px 0 rgba(var(--mood-rgb), 0.45);
+  font-weight: 700;
 }
 
 @keyframes floatGlow {
@@ -164,7 +496,24 @@ button:not(:disabled),
   }
 
   .animate-glow,
-  .animate-marquee {
+  .animate-marquee,
+  .mesh-gradient::before,
+  .mesh-gradient::after {
     animation: none;
+  }
+
+  .grain-overlay {
+    opacity: 0.03;
+  }
+
+  .pointer-light {
+    display: none;
+  }
+}
+
+/* Touch devices have no hover light — it would only sit at the last tap. */
+@media (hover: none), (pointer: coarse) {
+  .pointer-light {
+    display: none;
   }
 }

@@ -4,69 +4,39 @@ import Container from "@/components/ui/Container";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
 import ContentCard from "@/components/ui/cards/ContentCard";
+import MeshGradient from "@/components/effects/MeshGradient";
+import { BOOKS } from "@/lib/content";
 
-const books = [
-  {
-    id: "paper-constellations",
-    title: "Paper Constellations",
-    author: "Elena Marek",
-    progress: 0.44,
-    chapter: "Chapter 4 of 9",
-    meta: "84 pages left",
-    gradient: "from-emerald-500 to-teal-700",
-    emoji: "🪐"
-  },
-  {
-    id: "tide-returns",
-    title: "The Tide Returns",
-    author: "Jonas Wu",
-    progress: 0.71,
-    chapter: "Chapter 7 of 10",
-    meta: "38 pages left",
-    gradient: "from-sky-500 to-indigo-700",
-    emoji: "🌊"
-  },
-  {
-    id: "garden-whispers",
-    title: "Garden Whispers",
-    author: "Priya Nair",
-    progress: 0.18,
-    chapter: "Chapter 1 of 8",
-    meta: "212 pages left",
-    gradient: "from-rose-500 to-pink-700",
-    emoji: "🌸"
-  },
-  {
-    id: "light-keepers",
-    title: "Light Keepers",
-    author: "Omar Hale",
-    progress: 0.92,
-    chapter: "Epilogue",
-    meta: "6 pages left",
-    gradient: "from-amber-500 to-orange-700",
-    emoji: "🏮"
-  }
-];
+type BooksSectionProps = {
+  /** Where the header action leads (sanctuary: #originals, books page: /originals) */
+  actionHref?: string;
+  /** Where each book card leads (sanctuary: #originals, books page: /originals) */
+  cardHref?: string;
+};
 
 /** Books — stories that sit with you for days, page by page. */
-export default function BooksSection() {
+export default function BooksSection({ actionHref = "#originals", cardHref = "#originals" }: BooksSectionProps) {
   return (
-    <section id="books" className="scroll-mt-24 py-24 text-white">
-      <Container>
+    <section id="books" className="relative scroll-mt-24 py-24 text-white">
+      {/* Warm reading room — violet light with candle-warm neutral */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <MeshGradient preset="books" />
+      </div>
+      <Container className="relative">
         <SectionHeader
           align="left"
           eyebrow="Books"
           title="Stories that sit with you for days"
           subtitle="Every bookmark is a promise kept. Pick up where your pages remember you."
           action={
-            <Button href="#originals" variant="ghost" size="md">
+            <Button href={actionHref} variant="ghost" size="md">
               Visit the library
             </Button>
           }
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {books.map((book, index) => (
+          {BOOKS.map((book, index) => (
             <ContentCard
               key={book.id}
               delay={index * 0.08}
@@ -75,9 +45,10 @@ export default function BooksSection() {
               progress={book.progress}
               progressLabel={`Reading progress for ${book.title}`}
               meta={`${book.chapter} · ${book.meta}`}
-              href="#originals"
+              href={cardHref}
               badges={[{ label: "Reading", tone: "emerald" as const }]}
-              cover={{ gradient: book.gradient, emoji: book.emoji }}
+              tone="paper"
+              cover={{ gradient: book.cover.gradient, emoji: book.cover.emoji }}
             />
           ))}
         </div>

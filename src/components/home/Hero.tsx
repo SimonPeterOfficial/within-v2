@@ -101,7 +101,7 @@ export default function Hero() {
             variants={staggerContainer(0.18, 0.35)}
             initial="hidden"
             animate="show"
-            className="mt-10 text-[15vw] font-black leading-[0.92] tracking-tight sm:text-7xl md:text-8xl lg:text-9xl"
+            className="mt-10 font-display text-[15vw] font-medium leading-[0.92] tracking-[-0.03em] sm:text-7xl md:text-8xl lg:text-9xl"
           >
             <motion.span variants={blurUp} className="block">
               Feel Seen.
@@ -120,11 +120,11 @@ export default function Hero() {
             variants={blurUp}
             className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-gray-300 md:text-lg"
           >
-            A home for stories, emotions, creators and meaningful connections — a universe
-            built around how you feel right now.
+            A home for the things that make you, you — stories, films, music, books and the
+            people who make them. Find a place for the way you feel.
           </motion.p>
 
-          {/* Magnetic, breathing CTAs */}
+          {/* Magnetic, breathing CTAs — enter, or wander first (no account needed) */}
           <motion.div
             variants={blurUp}
             className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
@@ -135,11 +135,18 @@ export default function Hero() {
               </Button>
             </Magnetic>
             <Magnetic>
-              <Button href="#originals" variant="outline" size="xl">
-                Explore Originals
+              <Button href="/discover" variant="outline" size="xl">
+                Explore first
               </Button>
             </Magnetic>
           </motion.div>
+
+          <motion.p
+            variants={blurUp}
+            className="mt-6 text-xs text-gray-500"
+          >
+            No account needed to wander — save & personalization come when you&apos;re ready.
+          </motion.p>
         </motion.div>
       </motion.div>
 

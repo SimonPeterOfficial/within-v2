@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/session";
 import { ThemeProvider } from "@/lib/theme";
+import { EnvironmentProvider } from "@/lib/environment";
 import CustomCursor from "@/components/effects/CustomCursor";
+import GrainOverlay from "@/components/effects/GrainOverlay";
+import PointerLight from "@/components/effects/PointerLight";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,6 +16,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// The editorial display face — soft serif with a real italic axis. Headlines
+// across the universe speak in Fraunces; body copy stays in Geist.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -49,20 +60,24 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white">
         <ThemeProvider>
-          <AuthProvider>
-            <a
-              href="#main"
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
-            >
-              Skip to content
-            </a>
-            {children}
-            <CustomCursor />
-          </AuthProvider>
+          <EnvironmentProvider>
+            <AuthProvider>
+              <a
+                href="#main"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
+              >
+                Skip to content
+              </a>
+              {children}
+              <GrainOverlay />
+              <PointerLight />
+              <CustomCursor />
+            </AuthProvider>
+          </EnvironmentProvider>
         </ThemeProvider>
       </body>
     </html>

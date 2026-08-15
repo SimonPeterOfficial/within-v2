@@ -1,227 +1,300 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
-import { applyMood, getMood, moods, onMoodChange, type Mood } from "@/lib/mood";
-import { gradients, moodGlow } from "@/lib/design";
+import { useSession } from "@/lib/auth/session";
+import { useEnvironment } from "@/lib/environment";
+import { applyMood } from "@/lib/mood";
+import { moodGlow } from "@/lib/design";
+import {
+  bumpAuriOpenCount,
+  hasSeenAuriEntrance,
+  markAuriEntranceSeen,
+  TIME_WHISPERS,
+  type AuriContext,
+  type AuriState
+} from "@/lib/auri";
+import AuriOwl from "@/components/sanctuary/AuriOwl";
+import AuriPanel from "@/components/sanctuary/AuriPanel";
+import AuriEntrance from "@/components/sanctuary/AuriEntrance";
 
 /** Dispatched when anything in the universe asks Auri to appear (e.g. QuickActions). */
 export const AURI_OPEN_EVENT = "within:auri-open";
 
-/** Gentle nudges that cycle while Auri is resting, so the presence feels alive. */
-const whispers = ["tap to talk ✨", "Auri is listening…", "your mood shapes the light"];
+/** How long the room can stay untouched before Auri rests her eyes. */
+const SLEEP_AFTER_MS = 90 * 1000;
 
-type AuriBubbleProps = {
-  mood: Mood | undefined;
-  onSelect: (id: string | null) => void;
-};
-
-/** Auri's reply bubble — mounts fresh each time, "thinks" before answering. */
-function AuriBubble({ mood, onSelect }: AuriBubbleProps) {
-  const [thinking, setThinking] = useState(true);
+/**
+ * Auri — a quiet presence living inside WithIn.
+ *
+ * A small owl rests in the corner of every page. She breathes, blinks, and
+ * notices the cursor; tap her and she opens an intimate glass chamber with a
+ * greeting shaped by the hour, the route, your mood, and whether you're new.
+ * The very first time she appears she arrives with a short cinematic —
+ * dust, a small light, an owl gathering in it.
+ *
+ * The environment (src/lib/environment.tsx) owns the hour and your mood;
+ * Auri reads them here. Her presence runs a small state machine — idle,
+ * observing, curious, greeting, thinking, listening, responding, sleeping —
+ * and each state is a whisper, never a performance.
+ */
+export default function AuriOrb() {
+  const pathname = usePathname();
+  const { status, user } = useSession();
+  const { period, moodId, visits } = useEnvironment();
   const prefersReducedMotion = useReducedMotionSafe();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setThinking(false), 1100);
-    return () => clearTimeout(timer);
+  const [open, setOpen] = useState(false);
+  const [entrance, setEntrance] = useState(false);
+  const [whisperIndex, setWhisperIndex] = useState(0);
+  const [openCount, setOpenCount] = useState(0);
+  const [auriState, setAuriState] = useState<AuriState>("idle");
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const decayRef = useRef<number | null>(null);
+  const sleepRef = useRef<number | null>(null);
+
+  /* ── The presence state machine ─────────────────────────────────────── */
+
+  const clearSleepTimer = useCallback(() => {
+    if (sleepRef.current) {
+      window.clearTimeout(sleepRef.current);
+      sleepRef.current = null;
+    }
   }, []);
 
-  const message = mood
-    ? `Auri noticed your world feels ${mood.label.toLowerCase()} today. ${mood.line}`
-    : "I'm always here. Tell me how you feel and I'll shape your sanctuary around it.";
+  const scheduleSleep = useCallback(() => {
+    if (prefersReducedMotion) return;
+    clearSleepTimer();
+    sleepRef.current = window.setTimeout(() => {
+      setAuriState((current) =>
+        current === "idle" || current === "observing" ? "sleeping" : current
+      );
+    }, SLEEP_AFTER_MS);
+  }, [prefersReducedMotion, clearSleepTimer]);
+
+  // While resting, if the pointer comes near, she wakes — and the presence
+  // (her proximity) keeps her awake as long as you stay close.
+  useEffect(() => {
+    if (prefersReducedMotion || open) return;
+    const onMove = (event: MouseEvent) => {
+      const el = buttonRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      if (Math.hypot(event.clientX - cx, event.clientY - cy) < 320) {
+        setAuriState((current) => (current === "sleeping" ? "observing" : current));
+        scheduleSleep();
+      }
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [prefersReducedMotion, open, scheduleSleep]);
+
+  // Schedule the first rest once mounted.
+  useEffect(() => {
+    scheduleSleep();
+    return () => {
+      clearSleepTimer();
+      if (decayRef.current) window.clearTimeout(decayRef.current);
+    };
+  }, [scheduleSleep, clearSleepTimer]);
+
+  // The panel reports conversation states (thinking, responding…); transient
+  // ones gently settle back to listening.
+  const handlePresence = useCallback((next: AuriState) => {
+    setAuriState(next);
+    if (decayRef.current) {
+      window.clearTimeout(decayRef.current);
+      decayRef.current = null;
+    }
+    if (next === "greeting") {
+      decayRef.current = window.setTimeout(() => setAuriState("listening"), 2600);
+    } else if (next === "responding") {
+      decayRef.current = window.setTimeout(() => setAuriState("listening"), 2000);
+    }
+  }, []);
+
+  /* ── Open / close / first arrival ───────────────────────────────────── */
+
+  const openPanel = useCallback(() => {
+    clearSleepTimer();
+    setOpenCount(bumpAuriOpenCount());
+    setOpen(true);
+    setAuriState("greeting");
+  }, [clearSleepTimer]);
+
+  const closePanel = useCallback(() => {
+    setOpen(false);
+    setAuriState("idle");
+    // Return focus to the owl — the conversation is over, she stays present.
+    requestAnimationFrame(() => buttonRef.current?.focus());
+    scheduleSleep();
+  }, [scheduleSleep]);
+
+  const finishEntrance = useCallback(() => {
+    markAuriEntranceSeen();
+    setEntrance(false);
+    openPanel();
+  }, [openPanel]);
+
+  const handleToggle = useCallback(() => {
+    if (open) {
+      closePanel();
+      return;
+    }
+    // First ever arrival gets the cinematic — once per browser, and never
+    // under Reduced Motion (the panel simply opens).
+    if (!hasSeenAuriEntrance() && !prefersReducedMotion) {
+      setEntrance(true);
+    } else {
+      openPanel();
+    }
+  }, [open, openPanel, closePanel, prefersReducedMotion]);
+
+  // Anywhere in the app can ask Auri to appear (e.g. QuickActions "Talk to Auri").
+  useEffect(() => {
+    const requestOpen = () => handleToggle();
+    window.addEventListener(AURI_OPEN_EVENT, requestOpen);
+    return () => window.removeEventListener(AURI_OPEN_EVENT, requestOpen);
+  }, [handleToggle]);
+
+  // Escape closes the panel; during the entrance it finishes the reveal.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (entrance) {
+        finishEntrance();
+      } else if (open) {
+        closePanel();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [entrance, open, finishEntrance, closePanel]);
+
+  // Cycle the resting whispers so Auri feels present rather than decorative.
+  // Returning users get a quiet "Welcome back." before the hour's line.
+  const whispers = useMemo(() => {
+    const base = [TIME_WHISPERS[period], "tap to talk", "your mood shapes the light", "Auri is listening…"];
+    return visits.isReturningUser ? ["Welcome back.", ...base] : base;
+  }, [period, visits.isReturningUser]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const id = window.setInterval(
+      () => setWhisperIndex((index) => (index + 1) % whispers.length),
+      4600
+    );
+    return () => clearInterval(id);
+  }, [prefersReducedMotion, whispers.length]);
+
+  const context: AuriContext = useMemo(
+    () => ({
+      period,
+      pathname,
+      moodId,
+      isAuthenticated: status === "authenticated",
+      firstName: user?.name.trim().split(/\s+/)[0],
+      firstOpen: openCount === 1,
+      openCount
+    }),
+    [period, pathname, moodId, status, user, openCount]
+  );
+
+  const wake = () => {
+    clearSleepTimer();
+    setAuriState((current) => (current === "sleeping" ? "idle" : current));
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className="w-72 rounded-3xl border border-white/10 bg-black/70 p-5 backdrop-blur-sm"
-    >
-      <p className="text-sm leading-relaxed text-gray-300">
-        <span className="font-semibold text-emerald-300">Auri:</span>{" "}
-        {thinking ? (
-          <span className="inline-flex items-center gap-1" aria-hidden>
-            {[0, 1, 2].map((dot) => (
-              <motion.span
-                key={dot}
-                animate={
-                  prefersReducedMotion
-                    ? undefined
-                    : { y: [0, -3, 0], opacity: [0.4, 1, 0.4] }
-                }
-                transition={{ duration: 0.9, repeat: Infinity, delay: dot * 0.15 }}
-                className="h-1.5 w-1.5 rounded-full bg-emerald-300"
-              />
-            ))}
-          </span>
-        ) : (
+    <>
+      {/* First-arrival cinematic */}
+      <AnimatePresence>
+        {entrance && <AuriEntrance onComplete={finishEntrance} />}
+      </AnimatePresence>
+
+      {/* The presence — rests clear of the mobile menu trigger, above it on phones */}
+      <div className="fixed bottom-20 right-4 z-40 flex flex-col items-end gap-3 sm:right-6 lg:bottom-6">
+        {/* Soft light emission pool — follows the mood */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-8 -right-4 h-36 w-36 rounded-full blur-2xl transition-opacity duration-700"
+          style={{ background: moodGlow(0.28), opacity: entrance ? 0 : 1 }}
+        />
+
+        {/* Whisper prompt — a soft word that cycles while Auri rests */}
+        {!open && !entrance && (
           <AnimatePresence mode="wait">
             <motion.span
-              key={message}
+              key={whispers[whisperIndex]}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.4 }}
+              className="pointer-events-none rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium tracking-wide text-emerald-300 backdrop-blur"
             >
-              {message}
+              {whispers[whisperIndex]}
             </motion.span>
           </AnimatePresence>
         )}
-      </p>
-      <div className="mt-4 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-500">
-        Type a feeling…
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {moods.map((item) => {
-          const active = mood?.id === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelect(active ? null : item.id)}
-              aria-pressed={active}
-              className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                active
-                  ? "border-[rgba(var(--mood-rgb),0.6)] bg-[rgba(var(--mood-rgb),0.15)] text-white"
-                  : "border-white/10 bg-white/5 text-gray-300 hover:border-emerald-400/40 hover:text-white"
-              }`}
+
+        {/* The chamber — AuriPanel drives its own entrance; this wrapper
+            owns the exit so the close never pops abruptly */}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              key="auri-panel"
+              className="absolute bottom-full right-0 mb-4"
+              exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              {item.emoji} {item.label}
-            </button>
-          );
-        })}
-      </div>
-    </motion.div>
-  );
-}
-
-/** Living presence — a breathing orb with a particle aura that speaks your mood. */
-export default function AuriOrb() {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [whisperIndex, setWhisperIndex] = useState(0);
-  const prefersReducedMotion = useReducedMotionSafe();
-
-  // Stay in sync with moods chosen anywhere (e.g. the MoodOrbit)
-  useEffect(() => onMoodChange((id) => setSelected(id)), []);
-
-  // Anywhere in the app can ask Auri to appear (e.g. QuickActions "Talk to Auri")
-  useEffect(() => {
-    const open = () => setOpen(true);
-    window.addEventListener(AURI_OPEN_EVENT, open);
-    return () => window.removeEventListener(AURI_OPEN_EVENT, open);
-  }, []);
-
-  // Cycle the resting whispers so Auri feels present rather than decorative
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-    const id = setInterval(
-      () => setWhisperIndex((index) => (index + 1) % whispers.length),
-      4200
-    );
-    return () => clearInterval(id);
-  }, [prefersReducedMotion]);
-
-  const selectedMood = getMood(selected);
-
-  return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
-      {/* Soft light emission pool — follows the mood */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -bottom-10 -right-6 h-40 w-40 rounded-full blur-3xl"
-        style={{ background: moodGlow(0.25) }}
-      />
-
-      <AnimatePresence>
-        {open && (
-          <AuriBubble
-            key="auri-bubble"
-            mood={selectedMood}
-            onSelect={(id) => applyMood(id)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Whisper prompt — cycles through gentle nudges so Auri feels present */}
-      {!open && (
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={whisperIndex}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.4 }}
-            className="rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-[11px] font-medium tracking-wide text-emerald-300 backdrop-blur"
-          >
-            {whispers[whisperIndex]}
-          </motion.span>
-        </AnimatePresence>
-      )}
-
-      <motion.button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-label={open ? "Close Auri" : "Open Auri"}
-        animate={prefersReducedMotion ? undefined : { y: [0, -6, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="group relative flex h-16 w-16 items-center justify-center"
-      >
-        {!prefersReducedMotion && (
-          <span className="absolute inset-0 animate-ping rounded-full bg-[rgba(var(--mood-rgb),0.3)]" />
-        )}
-
-        {/* Rotating aura ring */}
-        {!prefersReducedMotion && (
-          <motion.span
-            aria-hidden
-            animate={{ rotate: 360 }}
-            transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-2 rounded-full border border-purple-400/25"
-          />
-        )}
-
-        {/* Orbiting particle aura */}
-        {!prefersReducedMotion && (
-          <motion.span
-            aria-hidden
-            animate={{ rotate: 360 }}
-            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-4"
-          >
-            {[0, 60, 120, 180, 240, 300].map((angle) => (
-              <span
-                key={angle}
-                className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-[rgba(var(--mood-rgb),0.7)]"
-                style={{
-                  transform: `rotate(${angle}deg) translateX(36px)`,
-                  marginLeft: -2,
-                  marginTop: -2
-                }}
+              <AuriPanel
+                context={context}
+                moodId={moodId}
+                onMoodSelect={(id) => applyMood(id)}
+                onClose={closePanel}
+                onPresenceChange={handlePresence}
               />
-            ))}
-          </motion.span>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Breathing core — glows in the current mood color */}
-        <motion.span
-          animate={prefersReducedMotion ? undefined : { scale: [1, 1.05, 1] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          style={{ backgroundImage: gradients.orb }}
-          className="relative flex h-16 w-16 items-center justify-center rounded-full shadow-orb"
+        {/* The owl — she notices you when you come near */}
+        <motion.button
+          ref={buttonRef}
+          type="button"
+          onClick={handleToggle}
+          onMouseEnter={prefersReducedMotion ? undefined : () => { wake(); setAuriState("curious"); }}
+          onMouseLeave={
+            prefersReducedMotion
+              ? undefined
+              : () => {
+                  if (!open) {
+                    setAuriState("idle");
+                    scheduleSleep();
+                  }
+                }
+          }
+          aria-expanded={open}
+          aria-haspopup="dialog"
+          aria-label={open ? "Close Auri" : "Talk to Auri"}
+          whileHover={prefersReducedMotion ? undefined : { scale: 1.06 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 320, damping: 20 }}
+          className="material-soft-clay group relative flex h-16 w-16 items-center justify-center rounded-full transition-colors duration-300 hover:border-[rgba(var(--mood-rgb),0.5)]"
         >
-          <span className="text-2xl" aria-hidden>
-            ✦
+          <AuriOwl size={56} followCursor state={auriState} className="drop-shadow-[0_6px_16px_rgba(0,0,0,0.45)]" />
+          <span
+            className="absolute right-full mr-3 whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-xs font-medium text-emerald-300 opacity-0 backdrop-blur transition group-hover:opacity-100"
+            aria-hidden
+          >
+            Auri
           </span>
-        </motion.span>
-
-        <span className="absolute right-full mr-3 whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-xs font-medium text-emerald-300 opacity-0 backdrop-blur transition group-hover:opacity-100">
-          Auri
-        </span>
-      </motion.button>
-    </div>
+        </motion.button>
+      </div>
+    </>
   );
 }

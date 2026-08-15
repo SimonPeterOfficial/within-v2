@@ -42,23 +42,25 @@ export function moodGlow(alpha: number): string {
 }
 
 /** Typography recipes — the type system.
- * Every text style in the universe comes from here so headlines never drift
- * between sections. Consume via the <Text> primitive or directly. */
+ * Headlines speak in the editorial display face (Fraunces) with generous
+ * leading and tightened tracking; body copy stays in Geist. Every style in
+ * the universe comes from here so headlines never drift between sections.
+ * Consume via the <Text> primitive or directly. */
 export const typography = {
-  /** Largest statement — landing heroes */
-  display: "text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl",
+  /** Largest statement — the landing hero */
+  display: "font-display font-medium text-6xl leading-[0.98] tracking-[-0.03em] md:text-8xl",
   /** Page-level hero heading */
-  hero: "text-4xl font-bold tracking-tight md:text-6xl",
-  /** Section headings */
-  sectionTitle: "text-4xl font-bold tracking-tight md:text-5xl",
+  hero: "font-display font-medium text-4xl leading-[1.02] tracking-[-0.02em] md:text-6xl",
+  /** Section headings — editorial, wide-set */
+  sectionTitle: "font-display font-semibold text-3xl leading-[1.08] tracking-[-0.02em] md:text-5xl",
   /** Supportive subheadings */
-  subtitle: "text-lg text-gray-400",
+  subtitle: "text-lg leading-relaxed text-gray-400",
   /** Default body copy */
   body: "text-base leading-relaxed",
   /** Small auxiliary text */
   caption: "text-sm text-gray-500",
-  /** Uppercase kicker above titles */
-  eyebrow: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-400",
+  /** Uppercase kicker above titles — quiet, widely tracked */
+  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400",
   /** Compact labels (chips, form labels) */
-  label: "text-xs font-medium uppercase tracking-widest"
+  label: "text-[11px] font-medium uppercase tracking-[0.2em]"
 } as const;

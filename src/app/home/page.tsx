@@ -6,6 +6,7 @@ import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import SanctuaryHero from "@/components/sanctuary/SanctuaryHero";
 import QuickActions from "@/components/sanctuary/QuickActions";
 import ContinueJourney from "@/components/sanctuary/ContinueJourney";
+import BecauseYouChose from "@/components/sanctuary/BecauseYouChose";
 import Recommended from "@/components/sanctuary/Recommended";
 import MoodOrbit from "@/components/sanctuary/MoodOrbit";
 import MemoryCards from "@/components/sanctuary/MemoryCards";
@@ -29,36 +30,47 @@ export const metadata: Metadata = {
 
 const shellItems: SidebarItem[] = [
   { label: "Sanctuary", href: "#sanctuary", icon: "home" },
+  { label: "Mood", href: "#mood", icon: "moon" },
   { label: "Continue", href: "#continue", icon: "play" },
   { label: "Recommended", href: "#recommended", icon: "sparkles" },
-  { label: "Mood", href: "#mood", icon: "moon" },
   { label: "Stories", href: "#memories", icon: "stories" },
-  { label: "Originals", href: "#originals", icon: "originals" },
-  { label: "Music", href: "#music", icon: "music" },
-  { label: "Books", href: "#books", icon: "book" },
-  { label: "Photography", href: "#photography", icon: "camera" },
-  { label: "Communities", href: "#communities", icon: "users" },
   { label: "Reflection", href: "#reflection", icon: "heart" },
-  { label: "Discover", href: "#discover", icon: "discover" },
-  { label: "Profile", href: "/login", icon: "profile", route: true }
+  /* ── The universe — real routes, every corner reachable from here ── */
+  { label: "Discover", href: "/discover", icon: "discover", route: true },
+  { label: "Originals", href: "/originals", icon: "originals", route: true },
+  { label: "Music", href: "/music", icon: "music", route: true },
+  { label: "Books", href: "/books", icon: "book", route: true },
+  { label: "Photography", href: "/photography", icon: "camera", route: true },
+  { label: "Communities", href: "/communities", icon: "users", route: true },
+  { label: "Creators", href: "/creators", icon: "sparkles", route: true },
+  { label: "Profile", href: "/profile", icon: "profile", route: true },
+  { label: "Settings", href: "/settings", icon: "settings", route: true }
 ];
 
 export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* One living atmosphere: glow → fog → aurora → light rays → particles → stars */}
-      <DepthLayers />
+      {/* One living atmosphere: glow → fog → mesh → aurora → light rays →
+          particles → stars — the sanctuary room, calm and silver-violet.
+          Quieter than the landing by design: fewer motes, softer fog. */}
+      <DepthLayers preset="sanctuary" particles={7} stars={16} fog={0.5} />
 
       <AppShell items={shellItems}>
         <SanctuaryHero />
         <QuickActions />
-        <ContinueJourney />
-        <Recommended />
+
+        {/* Dreamscape hierarchy — the universe, in order: mood → continue →
+            featured original → recommended → memories → the arts → reflection
+            → the Auri moment → the door home */}
         <MoodOrbit />
-        <MemoryCards />
+        <ContinueJourney />
+        {/* Personalized first — chosen interests surface right after the journey */}
+        <BecauseYouChose />
         <Suspense fallback={null}>
           <OriginalsShowcase />
         </Suspense>
+        <Recommended />
+        <MemoryCards />
         <Suspense fallback={null}>
           <MusicSection />
         </Suspense>

@@ -33,7 +33,7 @@ export default function MoodOrbit() {
         subtitle="Touch a feeling — the entire sanctuary responds."
       />
 
-      <div className="relative mx-auto mt-12 h-[270px] w-[270px] sm:h-[380px] sm:w-[380px]">
+      <div className="relative mx-auto mt-12 h-[300px] w-[300px] sm:h-[440px] sm:w-[440px]">
         {/* Emotional color-shift aura */}
         <AnimatePresence>
           {selected && (
@@ -113,7 +113,8 @@ export default function MoodOrbit() {
         {/* Mood chips floating around the orbit — spring in */}
         {moods.map((mood, index) => {
           const angle = (index / moods.length) * Math.PI * 2 - Math.PI / 2;
-          const radius = 44;
+          // 40% keeps eight moods on the ring without spilling off small screens
+          const radius = 40;
           const isSelected = selected === mood.id;
           return (
             <motion.button
@@ -123,7 +124,9 @@ export default function MoodOrbit() {
                 top: `calc(50% + ${Math.sin(angle) * radius}%)`,
                 borderColor: isSelected ? rgbString(mood.rgb, 0.7) : undefined,
                 backgroundColor: isSelected ? rgbString(mood.rgb, 0.14) : undefined,
-                boxShadow: isSelected ? `0 0 22px ${rgbString(mood.rgb, 0.45)}` : undefined
+                boxShadow: isSelected
+                  ? `0 0 22px ${rgbString(mood.rgb, 0.45)}, inset 0 1px 0 rgba(255,255,255,0.22)`
+                  : undefined
               }}
               initial={{ opacity: 0, x: "-50%", y: "-50%", scale: 0.7 }}
               animate={{
@@ -146,7 +149,7 @@ export default function MoodOrbit() {
               }}
               onClick={() => handleSelect(mood.id)}
               aria-pressed={isSelected}
-              className={`absolute rounded-full border px-3 py-1.5 text-xs backdrop-blur transition-colors duration-300 sm:px-4 sm:py-2 sm:text-sm ${
+              className={`absolute rounded-full border px-2 py-1.5 text-[11px] backdrop-blur transition-colors duration-300 sm:px-4 sm:py-2 sm:text-sm ${
                 isSelected
                   ? "text-white"
                   : "border-white/10 bg-white/5 text-gray-300 hover:border-white/25 hover:bg-white/10"
