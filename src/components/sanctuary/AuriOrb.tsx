@@ -12,8 +12,11 @@ import {
   bumpAuriOpenCount,
   hasSeenAuriEntrance,
   markAuriEntranceSeen,
+  getAuriPreferences,
+  DEFAULT_AURI_PREFERENCES,
   TIME_WHISPERS,
   type AuriContext,
+  type AuriPreferences,
   type AuriState
 } from "@/lib/auri";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
@@ -51,9 +54,17 @@ export default function AuriOrb() {
   const [whisperIndex, setWhisperIndex] = useState(0);
   const [openCount, setOpenCount] = useState(0);
   const [auriState, setAuriState] = useState<AuriState>("idle");
+  const [prefs, setPrefs] = useState<AuriPreferences>(DEFAULT_AURI_PREFERENCES);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const decayRef = useRef<number | null>(null);
   const sleepRef = useRef<number | null>(null);
+
+  // Presence preferences (Settings → Auri) — the whispers toggle governs the
+  // resting lines below; resolved after mount, hydration-safe.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setPrefs(getAuriPreferences()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   /* ── The presence state machine ─────────────────────────────────────── */
 
@@ -183,13 +194,13 @@ export default function AuriOrb() {
   }, [period, visits.isReturningUser]);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || !prefs.whispers) return;
     const id = window.setInterval(
       () => setWhisperIndex((index) => (index + 1) % whispers.length),
       4600
     );
     return () => clearInterval(id);
-  }, [prefersReducedMotion, whispers.length]);
+  }, [prefersReducedMotion, prefs.whispers, whispers.length]);
 
   const context: AuriContext = useMemo(
     () => ({
@@ -226,7 +237,7 @@ export default function AuriOrb() {
         />
 
         {/* Whisper prompt — a soft word that cycles while Auri rests */}
-        {!open && !entrance && (
+        {!open && !entrance && prefs.whispers && (
           <AnimatePresence mode="wait">
             <motion.span
               key={whispers[whisperIndex]}

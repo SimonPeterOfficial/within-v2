@@ -3,8 +3,6 @@ import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import DepthLayers from "@/components/effects/DepthLayers";
 import Hero from "@/components/home/Hero";
-import ContinueJourney from "@/components/sanctuary/ContinueJourney";
-import Recommended from "@/components/sanctuary/Recommended";
 import Footer from "@/components/layout/Footer";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 
@@ -14,23 +12,26 @@ import AuriOrb from "@/components/sanctuary/AuriOrb";
 // `ssr: false` inside Client Components (see CinematicLoaderGate).
 import CinematicLoaderGate from "@/components/loader/CinematicLoaderGate";
 
-// Below-the-fold sections are code-split so the first paint stays lean.
+// Every section below the hero is code-split so the first paint stays lean —
+// the landing opens with darkness and light, then the universe unfolds.
+const EmotionalDiscovery = dynamic(() => import("@/components/landing/EmotionalDiscovery"));
 const OriginalsShowcase = dynamic(() => import("@/components/sanctuary/OriginalsShowcase"));
-const MusicSection = dynamic(() => import("@/components/sanctuary/MusicSection"));
-const BooksSection = dynamic(() => import("@/components/sanctuary/BooksSection"));
-const PhotographySection = dynamic(() => import("@/components/sanctuary/PhotographySection"));
-const CommunitiesSection = dynamic(() => import("@/components/sanctuary/CommunitiesSection"));
+const SanctuaryMoment = dynamic(() => import("@/components/landing/SanctuaryMoment"));
+const AuriMoment = dynamic(() => import("@/components/landing/AuriMoment"));
+const ContentUniverse = dynamic(() => import("@/components/landing/ContentUniverse"));
+const CreatorUniverse = dynamic(() => import("@/components/landing/CreatorUniverse"));
+const RecentDiscussions = dynamic(() => import("@/components/communities/RecentDiscussions"));
 const FinaleCTA = dynamic(() => import("@/components/sanctuary/FinaleCTA"));
 
 export const metadata: Metadata = {
-  title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
+  title: "WithIn — Feel You.",
   description:
-    "A home for stories, emotions, creators and meaningful connections — a universe built around how you feel right now.",
+    "A place for stories, emotions, people — and everything that lives within. A universe built around how you feel right now.",
 };
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#04050a] text-white">
       {/* One living atmosphere behind the entire world: glow → fog → mesh →
           aurora → light rays → particles → stars, all drifting in slow motion */}
       <DepthLayers preset="home" />
@@ -39,23 +40,40 @@ export default function Home() {
 
       <main id="main" className="relative">
         <Hero />
-        <ContinueJourney storyHref="#continue" actionHref="#originals" />
-        <Recommended storyHref="#continue" />
 
+        {/* Emotional discovery — the world answers how you feel */}
+        <Suspense fallback={null}>
+          <EmotionalDiscovery />
+        </Suspense>
+
+        {/* WithIn Originals — the studio shelf */}
         <Suspense fallback={null}>
           <OriginalsShowcase trailerHref="/signup" />
         </Suspense>
+
+        {/* The sanctuary — the quiet room inside */}
         <Suspense fallback={null}>
-          <MusicSection actionHref="#books" />
+          <SanctuaryMoment />
         </Suspense>
+
+        {/* Auri — the presence that listens */}
         <Suspense fallback={null}>
-          <BooksSection />
+          <AuriMoment />
         </Suspense>
+
+        {/* The content universe — six worlds, one light */}
         <Suspense fallback={null}>
-          <PhotographySection />
+          <ContentUniverse />
         </Suspense>
+
+        {/* The creator universe — the people who make it */}
         <Suspense fallback={null}>
-          <CommunitiesSection actionHref="#join" />
+          <CreatorUniverse />
+        </Suspense>
+
+        {/* Community — quiet rooms, kindred souls */}
+        <Suspense fallback={null}>
+          <RecentDiscussions id="community" />
         </Suspense>
 
         <Suspense fallback={null}>

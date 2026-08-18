@@ -3,7 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
-import { auriGreeting, auriReply, TIME_GREETINGS, type AuriContext, type AuriState } from "@/lib/auri";
+import {
+  auriGreeting,
+  auriLocationLine,
+  auriReply,
+  getAuriPreferences,
+  TIME_GREETINGS,
+  type AuriContext,
+  type AuriState
+} from "@/lib/auri";
 import { getMood, moods } from "@/lib/mood";
 import { moodGlow } from "@/lib/design";
 import Icon from "@/components/ui/Icon";
@@ -98,10 +106,16 @@ export default function AuriPanel({ context, moodId, onMoodSelect, onClose, onPr
   // word. Captured once at mount: the conversation must never be reset when
   // the context evolves (mood chips, the hour turning) while she is open.
   // Deferred (async) so the effect body never sets state synchronously.
+  // The "Time greetings" preference decides whether the hour leads the line
+  // or Auri simply lets the route speak for itself.
   const greetingRef = useRef(greeting);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      setMessages([{ id: nextId(), role: "auri", text: greetingRef.current }]);
+      const prefs = getAuriPreferences();
+      const opening = prefs.greetings
+        ? greetingRef.current
+        : `I'm here. ${auriLocationLine(context.pathname)}`;
+      setMessages([{ id: nextId(), role: "auri", text: opening }]);
       inputRef.current?.focus();
       onPresenceChange?.("greeting");
     });

@@ -6,14 +6,34 @@ import Button from "@/components/ui/Button";
 import CommunityCard from "@/components/ui/cards/CommunityCard";
 import MeshGradient from "@/components/effects/MeshGradient";
 import { COMMUNITIES } from "@/lib/content";
+import { useStoredInterests } from "@/lib/interests";
 
 type CommunitiesSectionProps = {
   /** Where the header action leads (sanctuary: #discover, landing: #join) */
   actionHref?: string;
 };
 
-/** Communities — quiet rooms full of kindred souls. */
+/** Communities — quiet rooms full of kindred souls.
+ * When Communities aren't among the listener's interests the rooms stay
+ * reachable as a quiet rail — prominence follows preference. */
 export default function CommunitiesSection({ actionHref = "#discover" }: CommunitiesSectionProps) {
+  const interests = useStoredInterests();
+  // No interests yet (new/landing) → everything is prominent. Otherwise the
+  // rooms lead only when the listener actually chose them.
+  const prominent = interests.length === 0 || interests.includes("communities");
+
+  const renderCommunity = (community: (typeof COMMUNITIES)[number], index: number) => (
+    <CommunityCard
+      key={community.id}
+      delay={index * 0.08}
+      name={community.name}
+      tagline={community.tagline}
+      members={community.members}
+      avatars={community.avatars}
+      gradient={community.gradient}
+    />
+  );
+
   return (
     <section id="communities" className="relative scroll-mt-24 py-24 text-white">
       {/* Communal room — emerald meeting violet, quietly energetic */}
@@ -33,19 +53,19 @@ export default function CommunitiesSection({ actionHref = "#discover" }: Communi
           }
         />
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {COMMUNITIES.map((community, index) => (
-            <CommunityCard
-              key={community.id}
-              delay={index * 0.08}
-              name={community.name}
-              tagline={community.tagline}
-              members={community.members}
-              avatars={community.avatars}
-              gradient={community.gradient}
-            />
-          ))}
-        </div>
+        {prominent ? (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {COMMUNITIES.map(renderCommunity)}
+          </div>
+        ) : (
+          <div className="mt-12 flex gap-5 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {COMMUNITIES.map((community, index) => (
+              <div key={community.id} className="w-72 shrink-0">
+                {renderCommunity(community, index)}
+              </div>
+            ))}
+          </div>
+        )}
       </Container>
     </section>
   );

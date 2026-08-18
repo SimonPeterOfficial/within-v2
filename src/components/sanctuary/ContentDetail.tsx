@@ -162,7 +162,9 @@ export default function ContentDetail({
 
           <p className="mt-6 text-xs text-gray-600">
             {status === "authenticated"
-              ? "Your save lives in this browser for now — nothing leaves your device."
+              ? saved
+                ? "Kept — it's waiting in your library (in this browser for now)."
+                : "Save it and it will wait in your library — nothing leaves your device yet."
               : "Sign in to keep this in your library."}
           </p>
         </div>

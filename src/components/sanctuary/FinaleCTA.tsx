@@ -9,24 +9,37 @@ import GradientText from "@/components/ui/GradientText";
 import { blurUp, staggerContainer } from "@/lib/animations";
 
 type FinaleCTAProps = {
-  /** Landing funnels guests straight into signup; the sanctuary sends them to log in */
   primaryHref?: string;
 };
 
-/** Closing cinematic moment — a door left open. */
+/**
+ * Closing cinematic moment — a door left open.
+ *
+ * "There is more Within." — the culmination of the journey.
+ * Stars, light rays, and a deep vignette frame the final invitation.
+ */
 export default function FinaleCTA({ primaryHref = "/login" }: FinaleCTAProps) {
   return (
-    <section className="relative overflow-hidden px-6 py-32 text-center text-white">
-      {/* Central mood glow + closing light rays */}
+    <section className="relative overflow-hidden px-6 py-36 text-center text-white">
+      {/* Central mood glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-glow"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[rgba(var(--mood-rgb),0.04)] blur-glow"
       />
-      <LightRays intensity={0.22} />
+      <LightRays intensity={0.15} />
       <StarField count={40} seed={13} />
 
+      {/* Deep vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.65)_100%)]"
+      />
+
+      {/* Section divider */}
+      <div aria-hidden className="section-divider absolute left-0 right-0 top-0" />
+
       <motion.div
-        variants={staggerContainer(0.14, 0.1)}
+        variants={staggerContainer(0.18, 0.12)}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.4 }}
@@ -34,21 +47,22 @@ export default function FinaleCTA({ primaryHref = "/login" }: FinaleCTAProps) {
       >
         <motion.p
           variants={blurUp}
-          className="text-xs font-semibold uppercase tracking-[0.5em] text-emerald-400"
+          className="text-[11px] font-semibold uppercase tracking-[0.5em] text-emerald-400/60"
         >
           The door is open
         </motion.p>
 
         <motion.h2
           variants={blurUp}
-          className="mt-6 text-5xl font-black leading-tight tracking-tight md:text-7xl"
+          className="mx-auto mt-6 max-w-3xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.02em] md:text-6xl lg:text-7xl"
         >
-          Your universe is <GradientText>waiting.</GradientText>
+          There is more
+          <GradientText className="italic"> Within.</GradientText>
         </motion.h2>
 
         <motion.p
           variants={blurUp}
-          className="mx-auto mt-6 max-w-xl text-gray-400"
+          className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-gray-400/70"
         >
           Every story, every feeling, every connection — one sanctuary within.
         </motion.p>

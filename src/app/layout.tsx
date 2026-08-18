@@ -6,6 +6,7 @@ import { EnvironmentProvider } from "@/lib/environment";
 import CustomCursor from "@/components/effects/CustomCursor";
 import GrainOverlay from "@/components/effects/GrainOverlay";
 import PointerLight from "@/components/effects/PointerLight";
+import PresenceField from "@/components/effects/PresenceField";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -74,6 +75,7 @@ export default function RootLayout({
               </a>
               {children}
               <GrainOverlay />
+              <PresenceField />
               <PointerLight />
               <CustomCursor />
             </AuthProvider>

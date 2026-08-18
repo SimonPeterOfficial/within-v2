@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Container from "@/components/ui/Container";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
 import ContentCard from "@/components/ui/cards/ContentCard";
-import { getStoredInterests, getInterest, interestSummary, type InterestId } from "@/lib/interests";
+import { useStoredInterests, getInterest, interestSummary, type InterestId } from "@/lib/interests";
 import { UNIVERSE } from "@/lib/search";
 
 /** Picks up to `count` entries per chosen shelf, in catalog order. */
@@ -29,14 +29,7 @@ function picksForInterests(ids: InterestId[], count = 2) {
  * the section stays quiet and the home reads as the default universe.
  */
 export default function BecauseYouChose() {
-  const [interests, setInterests] = useState<InterestId[]>([]);
-
-  // Hydration-safe: interests resolve after mount (they live in this browser).
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setInterests(getStoredInterests()));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
+  const interests = useStoredInterests();
   const picks = useMemo(() => picksForInterests(interests), [interests]);
 
   if (picks.length === 0) return null;

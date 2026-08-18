@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
 import { recommendFor, recommendationReason } from "@/lib/recommendations";
+import { getAuriPreferences } from "@/lib/auri";
 import { useEnvironment } from "@/lib/environment";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
@@ -18,6 +19,16 @@ import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 export default function AuriSuggestion() {
   const { period, moodId } = useEnvironment();
   const prefersReducedMotion = useReducedMotionSafe();
+  const [enabled, setEnabled] = useState(true);
+
+  // The "Discovery moments" preference (Settings → Auri) governs whether Auri
+  // sets anything out at all — resolved after mount, hydration-safe.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setEnabled(getAuriPreferences().suggestions);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const pick = useMemo(() => {
     const deck = recommendFor(moodId, period);
@@ -39,7 +50,7 @@ export default function AuriSuggestion() {
     return anchorToRoute[pick.href] ?? pick.href;
   }, [pick]);
 
-  if (!pick) return null;
+  if (!enabled || !pick) return null;
   const reason = recommendationReason(moodId, period);
 
   return (

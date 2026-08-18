@@ -9,6 +9,12 @@ import AuriOwl from "@/components/sanctuary/AuriOwl";
 import { getMood, moods } from "@/lib/mood";
 import { useEnvironment } from "@/lib/environment";
 import { memory } from "@/lib/memory";
+import {
+  DEFAULT_AURI_PREFERENCES,
+  getAuriPreferences,
+  saveAuriPreferences,
+  type AuriPreferences
+} from "@/lib/auri";
 import { copy } from "@/lib/navigation";
 
 /** Language options — the UI is prepared but not translated yet. */
@@ -23,16 +29,16 @@ const LANGUAGES = [
   { code: "ko", label: "한국어" }
 ];
 
-/** Auri's presence options — kept quiet, never clinical. */
-const AURI_PREFERENCES = [
+/** Auri's presence options — kept quiet, never clinical. These toggle real
+ * behavior: AuriOrb (whispers), AuriPanel (greetings), AuriSuggestion
+ * (discovery moments) each read the saved preferences. */
+const AURI_PREFERENCES: { id: keyof AuriPreferences; label: string; detail: string }[] = [
   { id: "whispers", label: "Resting whispers", detail: "Small lines under the owl while she rests." },
   { id: "greetings", label: "Time greetings", detail: "Good morning, good evening — the room says hello." },
   { id: "suggestions", label: "Discovery moments", detail: "Let Auri set out something she thinks you'll like." }
-] as const;
+];
 
-const PREF_KEY = "auri-preferences";
 const LANG_KEY = "language";
-const MOOD_KEY = "default-mood";
 
 function SettingRow({
   label,
@@ -60,23 +66,22 @@ function SettingRow({
  */
 export default function SettingsView() {
   const { moodId, setMood } = useEnvironment();
-  const [prefs, setPrefs] = useState<string[]>([]);
+  const [prefs, setPrefs] = useState<AuriPreferences>(DEFAULT_AURI_PREFERENCES);
   const [language, setLanguage] = useState("en");
 
   // Hydration-safe: preferences resolve after mount.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      const stored = memory.get<string[]>("preferences", PREF_KEY);
-      setPrefs(Array.isArray(stored) ? stored : ["whispers", "greetings", "suggestions"]);
+      setPrefs(getAuriPreferences());
       setLanguage(memory.get<string>("preferences", LANG_KEY) ?? "en");
     });
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const togglePref = (id: string) => {
-    const next = prefs.includes(id) ? prefs.filter((item) => item !== id) : [...prefs, id];
+  const togglePref = (id: keyof AuriPreferences) => {
+    const next = { ...prefs, [id]: !prefs[id] };
     setPrefs(next);
-    memory.set("preferences", PREF_KEY, next);
+    saveAuriPreferences(next);
   };
 
   const changeLanguage = (code: string) => {
@@ -84,10 +89,9 @@ export default function SettingsView() {
     memory.set("preferences", LANG_KEY, code);
   };
 
-  const changeMood = (id: string | null) => {
-    setMood(id);
-    memory.setPreference(MOOD_KEY, id ?? "");
-  };
+  // The default mood works through the shared mood engine — applyMood persists
+  // the choice itself, so no separate preference key is needed.
+  const changeMood = (id: string | null) => setMood(id);
 
   return (
     <>
@@ -165,7 +169,7 @@ export default function SettingsView() {
               </div>
               <div className="mt-4 divide-y divide-white/5">
                 {AURI_PREFERENCES.map((pref) => {
-                  const enabled = prefs.includes(pref.id);
+                  const enabled = prefs[pref.id];
                   return (
                     <div key={pref.id} className="flex items-center justify-between gap-4 py-4">
                       <div>

@@ -8,6 +8,45 @@
  * the app doesn't actually have, and she never invents emotional diagnoses.
  */
 
+import { memory } from "@/lib/memory";
+
+/* ── Presence preferences — what Auri shares, tuned in Settings ────────
+ * Stored through the memory layer (local, honest). Consumers read these so
+ * the Settings toggles govern real behavior — never decorative switches. */
+
+export type AuriPreferences = {
+  /** The small lines under the owl while she rests */
+  whispers: boolean;
+  /** Time-of-day greetings when the panel opens */
+  greetings: boolean;
+  /** Auri's discovery moments ("Auri found something…") */
+  suggestions: boolean;
+};
+
+const PREFERENCES_KEY = "auri-preferences";
+
+export const DEFAULT_AURI_PREFERENCES: AuriPreferences = {
+  whispers: true,
+  greetings: true,
+  suggestions: true
+};
+
+/** Reads the saved presence preferences (all on by default, never throws). */
+export function getAuriPreferences(): AuriPreferences {
+  const raw = memory.get<Partial<AuriPreferences>>("preferences", PREFERENCES_KEY);
+  if (!raw || typeof raw !== "object") return DEFAULT_AURI_PREFERENCES;
+  return {
+    whispers: raw.whispers !== false,
+    greetings: raw.greetings !== false,
+    suggestions: raw.suggestions !== false
+  };
+}
+
+/** Persists Auri's presence preferences — local only, nothing leaves. */
+export function saveAuriPreferences(prefs: AuriPreferences) {
+  memory.set("preferences", PREFERENCES_KEY, prefs);
+}
+
 /* ── Time of day ─────────────────────────────────────────────────────── */
 
 export type TimePeriod = "morning" | "afternoon" | "evening" | "night";

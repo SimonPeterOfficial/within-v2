@@ -17,7 +17,7 @@
 const BASE_URL = (process.argv[2] || "http://localhost:3000").replace(/\/$/, "");
 
 const ROUTES = [
-  { path: "/", markers: ["Feel Seen", "Enter WithIn", "Explore first"] },
+  { path: "/", markers: ["You.", "Enter WithIn", "Explore the universe"] },
   { path: "/home", markers: ["Welcome", "sanctuary", "Discover"] },
   { path: "/login", markers: ["Welcome", "Log in", "Forgot password?"] },
   { path: "/signup", markers: ["make you, you", "Enter WithIn"] },

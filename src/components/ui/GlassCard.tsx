@@ -25,9 +25,9 @@ export type GlassCardProps = {
 };
 
 const tones: Record<GlassTone, string> = {
-  soft: "border-white/5 bg-white/[0.03] backdrop-blur-sm",
-  default: "border-white/10 bg-white/5 backdrop-blur-sm",
-  strong: "border-white/15 bg-white/[0.08] backdrop-blur",
+  soft: "border-white/[0.05] bg-white/[0.02] backdrop-blur-sm",
+  default: "border-white/[0.08] bg-white/[0.04] backdrop-blur-sm",
+  strong: "border-white/[0.12] bg-white/[0.07] backdrop-blur",
   aurora: "material-aurora-glass",
   tactile: "material-tactile-glass",
   clay: "material-soft-clay",
@@ -54,14 +54,14 @@ export default function GlassCard({
       style={style}
       className={`relative rounded-card border ${tones[tone]} ${
         hoverLift
-          ? "transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 hover:shadow-card-hover active:scale-[0.99]"
+          ? "transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-white/[0.15] hover:bg-white/[0.06] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.12)] active:scale-[0.99]"
           : ""
       } ${sheen ? "overflow-hidden" : ""} ${className}`}
     >
       {sheen && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_32%,rgba(255,255,255,0.07)_46%,transparent_60%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_32%,rgba(255,255,255,0.05)_46%,transparent_60%)]"
         />
       )}
       {children}

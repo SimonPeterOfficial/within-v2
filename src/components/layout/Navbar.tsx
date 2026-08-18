@@ -8,53 +8,54 @@ import Logo from "@/components/ui/Logo";
 import { spring } from "@/lib/animations";
 
 const navLinks = [
-  { label: "Continue", href: "#continue" },
+  { label: "Discover", href: "#feel" },
   { label: "Originals", href: "#originals" },
-  { label: "Music", href: "#music" },
-  { label: "Communities", href: "#communities" }
+  { label: "Sanctuary", href: "#sanctuary" },
+  { label: "Auri", href: "#auri" },
+  { label: "Universe", href: "#universe" },
+  { label: "Creators", href: "#creators" },
 ];
 
-/** Section ids the scroll-spy watches — mirrors navLinks hrefs without the #. */
 const sectionIds = navLinks.map((link) => link.href.slice(1));
 
 /**
- * Premium floating navigation — a rounded glass pill with an animated active
- * pill that glides between links as you scroll (scroll-spy over the section
- * anchors), plus an "Enter WithIn" CTA that opens the door.
+ * Premium floating navigation — almost invisible until interacted with.
+ *
+ * DESIGN: A minimal glass pill that tightens on scroll. The active pill
+ * glides between sections via scroll-spy. Navigation should feel like
+ * it belongs to the atmosphere, not on top of it.
  */
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotionSafe();
 
   const closeMenu = () => setIsOpen(false);
 
-  // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closeMenu();
     };
-
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  // Scroll-spy — the active pill glides to whichever section is in view.
-  // Some sections render inside code-split Suspense chunks, so discovery
-  // retries via a MutationObserver until every id exists, then connects the
-  // spy once. setState only runs inside observer callbacks (async), keeping
-  // the set-state-in-effect rule satisfied.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     let spy: IntersectionObserver | null = null;
-
     const connectSpy = () => {
       const sections = sectionIds
         .map((id) => document.getElementById(id))
         .filter((section): section is HTMLElement => Boolean(section));
       if (sections.length !== sectionIds.length) return false;
-
       spy = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -66,23 +67,16 @@ export default function Navbar() {
       sections.forEach((section) => spy?.observe(section));
       return true;
     };
-
     if (connectSpy()) return;
-
     const watcher = new MutationObserver(() => {
       if (connectSpy()) watcher.disconnect();
     });
     watcher.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      watcher.disconnect();
-      spy?.disconnect();
-    };
+    return () => { watcher.disconnect(); spy?.disconnect(); };
   }, []);
 
   return (
-    <nav className="fixed top-0 z-50 w-full px-4 py-5 sm:px-8">
-      {/* Invisible overlay that closes the menu when clicking outside */}
+    <nav className="fixed top-0 z-50 w-full px-3 py-3 sm:px-6">
       {isOpen && (
         <button
           type="button"
@@ -92,28 +86,34 @@ export default function Navbar() {
         />
       )}
 
-      {/* Glass pill */}
-      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/15 bg-white/5 px-3 py-3 shadow-soft backdrop-blur-md sm:px-6">
+      {/* Glass pill — almost invisible at top, tightens on scroll */}
+      <div
+        className={`relative z-10 mx-auto flex max-w-6xl items-center justify-between rounded-full border px-3 py-2.5 backdrop-blur-md sm:px-5 transition-all duration-700 ease-out ${
+          scrolled
+            ? "border-white/[0.07] bg-[rgba(8,8,16,0.75)] shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+            : "border-transparent bg-transparent"
+        }`}
+      >
         <a href="#top" className="shrink-0" onClick={closeMenu}>
           <Logo />
         </a>
 
-        {/* Desktop links — active pill glides between sections */}
-        <div className="relative hidden items-center gap-1 md:flex">
+        {/* Desktop links — quiet, minimal */}
+        <div className="relative hidden items-center gap-0.5 md:flex">
           {navLinks.map((link) => {
             const isActive = active === link.href;
             return (
               <a
                 key={link.label}
                 href={link.href}
-                className={`relative rounded-full px-4 py-2 text-sm transition-colors duration-300 ${
-                  isActive ? "text-white" : "text-gray-400 hover:text-white"
+                className={`relative rounded-full px-3.5 py-1.5 text-[13px] transition-colors duration-300 ${
+                  isActive ? "text-white" : "text-gray-500 hover:text-gray-200"
                 }`}
               >
                 {isActive && (
                   <motion.span
                     layoutId="nav-active"
-                    className="absolute inset-0 rounded-full border border-white/10 bg-white/10 shadow-[0_0_18px_rgba(var(--mood-rgb),0.28)]"
+                    className="absolute inset-0 rounded-full border border-white/[0.06] bg-white/[0.06] shadow-[0_0_12px_rgba(var(--mood-rgb),0.15)]"
                     transition={spring}
                   />
                 )}
@@ -123,7 +123,7 @@ export default function Navbar() {
           })}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button href="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
             Sign in
           </Button>
@@ -131,16 +131,16 @@ export default function Navbar() {
             Enter WithIn
           </Button>
 
-          {/* Mobile menu toggle */}
+          {/* Mobile toggle */}
           <button
             type="button"
-            onClick={() => setIsOpen((open) => !open)}
+            onClick={() => setIsOpen((o) => !o)}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             aria-label={isOpen ? "Close menu" : "Open menu"}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10 md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] text-white transition hover:bg-white/[0.08] md:hidden"
           >
-            <span className="relative block h-3.5 w-5" aria-hidden>
+            <span className="relative block h-3.5 w-4" aria-hidden>
               <span
                 className={`absolute left-0 top-0 h-0.5 w-full rounded-full bg-current transition-all duration-300 ${
                   isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : ""
@@ -161,7 +161,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu panel */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -173,7 +173,7 @@ export default function Navbar() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="relative z-10 mx-auto mt-2 max-w-6xl md:hidden"
           >
-            <div className="rounded-3xl border border-white/10 bg-black/70 p-4 shadow-soft backdrop-blur-md">
+            <div className="glass-level-4 rounded-3xl p-4 backdrop-blur-xl">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -184,7 +184,6 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-
               <div className="mt-2 border-t border-white/10 pt-3">
                 <Button
                   href="/signup"

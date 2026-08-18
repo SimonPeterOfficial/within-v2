@@ -105,7 +105,7 @@ export default function Sidebar({ items }: SidebarProps) {
         {isActive && (
           <motion.span
             layoutId="sidebar-active"
-            className="absolute inset-0 rounded-full bg-white/10"
+            className="absolute inset-0 rounded-full border border-white/10 bg-white/10 shadow-[0_0_18px_rgba(var(--mood-rgb),0.28)]"
             transition={spring}
           />
         )}
@@ -215,7 +215,7 @@ export default function Sidebar({ items }: SidebarProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-40 cursor-default bg-black/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[45] cursor-default bg-black/60 backdrop-blur-sm lg:hidden"
             />
             <motion.aside
               ref={panelRef}
@@ -229,7 +229,7 @@ export default function Sidebar({ items }: SidebarProps) {
                 duration: prefersReducedMotion ? 0 : 0.35,
                 ease: [0.16, 1, 0.3, 1]
               }}
-              className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-black/85 p-6 backdrop-blur-xl outline-none lg:hidden"
+              className="fixed inset-y-0 left-0 z-[55] flex w-72 flex-col border-r border-white/10 bg-black/85 p-6 backdrop-blur-xl outline-none lg:hidden"
             >
               <div className="flex items-center justify-between">
                 <Link href="/" onClick={close}>

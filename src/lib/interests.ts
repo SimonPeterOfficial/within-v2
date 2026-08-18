@@ -4,6 +4,7 @@
  * claims). Stored through the memory layer, so it's local and honest about it.
  */
 
+import { useEffect, useState } from "react";
 import { memory } from "@/lib/memory";
 
 export type InterestId =
@@ -68,4 +69,20 @@ export function interestSummary(ids: InterestId[]): string {
     .map((id) => getInterest(id)?.label)
     .filter((label): label is string => Boolean(label))
     .join(", ");
+}
+
+/**
+ * Reads the stored interests after mount — the one hydration-safe way to
+ * personalize client components (BecauseYouChose, the home shelves). SSR and
+ * the first client pass see an empty list, then the real choice resolves.
+ */
+export function useStoredInterests(): InterestId[] {
+  const [interests, setInterests] = useState<InterestId[]>([]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setInterests(getStoredInterests()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  return interests;
 }

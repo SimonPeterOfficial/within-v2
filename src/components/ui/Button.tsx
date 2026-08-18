@@ -29,13 +29,13 @@ const sizes: Record<ButtonSize, string> = {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[rgba(var(--mood-rgb),1)] text-black font-bold hover:scale-[1.03] hover:shadow-mood-lg",
+    "bg-[rgba(var(--mood-rgb),1)] text-black font-bold hover:scale-[1.02] hover:shadow-[0_0_32px_rgba(var(--mood-rgb),0.4)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   gradient:
-    "text-black font-bold hover:scale-[1.03] hover:shadow-brand-cta",
+    "text-black font-bold hover:scale-[1.02] hover:shadow-[0_0_36px_rgba(168,85,247,0.35)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   outline:
-    "border border-white/15 bg-white/5 text-white font-bold backdrop-blur hover:border-white/30 hover:bg-white/10",
-  ghost: "text-gray-300 font-semibold hover:text-white hover:bg-white/5",
-  light: "bg-white text-black font-semibold hover:scale-[1.03]"
+    "border border-white/15 bg-white/[0.04] text-white font-bold backdrop-blur-sm hover:border-white/25 hover:bg-white/[0.08] focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+  ghost: "text-gray-400 font-semibold hover:text-white hover:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+  light: "bg-white text-black font-semibold hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(255,255,255,0.15)] focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
 };
 
 /**
@@ -58,10 +58,10 @@ export default function Button({
 }: ButtonProps) {
   const isGradient = variant === "gradient";
   const classes = clsx(
-    "inline-flex select-none items-center justify-center rounded-full transition duration-300 active:scale-[0.98]",
+    "inline-flex select-none items-center justify-center rounded-full transition-all duration-300 active:scale-[0.97]",
     sizes[size],
     variants[variant],
-    disabled && "pointer-events-none opacity-60",
+    disabled && "pointer-events-none opacity-50",
     className
   );
   const style = isGradient ? { backgroundImage: gradients.brand } : undefined;

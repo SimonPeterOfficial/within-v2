@@ -71,11 +71,32 @@ html {
   --within-text: var(--foreground);
   --within-text-muted: var(--ink-muted);
   --within-purple: #a78bfa;
+  --within-violet: #8b5cf6;
+  --within-teal: #2dd4bf;
   --within-emerald: #34d399;
   --within-cyan: #22d3ee;
+  --within-indigo: #6366f1;
   --within-border: rgba(255, 255, 255, 0.1);
+  --within-border-subtle: rgba(255, 255, 255, 0.06);
+  --within-border-strong: rgba(255, 255, 255, 0.18);
   --within-glow: rgba(168, 85, 247, 0.45);
   --within-grain-opacity: 0.05;
+
+  /* Glass system — four levels of translucency, each with a purpose */
+  --glass-1: rgba(255, 255, 255, 0.03);
+  --glass-2: rgba(255, 255, 255, 0.06);
+  --glass-3: rgba(255, 255, 255, 0.09);
+  --glass-4: rgba(255, 255, 255, 0.13);
+
+  /* Elevation tokens — a clear hierarchy from ground to modal */
+  --elevation-1: 0 1px 3px rgba(0,0,0,0.25);
+  --elevation-2: 0 4px 16px rgba(0,0,0,0.3);
+  --elevation-3: 0 12px 40px rgba(0,0,0,0.35);
+  --elevation-4: 0 24px 64px rgba(0,0,0,0.45);
+
+  /* Surface gradients — for backgrounds of elevated content */
+  --surface-gradient-subtle: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  --surface-gradient-elevated: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
 
   /* Atmosphere intensity — time of day tunes these; the aurora and mesh
      read them so the world breathes with the hour. */
@@ -434,6 +455,40 @@ html[data-theme-day="birthday"] .time-glow {
   font-weight: 700;
 }
 
+/* ── Glass 2.0 — four levels of translucency ───────────────────────────
+   Each level says what the surface is for. The dream needs hierarchy:
+   glass-1 is barely there, glass-4 is the focal point. */
+@utility glass-level-1 {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--glass-1);
+  backdrop-filter: blur(4px);
+}
+
+@utility glass-level-2 {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-2);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--elevation-1);
+}
+
+@utility glass-level-3 {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--glass-3);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--elevation-2);
+}
+
+@utility glass-level-4 {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--glass-4);
+  backdrop-filter: blur(28px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    var(--elevation-3);
+}
+
+
+
 @keyframes floatGlow {
   0% {
     transform: translateY(0px) scale(1);
@@ -444,6 +499,11 @@ html[data-theme-day="birthday"] .time-glow {
   100% {
     transform: translateY(0px) scale(1);
   }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-glow {
@@ -515,5 +575,277 @@ html[data-theme-day="birthday"] .time-glow {
 @media (hover: none), (pointer: coarse) {
   .pointer-light {
     display: none;
+  }
+}
+
+/* ── Presence field — the environment breathing around the visitor ──────
+   --px and --py are set by PresenceField.tsx from the pointer position.
+   They drive subtle atmospheric responses: mesh shift, aurora drift,
+   glass illumination bias, and micro-parallax on nearby elements. */
+:root {
+  --px: 0.5;
+  --py: 0.5;
+  /* Scroll depth 0–1, set by PresenceField */
+  --scroll-depth: 0;
+  /* Mood atmosphere tint (driven by mood selection) */
+  --mood-atmo-x: 0;
+  --mood-atmo-y: 0;
+  --mood-atmo-scale: 1;
+  /* Ripple system */
+  --ripple-x: 50%;
+  --ripple-y: 50%;
+  --ripple-opacity: 0;
+  --ripple-scale: 0;
+}
+
+/* Presence-driven mesh shift — the room tilts toward the visitor */
+.mesh-gradient {
+  transform: translate(
+    calc((var(--px) - 0.5) * 8px),
+    calc((var(--py) - 0.5) * 6px)
+  );
+  transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Presence-driven aurora drift — the light follows */
+.aurora-root > div {
+  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Mood atmosphere response — when a mood is selected, the mesh scales */
+.mesh-gradient.mood-active {
+  transform: translate(
+    calc((var(--px) - 0.5) * 8px),
+    calc((var(--py) - 0.5) * 6px)
+  ) scale(var(--mood-atmo-scale));
+  transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── Scroll depth parallax — 3 conceptual layers ───────────────────────
+   --scroll-depth (0–1) drives subtle layer separation.
+   Background drifts 0.02x, midground 0.05x, foreground stays put. */
+.depth-bg {
+  transform: translateY(calc(var(--scroll-depth) * -8px));
+  transition: transform 0.4s ease-out;
+}
+.depth-mid {
+  transform: translateY(calc(var(--scroll-depth) * -20px));
+  transition: transform 0.4s ease-out;
+}
+
+/* ── Water ripple — organic atmospheric click effect ────────────────────
+   Created by PresenceField.tsx on non-interactive clicks. A soft ring
+   expands from the pointer location and fades. */
+.ripple {
+  position: fixed;
+  z-index: 4;
+  pointer-events: none;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--mood-rgb), 0.25);
+  background: radial-gradient(circle, rgba(var(--mood-rgb), 0.08) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+}
+.ripple.animate {
+  animation: rippleExpand 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+@keyframes rippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.6;
+    border-width: 2px;
+  }
+  60% {
+    opacity: 0.25;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+/* Second ripple wave — delayed organic feel */
+.ripple.animate-2 {
+  animation: rippleExpand 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) 0.15s forwards;
+}
+
+/* ── Wordmark light sweep — occasional luminous highlight ───────────────
+   Driven by a CSS animation on the hero h1. Light travels behind the
+   text like sunlight through translucent material. */
+@keyframes wordmarkSweep {
+  0%, 85%, 100% {
+    background-position: -200% center;
+  }
+  92% {
+    background-position: 200% center;
+  }
+}
+
+.wordmark-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.12) 45%,
+    rgba(255,255,255,0.2) 50%,
+    rgba(255,255,255,0.12) 55%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wordmarkSweep 10s ease-in-out infinite;
+}
+
+/* Reduced motion: disable sweep, ripples, depth, presence */
+@media (prefers-reduced-motion: reduce) {
+  .mesh-gradient {
+    transform: none;
+    transition: none;
+  }
+  .depth-bg, .depth-mid {
+    transform: none;
+    transition: none;
+  }
+  .ripple { display: none; }
+  .wordmark-sweep { animation: none; }
+}
+
+/* ── CTA entrance glow — the "entering WithIn" moment ───────────────────
+   Applied to the primary CTA container via PresenceField when hovered. */
+.cta-entrance-glow {
+  transition: box-shadow 0.6s ease, transform 0.4s ease;
+}
+.cta-entrance-glow.active {
+  box-shadow:
+    0 0 40px rgba(var(--mood-rgb), 0.3),
+    0 0 80px rgba(var(--mood-rgb), 0.12),
+    inset 0 0 20px rgba(var(--mood-rgb), 0.08);
+  transform: scale(1.02);
+}
+
+/* ── Constellation memory — stars that appear as user explores ──────────
+   .constellation-star elements get visibility toggled by PresenceMemory. */
+.constellation-star {
+  transition: opacity 1.5s ease, transform 1.5s ease;
+}
+.constellation-star.hidden {
+  opacity: 0;
+  transform: scale(0);
+}
+.constellation-star.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Light on Water — concentric ripple breathing ────────────────────── */
+@keyframes rippleBreath {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  50% {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+/* ── Tactile card hover — premium depth system ───────────────────────── */
+.card-tactile {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+}
+.card-tactile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.card-tactile:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+/* ── Editorial section dividers ─────────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--mood-rgb),0.08) 30%, rgba(var(--mood-rgb),0.12) 50%, rgba(var(--mood-rgb),0.08) 70%, transparent 100%);
+}
+
+/* ── Scroll story labels ────────────────────────────────────────────── */
+.scroll-story-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.12);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+@media (min-width: 1024px) {
+  .scroll-story-label {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    mix-blend-mode: screen;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="rippleBreath"] {
+    animation: none !important;
+  }
+}
+
+/* ── Premium section transitions ──────────────────────────────────── */
+.section-transition {
+  position: relative;
+}
+.section-transition::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--mood-rgb),0.06) 25%, rgba(var(--mood-rgb),0.1) 50%, rgba(var(--mood-rgb),0.06) 75%, transparent 100%);
+}
+
+/* ── Premium button tactile system ────────────────────────────────── */
+.btn-tactile {
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-tactile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-tactile:hover::after {
+  opacity: 1;
+}
+
+/* ── Ambient glow pulse for sections ──────────────────────────────── */
+@keyframes ambientPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.ambient-pulse {
+  animation: ambientPulse 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-pulse {
+    animation: none;
   }
 }
