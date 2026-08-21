@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 import Button from "@/components/ui/Button";
 import Logo from "@/components/ui/Logo";
-import GradientText from "@/components/ui/GradientText";
 
 const exploreLinks = [
   { label: "Discover", href: "/discover" },
@@ -43,27 +42,24 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden px-6 pb-10 pt-24 text-white">
+    <footer className="relative overflow-hidden px-6 pb-10 pt-20 text-white">
       {/* Newsletter CTA — editorial, premium */}
       <div
         id="join"
-        className="relative mx-auto max-w-6xl scroll-mt-24 overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.025] px-8 py-16 text-center backdrop-blur-sm"
+        className="relative mx-auto max-w-5xl scroll-mt-24 overflow-hidden rounded-card border border-white/[0.06] bg-white/[0.02] px-8 py-14 text-center backdrop-blur-sm"
       >
-        <div className="animate-glow pointer-events-none absolute -top-28 left-1/4 h-56 w-56 rounded-full bg-purple-700/[0.08] blur-3xl" />
-        <div
-          className="animate-glow pointer-events-none absolute -bottom-28 right-1/5 h-56 w-56 rounded-full bg-emerald-600/[0.05] blur-3xl"
-          style={{ animationDelay: "3s" }}
-        />
+        <div className="pointer-events-none absolute -top-32 left-1/4 h-64 w-64 rounded-full bg-[rgba(var(--mood-rgb),0.06)] blur-smoke" />
+        <div className="pointer-events-none absolute -bottom-32 right-1/5 h-64 w-64 rounded-full bg-emerald-600/[0.04] blur-smoke" />
 
         <div className="relative">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400/50">
-            Join WithIn
+          <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-emerald-400/45">
+            Stay close
           </p>
-          <h2 className="mx-auto mt-5 max-w-2xl font-display text-4xl font-medium leading-[1.04] tracking-[-0.02em] md:text-5xl">
-            Your story starts <GradientText>within</GradientText>.
+          <h2 className="mx-auto mt-5 max-w-xl font-display text-3xl font-medium leading-[1.06] tracking-[-0.02em] md:text-4xl">
+            A quiet letter, once a week.
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-gray-400/70">
-            Get the newest stories, originals, and community news — delivered gently, once a week.
+          <p className="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-gray-400/60">
+            Stories, originals, and community moments — delivered gently, never often enough to feel loud.
           </p>
 
           {subscribed ? (
@@ -81,8 +77,8 @@ export default function Footer() {
                 placeholder="you@example.com"
                 className="flex-1 rounded-full border border-white/[0.07] bg-black/40 px-6 py-3 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition-all duration-300 focus:border-emerald-400/35 focus:bg-black/50 focus:shadow-[0_0_16px_rgba(52,211,153,0.08)]"
               />
-              <Button type="submit" variant="light" size="md">
-                Subscribe
+              <Button type="submit" variant="gradient" size="md">
+                Join
               </Button>
             </form>
           )}
@@ -99,7 +95,7 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <Logo />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500/70">
+            <p className="mt-4 max-w-xs text-[13px] leading-[1.7] text-gray-500/60">
               A universe where stories, emotions, and people connect.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">

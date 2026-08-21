@@ -27,13 +27,13 @@ export default function FogLayer({ intensity = 0.5, className = "" }: FogLayerPr
     >
       {/* Near fog — low, wide, drifts right */}
       <motion.div
-        className="absolute -left-1/4 bottom-[8%] h-[36vh] w-[150vw] rounded-[100%] bg-white blur-haze"
+        className="absolute -left-1/4 bottom-[8%] h-[36vh] w-[150vw] rounded-[100%] bg-white blur-smoke"
         animate={prefersReducedMotion ? undefined : { x: [0, 90, 0] }}
         transition={{ duration: 46, repeat: Infinity, ease: "easeInOut" }}
       />
       {/* Far fog — higher, thinner, drifts left */}
       <motion.div
-        className="absolute -right-1/4 bottom-[22%] h-[30vh] w-[130vw] rounded-[100%] bg-emerald-200/40 blur-glow"
+        className="absolute -right-1/4 bottom-[22%] h-[30vh] w-[130vw] rounded-[100%] bg-emerald-200/40 blur-smoke"
         animate={prefersReducedMotion ? undefined : { x: [0, -70, 0] }}
         transition={{ duration: 58, repeat: Infinity, ease: "easeInOut" }}
       />

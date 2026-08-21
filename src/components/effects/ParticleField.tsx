@@ -66,8 +66,7 @@ export default function ParticleField({ count = 30, seed = 7, className = "" }: 
             top: particle.top,
             width: particle.size,
             height: particle.size,
-            background: particle.color,
-            boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`
+            background: particle.color
           }}
           animate={
             prefersReducedMotion

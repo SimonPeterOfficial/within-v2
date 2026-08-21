@@ -57,8 +57,7 @@ export default function StarField({
             left: `${star.x}%`,
             top: `${star.y}%`,
             width: star.size,
-            height: star.size,
-            boxShadow: "0 0 6px rgba(255, 255, 255, 0.6)"
+            height: star.size
           }}
           animate={
             prefersReducedMotion

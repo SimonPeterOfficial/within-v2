@@ -22,7 +22,7 @@ export default function AuroraBackground({ className = "" }: AuroraBackgroundPro
     >
       {/* Mood veil — the dominant color, breathes wide */}
       <motion.div
-        className="absolute -top-1/4 left-1/4 h-[60vh] w-[60vw] rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-veil"
+        className="absolute -top-1/4 left-1/4 h-[60vh] w-[60vw] rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-smoke"
         animate={
           prefersReducedMotion ? undefined : { x: [0, 60, 0], y: [0, 30, 0], scale: [1, 1.15, 1] }
         }
@@ -31,7 +31,7 @@ export default function AuroraBackground({ className = "" }: AuroraBackgroundPro
 
       {/* Emerald counter-drift */}
       <motion.div
-        className="absolute -bottom-1/4 right-1/4 h-[60vh] w-[50vw] rounded-full bg-emerald-500/[0.06] blur-veil"
+        className="absolute -bottom-1/4 right-1/4 h-[60vh] w-[50vw] rounded-full bg-emerald-500/[0.06] blur-smoke"
         animate={
           prefersReducedMotion ? undefined : { x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }
         }
@@ -40,7 +40,7 @@ export default function AuroraBackground({ className = "" }: AuroraBackgroundPro
 
       {/* Deep violet underglow for extra depth */}
       <motion.div
-        className="absolute -left-1/4 bottom-1/4 h-[45vh] w-[45vw] rounded-full bg-violet-700/[0.06] blur-veil"
+        className="absolute -left-1/4 bottom-1/4 h-[45vh] w-[45vw] rounded-full bg-violet-700/[0.06] blur-smoke"
         animate={
           prefersReducedMotion ? undefined : { x: [0, 40, 0], y: [0, -20, 0], scale: [1, 1.12, 1] }
         }

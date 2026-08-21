@@ -8,14 +8,17 @@ import AuriOwl from "@/components/sanctuary/AuriOwl";
 import { AURI_OPEN_EVENT } from "@/components/sanctuary/AuriOrb";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { blurUp, staggerContainer } from "@/lib/animations";
+import { fireRipple } from "@/lib/ripple";
 
 /**
  * Auri — the presence that listens.
  *
- * COMPOSITION: A centered luminous portal with Auri at its heart.
- * Orbital rings, concentric glow, and a quiet promise. The environment
- * resembles: a portal + water + nebula + light. This must be one of
- * the most visually beautiful sections on the site.
+ * This section should feel intimate, mysterious, and warm.
+ * Not a product pitch. Not a chatbot advertisement.
+ * More like: "Somewhere Within, something is listening."
+ *
+ * Composition: large atmospheric space + small luminous Auri +
+ * poetic statement + subtle interaction. Mystery is part of the product.
  */
 export default function AuriMoment() {
   const prefersReducedMotion = useReducedMotionSafe();
@@ -26,50 +29,33 @@ export default function AuriMoment() {
   };
 
   return (
-    <section id="auri" className="relative scroll-mt-24 overflow-hidden py-32 text-white">
-      {/* Deep atmospheric room */}
+    <section id="auri" className="relative scroll-mt-24 overflow-hidden py-36 text-white">
+      {/* Deep atmospheric room — warmer, more intimate */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 transition-all duration-[2000ms]"
         style={{
           background: hovering
-            ? "radial-gradient(ellipse at 50% 45%, rgba(var(--mood-rgb),0.09), transparent 55%)"
-            : "radial-gradient(ellipse at 50% 45%, rgba(var(--mood-rgb),0.04), transparent 55%)"
+            ? "radial-gradient(ellipse at 50% 42%, rgba(var(--mood-rgb),0.08), transparent 52%)"
+            : "radial-gradient(ellipse at 50% 42%, rgba(var(--mood-rgb),0.035), transparent 52%)"
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_60%,rgba(139,92,246,0.03),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_55%,rgba(139,92,246,0.025),transparent_48%)]"
       />
+
+      {/* Section divider */}
+      <div aria-hidden className="section-divider absolute left-0 right-0 top-0" />
 
       {/* Bottom fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#03040a] to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#02030a] to-transparent"
       />
 
       <Container className="relative">
-        {/* Eyebrow */}
-        <motion.div
-          variants={staggerContainer(0.2, 0.3)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          className="text-center mb-16"
-        >
-          <motion.p variants={blurUp} className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400/60">
-            Auri
-          </motion.p>
-          <motion.h2 variants={blurUp} className="mt-5 font-display text-4xl font-medium leading-[1.04] tracking-[-0.02em] md:text-6xl">
-            Auri sees you.
-          </motion.h2>
-          <motion.p variants={blurUp} className="mt-4 mx-auto max-w-md text-sm leading-relaxed text-gray-400/70 md:text-base">
-            Whenever you need a little light, Auri is here.
-            Not to judge. Not to fix. Just to understand.
-          </motion.p>
-        </motion.div>
-
-        {/* ── The Portal — centered luminous environment ── */}
+        {/* The Portal — centered luminous environment */}
         <motion.div
           variants={staggerContainer(0.1, 0.1)}
           initial="hidden"
@@ -81,44 +67,44 @@ export default function AuriMoment() {
         >
           {/* Outermost glow — the room answering */}
           <motion.div
-            initial={{ opacity: 0.2, scale: 0.95 }}
-            whileInView={{ opacity: hovering ? 0.5 : 0.3, scale: hovering ? 1.02 : 1 }}
+            initial={{ opacity: 0.15, scale: 0.95 }}
+            whileInView={{ opacity: hovering ? 0.45 : 0.25, scale: hovering ? 1.02 : 1 }}
             viewport={{ once: true }}
             transition={{ duration: 2.5, ease: "easeOut" }}
-            className="absolute inset-[-15%] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.08)_0%,transparent_65%)] blur-3xl"
+            className="absolute inset-[-18%] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.07)_0%,transparent_62%)] blur-3xl"
           />
 
           {/* Orbital ring 1 — slow rotation */}
           <div
-            className="pointer-events-none absolute inset-[5%] rounded-full border border-white/[0.04]"
+            className="pointer-events-none absolute inset-[5%] rounded-full border border-white/[0.035]"
             style={{
-              opacity: hovering ? 0.8 : 0.4,
+              opacity: hovering ? 0.75 : 0.35,
               transition: "opacity 2s ease",
-              animation: prefersReducedMotion ? "none" : "spin 60s linear infinite"
+              animation: prefersReducedMotion ? "none" : "spin 65s linear infinite"
             }}
           >
-            <span className="absolute -top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-emerald-300/50 shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
+            <span className="absolute -top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-emerald-300/45 shadow-[0_0_10px_rgba(52,211,153,0.45)]" />
           </div>
 
           {/* Orbital ring 2 — counter-rotation, fainter */}
           <div
-            className="pointer-events-none absolute inset-[12%] rounded-full border border-white/[0.025]"
+            className="pointer-events-none absolute inset-[13%] rounded-full border border-white/[0.02]"
             style={{
-              opacity: hovering ? 0.6 : 0.25,
+              opacity: hovering ? 0.55 : 0.2,
               transition: "opacity 2s ease",
-              animation: prefersReducedMotion ? "none" : "spin 90s linear infinite reverse"
+              animation: prefersReducedMotion ? "none" : "spin 95s linear infinite reverse"
             }}
           >
-            <span className="absolute -bottom-0.5 left-1/3 h-1 w-1 rounded-full bg-[rgba(var(--mood-rgb),0.6)] shadow-[0_0_8px_rgba(var(--mood-rgb),0.7)]" />
+            <span className="absolute -bottom-0.5 left-1/3 h-1 w-1 rounded-full bg-[rgba(var(--mood-rgb),0.55)] shadow-[0_0_8px_rgba(var(--mood-rgb),0.65)]" />
           </div>
 
           {/* Orbital ring 3 — outermost, barely visible */}
           <div
-            className="pointer-events-none absolute inset-[20%] rounded-full border border-dashed border-white/[0.015]"
+            className="pointer-events-none absolute inset-[22%] rounded-full border border-dashed border-white/[0.012]"
             style={{
-              opacity: hovering ? 0.4 : 0.15,
+              opacity: hovering ? 0.35 : 0.12,
               transition: "opacity 2s ease",
-              animation: prefersReducedMotion ? "none" : "spin 120s linear infinite"
+              animation: prefersReducedMotion ? "none" : "spin 130s linear infinite"
             }}
           />
 
@@ -127,10 +113,10 @@ export default function AuriMoment() {
             animate={
               prefersReducedMotion
                 ? undefined
-                : { scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }
+                : { scale: [1, 1.06, 1], opacity: [0.25, 0.45, 0.25] }
             }
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-[25%] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.1)_0%,transparent_70%)] blur-xl"
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-[28%] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.08)_0%,transparent_68%)] blur-xl"
           />
 
           {/* The owl — the presence at the center */}
@@ -138,12 +124,12 @@ export default function AuriMoment() {
             variants={blurUp}
             className="relative"
             animate={{
-              opacity: hovering ? 1 : 0.8,
-              scale: hovering ? 1.06 : 1
+              opacity: hovering ? 1 : 0.75,
+              scale: hovering ? 1.08 : 1
             }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
           >
-            <AuriOwl size={120} state={hovering ? "greeting" : "curious"} followCursor />
+            <AuriOwl size={110} state={hovering ? "greeting" : "curious"} followCursor />
           </motion.div>
 
           {/* Tiny greeting on hover */}
@@ -153,33 +139,38 @@ export default function AuriMoment() {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="absolute -bottom-4 text-[12px] italic text-white/50"
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="absolute -bottom-4 text-[12px] italic text-white/45"
               >
                 You&apos;re here.
               </motion.p>
             )}
           </AnimatePresence>
-
-          {/* Label */}
-          <motion.p
-            variants={blurUp}
-            className="absolute bottom-0 text-[10px] font-semibold uppercase tracking-[0.4em] text-gray-500/50"
-          >
-            Auri
-          </motion.p>
         </motion.div>
 
-        {/* Conversation preview + CTA */}
+        {/* Poetic statement + CTA — the promise */}
         <motion.div
-          variants={staggerContainer(0.12, 0.15)}
+          variants={staggerContainer(0.15, 0.18)}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          className="mt-16 text-center"
+          viewport={{ once: true, amount: 0.35 }}
+          className="mt-20 text-center"
         >
-          {/* Preview bubbles */}
-          <motion.div variants={blurUp} className="mx-auto mb-10 max-w-sm space-y-2.5">
+          <motion.p variants={blurUp} className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400/50">
+            Auri
+          </motion.p>
+          <motion.h2 variants={blurUp} className="mt-5 font-display text-4xl font-medium leading-[1.04] tracking-[-0.02em] md:text-6xl">
+            You don&apos;t always have to
+            <br className="hidden sm:block" />
+            {" "}know what to say.
+          </motion.h2>
+          <motion.p variants={blurUp} className="mt-5 mx-auto max-w-md text-[15px] leading-[1.7] text-gray-400/65 md:text-base">
+            Somewhere Within, something is listening.
+            Not to fix. Not to judge. Just to hold the light.
+          </motion.p>
+
+          {/* Preview bubbles — whispered, not a chat UI */}
+          <motion.div variants={blurUp} className="mx-auto mt-12 mb-10 max-w-xs space-y-2">
             {[
               { role: "auri" as const, text: "How are you feeling today?" },
               { role: "user" as const, text: "Quiet. Lighter than yesterday." },
@@ -187,14 +178,14 @@ export default function AuriMoment() {
             ].map((message, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 5 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.25 }}
                 className={
                   message.role === "auri"
-                    ? "w-fit max-w-[85%] mx-auto rounded-2xl rounded-tl-md border border-white/[0.05] bg-white/[0.03] px-4 py-2.5 text-[13px] leading-relaxed text-gray-300/80 backdrop-blur"
-                    : "w-fit max-w-[85%] ml-auto rounded-2xl rounded-tr-md border border-[rgba(var(--mood-rgb),0.15)] bg-[rgba(var(--mood-rgb),0.06)] px-4 py-2.5 text-[13px] leading-relaxed text-white/80 backdrop-blur"
+                    ? "w-fit max-w-[85%] mx-auto rounded-2xl rounded-tl-md border border-white/[0.04] bg-white/[0.025] px-4 py-2 text-[13px] leading-relaxed text-gray-300/70 backdrop-blur"
+                    : "w-fit max-w-[85%] ml-auto rounded-2xl rounded-tr-md border border-[rgba(var(--mood-rgb),0.12)] bg-[rgba(var(--mood-rgb),0.05)] px-4 py-2 text-[13px] leading-relaxed text-white/70 backdrop-blur"
                 }
               >
                 {message.text}
@@ -203,10 +194,10 @@ export default function AuriMoment() {
           </motion.div>
 
           <motion.div variants={blurUp} className="flex flex-wrap items-center justify-center gap-5">
-            <Button onClick={sayHello} variant="primary" size="lg">
+            <Button onClick={(e) => { sayHello(); fireRipple(e); }} variant="primary" size="lg">
               Meet Auri
             </Button>
-            <p className="text-[11px] text-gray-500/60">
+            <p className="text-[11px] text-gray-500/50">
               Everything Auri says stays in this browser.
             </p>
           </motion.div>

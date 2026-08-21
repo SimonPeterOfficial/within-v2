@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AuthLayout from "@/components/auth/AuthLayout";
+import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 export const metadata: Metadata = {
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthLayout>
+    <AuthSplitLayout>
       <ForgotPasswordForm />
-    </AuthLayout>
+    </AuthSplitLayout>
   );
 }

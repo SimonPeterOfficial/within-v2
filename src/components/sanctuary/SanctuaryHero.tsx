@@ -73,8 +73,8 @@ export default function SanctuaryHero() {
         style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
         className="pointer-events-none absolute inset-0"
       >
-        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-veil" />
-        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.06] blur-veil" />
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[rgba(var(--mood-rgb),0.07)] blur-smoke" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.06] blur-smoke" />
         <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/[0.04] blur-haze" />
       </motion.div>
 

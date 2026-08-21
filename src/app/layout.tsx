@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/lib/auth/session";
 import { ThemeProvider } from "@/lib/theme";
 import { EnvironmentProvider } from "@/lib/environment";
@@ -7,6 +8,7 @@ import CustomCursor from "@/components/effects/CustomCursor";
 import GrainOverlay from "@/components/effects/GrainOverlay";
 import PointerLight from "@/components/effects/PointerLight";
 import PresenceField from "@/components/effects/PresenceField";
+import MemoryRipple from "@/components/effects/MemoryRipple";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -78,6 +80,8 @@ export default function RootLayout({
               <PresenceField />
               <PointerLight />
               <CustomCursor />
+              <MemoryRipple />
+              <SpeedInsights />
             </AuthProvider>
           </EnvironmentProvider>
         </ThemeProvider>

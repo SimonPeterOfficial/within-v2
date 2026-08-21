@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 type AdminTopbarProps = {
@@ -28,10 +29,12 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname] ?? "Dashboard";
 
-  // Get time-based greeting
-  const hour = typeof window !== "undefined" ? new Date().getHours() : 18;
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  // Time-based greeting — resolved client-side to avoid hydration mismatch.
+  // useState lazy initializer runs once on the client, after hydration.
+  const [greeting] = useState(() => {
+    const hour = new Date().getHours();
+    return hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  });
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/[0.04] bg-[#06060c]/80 backdrop-blur-xl px-4 py-3 sm:px-6 lg:px-8">

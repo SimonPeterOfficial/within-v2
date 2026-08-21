@@ -10,6 +10,7 @@ import MeshGradient from "@/components/effects/MeshGradient";
 import BentoGrid, { BentoCard } from "@/components/ui/BentoGrid";
 import { ORIGINALS } from "@/lib/content";
 import { staggerContainer } from "@/lib/animations";
+import { fireRipple } from "@/lib/ripple";
 
 const featured = ORIGINALS[0];
 const FEATURED_PROGRESS = 0.42;
@@ -74,6 +75,7 @@ export default function OriginalsShowcase({ trailerHref = "#memories" }: Origina
                 {/* Play — the door into the original */}
                 <a
                   href={trailerHref}
+                  onClick={(e) => fireRipple(e)}
                   aria-label={`Play ${featured.title}`}
                   className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                 >

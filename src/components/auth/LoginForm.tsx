@@ -64,10 +64,12 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
+        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
           Welcome <GradientText>back</GradientText>.
         </h1>
-        <p className="mt-2 text-sm text-gray-400">Log in to continue your story.</p>
+        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
+          Your universe is still here.
+        </p>
       </div>
 
       <AnimatePresence>
@@ -128,9 +130,9 @@ export default function LoginForm() {
         </Link>
       </div>
 
-      <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
+      <Button type="submit" variant="gradient" size="lg" className="mt-2 w-full" disabled={loading}>
         {loading && <Icon name="loader" size={15} className="mr-2 animate-spin" />}
-        {loading ? "Entering…" : "Log in"}
+        {loading ? "Entering…" : "Enter WithIn"}
       </Button>
 
       <p className="text-center text-sm text-gray-400">

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
 type SidebarProps = {
   open: boolean;
@@ -11,44 +12,44 @@ type SidebarProps = {
 type NavItem = {
   label: string;
   href: string;
-  icon: string;
+  icon: IconName;
 };
 
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: "Overview",
     items: [
-      { label: "Dashboard", href: "/admin", icon: "◉" },
-      { label: "Users", href: "/admin/users", icon: "◎" },
-      { label: "Creators", href: "/admin/creators", icon: "✦" },
-      { label: "Content", href: "/admin/content", icon: "◇" },
-      { label: "Communities", href: "/admin/communities", icon: "⬡" },
-      { label: "Moderation", href: "/admin/moderation", icon: "◈" },
-      { label: "Reports", href: "/admin/moderation", icon: "△" },
+      { label: "Dashboard", href: "/admin", icon: "dashboard" },
+      { label: "Users", href: "/admin/users", icon: "users" },
+      { label: "Creators", href: "/admin/creators", icon: "sparkles" },
+      { label: "Content", href: "/admin/content", icon: "book" },
+      { label: "Communities", href: "/admin/communities", icon: "heart" },
+      { label: "Moderation", href: "/admin/moderation", icon: "shield" },
+      { label: "Reports", href: "/admin/moderation", icon: "alert" },
     ],
   },
   {
     title: "Insights",
     items: [
-      { label: "Analytics", href: "/admin/analytics", icon: "△" },
-      { label: "Engagement", href: "/admin/analytics", icon: "◎" },
-      { label: "Growth", href: "/admin/analytics", icon: "▽" },
+      { label: "Analytics", href: "/admin/analytics", icon: "analytics" },
+      { label: "Engagement", href: "/admin/analytics", icon: "heart" },
+      { label: "Growth", href: "/admin/analytics", icon: "star" },
     ],
   },
   {
     title: "Business",
     items: [
-      { label: "Subscriptions", href: "/admin", icon: "◻" },
-      { label: "Creator Earnings", href: "/admin/creators", icon: "◆" },
+      { label: "Subscriptions", href: "/admin", icon: "refresh" },
+      { label: "Creator Earnings", href: "/admin/creators", icon: "play" },
     ],
   },
   {
     title: "System",
     items: [
-      { label: "Auri", href: "/admin/auri", icon: "◉" },
-      { label: "Settings", href: "/admin/settings", icon: "⚙" },
-      { label: "Feature Flags", href: "/admin/features", icon: "◫" },
-      { label: "Audit Log", href: "/admin/audit", icon: "▤" },
+      { label: "Auri", href: "/admin/auri", icon: "sparkles" },
+      { label: "Settings", href: "/admin/settings", icon: "settings" },
+      { label: "Feature Flags", href: "/admin/features", icon: "flag" },
+      { label: "Audit Log", href: "/admin/audit", icon: "search" },
     ],
   },
 ];
@@ -113,9 +114,11 @@ export default function AdminSidebar({ open, onClose }: SidebarProps) {
                             : "text-gray-400 hover:text-gray-200 hover:bg-white/[0.03] border border-transparent"
                         }`}
                       >
-                        <span className={`text-xs ${isActive ? "text-emerald-400" : "text-gray-500"}`}>
-                          {item.icon}
-                        </span>
+                        <Icon
+                          name={item.icon}
+                          size={16}
+                          className={isActive ? "text-emerald-400" : "text-gray-500"}
+                        />
                         {item.label}
                       </Link>
                     </li>

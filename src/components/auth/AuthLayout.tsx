@@ -17,11 +17,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <section
       id="main"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-16 text-white"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#02030a] px-6 py-16 text-white"
     >
       <GlowBackground variant="hero" />
-      {/* Drifting dust keeps the auth surfaces alive, never static */}
-      <ParticleField count={14} seed={9} />
+      <ParticleField count={12} seed={9} />
+
+      {/* Deep vignette — cinematic framing */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
 
       <Button
         href="/"
@@ -42,11 +44,11 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         <div className="mb-8 flex items-center justify-center gap-3">
           <Logo />
           <span aria-hidden className="ml-2">
-            <AuriOwl size={30} particles={false} state="observing" />
+            <AuriOwl size={28} particles={false} state="observing" />
           </span>
         </div>
-        <GlassCard className="p-8 sm:p-10">{children}</GlassCard>
-        <p className="mt-6 text-center text-xs text-gray-600">
+        <GlassCard tone="strong" className="p-8 sm:p-10">{children}</GlassCard>
+        <p className="mt-5 text-center text-[11px] text-gray-500/50">
           Auri is keeping the light ready — nothing you write here leaves this device.
         </p>
       </motion.div>

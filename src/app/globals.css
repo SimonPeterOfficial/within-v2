@@ -220,6 +220,7 @@ html[data-time="night"] {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.35s ease;
+  will-change: transform;
 }
 
 .pointer-light[data-active] {
@@ -230,13 +231,13 @@ html[data-time="night"] {
   position: absolute;
   left: 0;
   top: 0;
-  width: 560px;
-  height: 560px;
+  width: 400px;
+  height: 400px;
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(var(--mood-rgb), 0.1) 0%,
-    rgba(var(--mood-rgb), 0.045) 35%,
+    rgba(var(--mood-rgb), 0.08) 0%,
+    rgba(var(--mood-rgb), 0.03) 35%,
     transparent 70%
   );
   transform: translate3d(var(--pl-x, 0px), var(--pl-y, 0px), 0) translate(-50%, -50%);
@@ -758,13 +759,38 @@ html[data-theme-day="birthday"] .time-glow {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.35s ease;
+  will-change: transform;
 }
 .card-tactile:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.06);
 }
 .card-tactile:active {
-  transform: translateY(-1px) scale(0.995);
+  transform: translateY(-1px) scale(0.997);
+  transition-duration: 0.15s;
+}
+
+/* ── Section ambient glow — presence-driven atmospheric response ────── */
+.section-ambient {
+  position: relative;
+}
+.section-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 50% at calc(50% + (var(--px, 0.5) - 0.5) * 20%) calc(var(--py, 0.5) * 40%),
+    rgba(var(--mood-rgb), 0.02),
+    transparent 65%
+  );
+  transition: background 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-ambient::after {
+    transition: none;
+  }
 }
 
 /* ── Editorial section dividers ─────────────────────────────────────── */

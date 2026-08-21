@@ -14,18 +14,26 @@ type LoaderWordmarkProps = {
 };
 
 /**
- * The loader's title card — the wordmark letters blur sharp into focus, then
- * the credit lines dissolve in beneath it, one after another.
+ * The loader's title card — the wordmark letters blur sharp into focus
+ * with a subtle tracking refinement (letters settle from wider to tighter),
+ * then the credit lines dissolve in beneath it, one after another.
+ *
+ * The wordmark should feel discovered rather than displayed.
  */
 export default function LoaderWordmark({ showLetters = false, creditStage = 0 }: LoaderWordmarkProps) {
   return (
     <div className="relative flex flex-col items-center">
+      {/* Wordmark — tracking refines as letters form */}
       <motion.div
         variants={letterStagger(0.07)}
         initial="hidden"
         animate={showLetters ? "show" : "hidden"}
         aria-hidden
         className="flex"
+        style={{
+          letterSpacing: showLetters ? "0.02em" : "0.08em",
+          transition: "letter-spacing 1.8s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
       >
         {LETTERS.map((letter, index) => (
           <motion.span

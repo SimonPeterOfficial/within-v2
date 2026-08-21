@@ -8,6 +8,14 @@ import Logo from "@/components/ui/Logo";
 import { spring } from "@/lib/animations";
 
 const navLinks = [
+  { label: "Home", href: "#top" },
+  { label: "Explore", href: "/explore" },
+  { label: "Within", href: "/within" },
+  { label: "Journey", href: "/journey" },
+];
+
+/** Section links for the landing page scroll-spy (only active on /) */
+const sectionLinks = [
   { label: "Discover", href: "#feel" },
   { label: "Originals", href: "#originals" },
   { label: "Sanctuary", href: "#sanctuary" },
@@ -16,7 +24,9 @@ const navLinks = [
   { label: "Creators", href: "#creators" },
 ];
 
-const sectionIds = navLinks.map((link) => link.href.slice(1));
+const sectionIds = sectionLinks
+  .filter((l) => l.href.startsWith("#"))
+  .map((link) => link.href.slice(1));
 
 /**
  * Premium floating navigation — almost invisible until interacted with.
@@ -174,6 +184,7 @@ export default function Navbar() {
             className="relative z-10 mx-auto mt-2 max-w-6xl md:hidden"
           >
             <div className="glass-level-4 rounded-3xl p-4 backdrop-blur-xl">
+              {/* Primary navigation */}
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -184,6 +195,22 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              {/* Section links for landing page */}
+              <div className="mt-1 border-t border-white/[0.06] pt-2">
+                <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500/50">
+                  Sections
+                </p>
+                {sectionLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={closeMenu}
+                    className="block rounded-2xl px-4 py-2 text-[13px] text-gray-400/60 transition hover:bg-white/5 hover:text-gray-200"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
               <div className="mt-2 border-t border-white/10 pt-3">
                 <Button
                   href="/signup"

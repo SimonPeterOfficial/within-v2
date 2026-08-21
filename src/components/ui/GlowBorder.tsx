@@ -27,7 +27,7 @@ export default function GlowBorder({ children, className = "" }: GlowBorderProps
             "conic-gradient(from 0deg, rgba(168, 85, 247, 0.75), rgba(52, 211, 153, 0.75), rgba(168, 85, 247, 0.1), rgba(52, 211, 153, 0.75), rgba(168, 85, 247, 0.75))"
         }}
       />
-      <div className="relative rounded-[calc(1.5rem-1px)] bg-[#050505]/90">{children}</div>
+      <div className="relative rounded-[calc(1.5rem-1px)] bg-[var(--background)]/90">{children}</div>
     </div>
   );
 }

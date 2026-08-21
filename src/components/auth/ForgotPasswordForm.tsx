@@ -46,10 +46,10 @@ export default function ForgotPasswordForm() {
   return (
     <div className="space-y-5">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
+        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
           Find your way <GradientText>back</GradientText>.
         </h1>
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
           Enter your email and we&apos;ll send you a reset link.
         </p>
       </div>

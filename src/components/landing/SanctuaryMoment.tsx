@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import GlassCard from "@/components/ui/GlassCard";
 import { blurUp, staggerContainer } from "@/lib/animations";
+import { fireRipple } from "@/lib/ripple";
 
 /** The quiet rooms of the sanctuary — what lives behind the door. */
 const ROOMS: { icon: IconName; label: string; line: string }[] = [
@@ -26,7 +27,7 @@ const ROOMS: { icon: IconName; label: string; line: string }[] = [
  */
 export default function SanctuaryMoment() {
   return (
-    <section id="sanctuary" className="relative scroll-mt-24 overflow-hidden py-28 text-white">
+    <section id="sanctuary" className="section-ambient relative scroll-mt-24 overflow-hidden py-32 text-white">
       {/* Warmer, deeper room — the private light */}
       <div
         aria-hidden
@@ -47,7 +48,7 @@ export default function SanctuaryMoment() {
       />
 
       <Container className="relative">
-        <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.2fr]">
+        <div className="grid items-center gap-16 lg:grid-cols-[1fr_1.15fr]">
           {/* Editorial statement — warm, inviting */}
           <motion.div
             variants={staggerContainer(0.12, 0.1)}
@@ -58,16 +59,16 @@ export default function SanctuaryMoment() {
             <motion.p variants={blurUp} className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400/60">
               The sanctuary
             </motion.p>
-            <motion.h2 variants={blurUp} className="mt-5 font-display text-4xl font-medium leading-[1.04] tracking-[-0.02em] md:text-6xl">
+            <motion.h2 variants={blurUp} className="mt-5 font-display text-4xl font-medium leading-[1.04] tracking-[-0.02em] md:text-5xl lg:text-6xl">
               Somewhere to come back to.
             </motion.h2>
-            <motion.p variants={blurUp} className="mt-6 max-w-md text-[15px] leading-[1.7] text-gray-400/70 md:text-base">
+            <motion.p variants={blurUp} className="mt-5 max-w-md text-[15px] leading-[1.75] text-gray-400/65 md:text-base">
               Discovery is the front door. The sanctuary is the quiet room inside — journal,
               mood, memories and Auri, all waiting when you need them. No noise. No feed.
               Just the place that knows how you feel.
             </motion.p>
             <motion.div variants={blurUp} className="mt-9 flex flex-wrap gap-4">
-              <Button href="/signup" variant="primary" size="lg">
+              <Button href="/signup" variant="primary" size="lg" onClick={(e) => fireRipple(e)}>
                 Step inside
               </Button>
               <Button href="/home" variant="ghost" size="lg">

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import AuthLayout from "@/components/auth/AuthLayout";
+import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import SignupForm from "@/components/auth/SignupForm";
 
 export const metadata: Metadata = {
   title: "Create your account — WithIn",
-  description: "Join the world within. Start your story in under a minute.",
+  description: "Create your place Within. A universe built around how you feel.",
 };
 
 export default function SignupPage() {
   return (
-    <AuthLayout>
+    <AuthSplitLayout>
       <SignupForm />
-    </AuthLayout>
+    </AuthSplitLayout>
   );
 }

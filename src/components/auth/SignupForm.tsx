@@ -58,9 +58,9 @@ export default function SignupForm() {
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div className="text-center">
         <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
-          Find a place for the things that <GradientText>make you, you</GradientText>.
+          Create your place <GradientText>Within</GradientText>.
         </h1>
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
           A few quiet questions, then the world tunes itself to you.
         </p>
       </div>

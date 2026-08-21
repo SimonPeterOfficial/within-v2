@@ -5,6 +5,7 @@ import DepthLayers from "@/components/effects/DepthLayers";
 import Hero from "@/components/home/Hero";
 import Footer from "@/components/layout/Footer";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
+import AuriSignatureMoment from "@/components/home/AuriSignatureMoment";
 
 // The cinematic intro is code-split so the landing page stays lean — it only
 // loads (and plays) on a fresh session, once, then dissolves into the hero.
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#04050a] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#02030a] text-white">
       {/* One living atmosphere behind the entire world: glow → fog → mesh →
           aurora → light rays → particles → stars, all drifting in slow motion */}
       <DepthLayers preset="home" />
@@ -39,43 +40,43 @@ export default function Home() {
       <CinematicLoaderGate />
 
       <main id="main" className="relative">
+        {/* 01 — ARRIVAL: The hero opens the universe */}
         <Hero />
 
-        {/* Emotional discovery — the world answers how you feel */}
+        {/* 02 — RECOGNITION: The world answers how you feel */}
         <Suspense fallback={null}>
           <EmotionalDiscovery />
         </Suspense>
 
-        {/* WithIn Originals — the studio shelf */}
-        <Suspense fallback={null}>
-          <OriginalsShowcase trailerHref="/signup" />
-        </Suspense>
-
-        {/* The sanctuary — the quiet room inside */}
-        <Suspense fallback={null}>
-          <SanctuaryMoment />
-        </Suspense>
-
-        {/* Auri — the presence that listens */}
+        {/* 03 — PRESENCE: Auri, the quiet listener */}
         <Suspense fallback={null}>
           <AuriMoment />
         </Suspense>
 
-        {/* The content universe — six worlds, one light */}
+        {/* 04 — EXPLORATION: Six worlds, one light */}
         <Suspense fallback={null}>
           <ContentUniverse />
         </Suspense>
 
-        {/* The creator universe — the people who make it */}
+        {/* 05 — PEOPLE: The creators who make it */}
         <Suspense fallback={null}>
           <CreatorUniverse />
         </Suspense>
 
-        {/* Community — quiet rooms, kindred souls */}
+        {/* 06 — BELONGING: The sanctuary — a place to come back to */}
+        <Suspense fallback={null}>
+          <SanctuaryMoment />
+        </Suspense>
+
+        {/* 07 — POSSIBILITY: Originals + Community conversations */}
+        <Suspense fallback={null}>
+          <OriginalsShowcase trailerHref="/signup" />
+        </Suspense>
         <Suspense fallback={null}>
           <RecentDiscussions id="community" />
         </Suspense>
 
+        {/* 08 — INVITATION: The final door */}
         <Suspense fallback={null}>
           <FinaleCTA primaryHref="/signup" />
         </Suspense>
@@ -83,6 +84,7 @@ export default function Home() {
 
       <Footer />
       <AuriOrb />
+      <AuriSignatureMoment />
     </div>
   );
 }

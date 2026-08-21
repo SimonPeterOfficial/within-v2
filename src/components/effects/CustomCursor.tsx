@@ -77,34 +77,34 @@ export default function CustomCursor() {
   const glowOpacity = isCTA ? 0.4 : visible ? 0.22 : 0;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[999]">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-[999]" style={{ contain: "layout style" }}>
       {/* Soft glow halo — CTA state is brighter and larger */}
-      <motion.div style={{ x: ringX, y: ringY }} className="absolute left-0 top-0">
+      <motion.div style={{ x: ringX, y: ringY, willChange: "transform" }} className="absolute left-0 top-0">
         <motion.div
           animate={{
-            scale: isCTA ? 2.2 : hovering ? 1.5 : 1,
+            scale: isCTA ? 2 : hovering ? 1.4 : 1,
             opacity: glowOpacity
           }}
           transition={{ type: "spring", stiffness: 200, damping: 22 }}
-          className="rounded-full blur-sm"
+          className="rounded-full blur-[2px]"
           style={{
-            width: isCTA ? 80 : 80,
-            height: isCTA ? 80 : 80,
-            marginLeft: isCTA ? -40 : -40,
-            marginTop: isCTA ? -40 : -40,
+            width: 64,
+            height: 64,
+            marginLeft: -32,
+            marginTop: -32,
             background: isCTA
-              ? `radial-gradient(circle, rgba(var(--mood-rgb),0.6), rgba(var(--mood-rgb),0.15) 50%, transparent 70%)`
-              : `radial-gradient(circle, rgba(var(--mood-rgb),0.5), transparent 65%)`
+              ? `radial-gradient(circle, rgba(var(--mood-rgb),0.5), rgba(var(--mood-rgb),0.1) 50%, transparent 70%)`
+              : `radial-gradient(circle, rgba(var(--mood-rgb),0.4), transparent 65%)`
           }}
         />
       </motion.div>
 
       {/* Trailing ring — scales up on CTA for the "entering" moment */}
-      <motion.div style={{ x: ringX, y: ringY }} className="absolute left-0 top-0">
+      <motion.div style={{ x: ringX, y: ringY, willChange: "transform" }} className="absolute left-0 top-0">
         <motion.div
           animate={{
             scale: ringScale,
-            opacity: visible ? (isCTA ? 0.7 : 0.45) : 0
+            opacity: visible ? (isCTA ? 0.65 : 0.4) : 0
           }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className="rounded-full border"
@@ -114,21 +114,21 @@ export default function CustomCursor() {
             marginLeft: -ringSize / 2,
             marginTop: -ringSize / 2,
             borderColor: isCTA
-              ? `rgba(var(--mood-rgb),0.8)`
-              : `rgba(var(--mood-rgb),0.55)`,
+              ? `rgba(var(--mood-rgb),0.7)`
+              : `rgba(var(--mood-rgb),0.45)`,
             boxShadow: isCTA
-              ? `0 0 16px rgba(var(--mood-rgb),0.3)`
+              ? `0 0 12px rgba(var(--mood-rgb),0.25)`
               : "none"
           }}
         />
       </motion.div>
 
       {/* Core dot */}
-      <motion.div style={{ x, y }} className="absolute left-0 top-0">
+      <motion.div style={{ x, y, willChange: "transform" }} className="absolute left-0 top-0">
         <motion.div
           animate={{ scale: coreScale, opacity: visible ? 1 : 0 }}
           transition={{ type: "spring", stiffness: 500, damping: 26 }}
-          className="h-2 w-2 -ml-1 -mt-1 rounded-full bg-[rgba(var(--mood-rgb),0.9)] shadow-[0_0_12px_rgba(var(--mood-rgb),0.8)]"
+          className="h-1.5 w-1.5 -ml-[3px] -mt-[3px] rounded-full bg-[rgba(var(--mood-rgb),0.85)] shadow-[0_0_8px_rgba(var(--mood-rgb),0.6)]"
         />
       </motion.div>
     </div>

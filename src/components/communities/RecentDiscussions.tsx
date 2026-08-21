@@ -47,7 +47,7 @@ const discussions = [
  */
 export default function RecentDiscussions({ id }: { id?: string }) {
   return (
-    <section id={id} className="scroll-mt-24 pb-28 text-white">
+    <section id={id} className="relative scroll-mt-24 pb-28 text-white">
       {/* Section divider */}
       <div aria-hidden className="section-divider absolute left-0 right-0 top-0" />
 

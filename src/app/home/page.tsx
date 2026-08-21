@@ -29,14 +29,16 @@ export const metadata: Metadata = {
 };
 
 const shellItems: SidebarItem[] = [
-  { label: "Sanctuary", href: "#sanctuary", icon: "home" },
+  /* ── Primary universe navigation ── */
+  { label: "Home", href: "/home", icon: "home", route: true },
+  { label: "Explore", href: "/explore", icon: "discover", route: true },
+  { label: "Within", href: "/within", icon: "sparkles", route: true },
+  { label: "Journey", href: "/journey", icon: "heart", route: true },
+  /* ── Sanctuary sections ── */
   { label: "Mood", href: "#mood", icon: "moon" },
   { label: "Continue", href: "#continue", icon: "play" },
   { label: "Recommended", href: "#recommended", icon: "sparkles" },
-  { label: "Stories", href: "#memories", icon: "stories" },
-  { label: "Reflection", href: "#reflection", icon: "heart" },
-  /* ── The universe — real routes, every corner reachable from here ── */
-  { label: "Discover", href: "/discover", icon: "discover", route: true },
+  /* ── The universe — real routes ── */
   { label: "Originals", href: "/originals", icon: "originals", route: true },
   { label: "Music", href: "/music", icon: "music", route: true },
   { label: "Books", href: "/books", icon: "book", route: true },

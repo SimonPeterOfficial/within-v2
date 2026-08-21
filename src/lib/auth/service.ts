@@ -1,4 +1,4 @@
-import type { AuthResult, AuthService, AuthSession, ResetResult } from "./types";
+import type { AuthResult, AuthService, AuthSession, ResetResult, UserRole } from "./types";
 
 /**
  * Demo auth service — localStorage-backed, latency-simulated.
@@ -18,7 +18,12 @@ import type { AuthResult, AuthService, AuthSession, ResetResult } from "./types"
 
 const USERS_KEY = "within:demo:users";
 const SESSION_KEY = "within:demo:session";
+const COOKIE_NAME = "within-session";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 const LATENCY_MS = 850;
+
+/** Admin email — the first account registered with this email gets admin role. */
+const ADMIN_EMAIL = "admin@within.app";
 
 type StoredUser = {
   id: string;
@@ -26,6 +31,7 @@ type StoredUser = {
   email: string;
   /** Demo-only hash — NOT secure, never ship as-is */
   passwordHash: string;
+  role: UserRole;
   createdAt: number;
 };
 
@@ -61,10 +67,32 @@ function createToken(): string {
 
 function toSession(user: StoredUser): AuthSession {
   return {
-    user: { id: user.id, name: user.name, email: user.email, createdAt: user.createdAt },
+    user: { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt },
     token: createToken(),
     createdAt: Date.now()
   };
+}
+
+/**
+ * Set a session cookie that Next.js middleware can read for server-side
+ * route protection. The cookie contains a base64-encoded session token —
+ * NOT encrypted (demo only; production would use signed JWTs).
+ */
+function setSessionCookie(session: AuthSession) {
+  try {
+    const payload = btoa(JSON.stringify({ token: session.token, userId: session.user.id, role: session.user.role }));
+    document.cookie = `${COOKIE_NAME}=${payload}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function clearSessionCookie() {
+  try {
+    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Reads the persisted session if one exists and is still valid. */
@@ -74,7 +102,13 @@ export function getStoredSession(): AuthSession | null {
     if (!raw) return null;
     const session = JSON.parse(raw) as AuthSession;
     const exists = readUsers().some((user) => user.id === session.user.id);
-    return exists ? session : null;
+    if (!exists) return null;
+    // Backfill role for sessions created before the role field existed
+    const user = readUsers().find((u) => u.id === session.user.id);
+    if (user && !session.user.role) {
+      session.user.role = user.role;
+    }
+    return session;
   } catch {
     return null;
   }
@@ -108,6 +142,7 @@ export const authService: AuthService = {
         /* ignore */
       }
     }
+    setSessionCookie(session);
     return { ok: true, session };
   },
 
@@ -124,6 +159,7 @@ export const authService: AuthService = {
       name: name.trim(),
       email: normalized,
       passwordHash: hash(password),
+      role: normalized === ADMIN_EMAIL ? "admin" : "user",
       createdAt: Date.now()
     };
     writeUsers([...readUsers(), user]);
@@ -134,6 +170,7 @@ export const authService: AuthService = {
     } catch {
       /* ignore */
     }
+    setSessionCookie(session);
     return { ok: true, session };
   },
 
@@ -150,6 +187,7 @@ export const authService: AuthService = {
   async signOut(): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 300));
     clearStoredSession();
+    clearSessionCookie();
   }
 };
 

@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import CreatorCard from "@/components/ui/cards/CreatorCard";
 import { CREATORS } from "@/lib/creators";
 import { staggerContainer, slideUp } from "@/lib/animations";
+import { fireRipple } from "@/lib/ripple";
 
 /** The first faces of the universe — writers, filmmakers, musicians, photographers. */
 const FEATURED_CREATORS = CREATORS.filter((creator) =>
@@ -24,7 +25,7 @@ export default function CreatorUniverse() {
   const supporting = FEATURED_CREATORS.slice(1);
 
   return (
-    <section id="creators" className="scroll-mt-24 py-28 text-white">
+    <section id="creators" className="relative scroll-mt-24 py-28 text-white">
       {/* Section divider */}
       <div aria-hidden className="section-divider absolute left-0 right-0 top-0" />
 
@@ -79,7 +80,7 @@ export default function CreatorUniverse() {
         </motion.div>
 
         <div className="mt-12 text-center">
-          <Button href="/creators" variant="outline" size="lg">
+          <Button href="/creators" variant="outline" size="lg" onClick={(e) => fireRipple(e)}>
             Meet everyone
           </Button>
         </div>

@@ -35,7 +35,7 @@ export default function DepthLayers({
   className = ""
 }: DepthLayersProps) {
   return (
-    <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
+    <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden contain-strict ${className}`}>
       <GlowBackground variant="ambient" />
       <FogLayer intensity={fog} />
       <MeshGradient preset={preset} />

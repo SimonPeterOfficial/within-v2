@@ -12,24 +12,28 @@ import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
 import Magnetic from "@/components/ui/Magnetic";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
+import MultilingualFragments from "@/components/home/MultilingualFragments";
 import { blurUp, staggerContainer } from "@/lib/animations";
+import { fireRipple } from "@/lib/ripple";
 
 /**
- * The WithIn landing hero — entering a living digital universe.
+ * The WithIn landing hero — the opening scene of a cinematic universe.
  *
- * COMPOSITION:
- *   Background: nebula layers + mesh + aurora + stars
- *   Midground:  breathing light core + secondary atmosphere ring
- *   Foreground: WITHIN wordmark (atmospheric) → "Feel You." (editorial)
- *   Ground:     light-on-water ripple motif
- *   Chrome:     navbar + scroll cue
+ * COMPOSITION (back to front):
+ *   Deep background:  nebula + mesh + aurora + stars
+ *   Mid atmosphere:   breathing light core + teal accent ring
+ *   Environment:      particles + starfield + floating orb
+ *   Presence:         Auri watching from the atmosphere
+ *   Light motif:      light-on-water ripple (signature WithIn)
+ *   Editorial:        WITHIN wordmark (atmospheric) → "Feel You." (statement)
+ *   Chrome:           navbar + scroll cue
  *
  * The pointer drives atmospheric drift. The world responds to presence.
+ * Typography hierarchy: display → statement → body → metadata.
  */
 export default function Hero() {
   const prefersReducedMotion = useReducedMotionSafe();
 
-  // Mouse parallax — each layer drifts at its own depth
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const smx = useSpring(mx, { stiffness: 50, damping: 20 });
@@ -54,20 +58,20 @@ export default function Hero() {
     <section
       id="top"
       onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#03040a] text-white"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#02030a] text-white"
     >
-      {/* ── Background layers (deepest → shallowest) ── */}
+      {/* ── Deep background (furthest → nearest) ── */}
       <GlowBackground variant="hero" />
 
-      {/* Nebula layers — deepest parallax */}
+      {/* Nebula layers — deepest parallax, spacious and expensive */}
       <motion.div
         aria-hidden
         style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
         className="pointer-events-none absolute inset-0"
       >
-        <div className="absolute left-[18%] top-[15%] h-[30rem] w-[30rem] rounded-full bg-[rgba(var(--mood-rgb),0.06)] blur-veil" />
-        <div className="absolute bottom-[18%] right-[15%] h-80 w-80 rounded-full bg-teal-500/[0.035] blur-veil" />
-        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/[0.04] blur-haze" />
+        <div className="absolute left-[15%] top-[12%] h-[32rem] w-[32rem] rounded-full bg-[rgba(var(--mood-rgb),0.05)] blur-smoke" />
+        <div className="absolute bottom-[15%] right-[12%] h-80 w-80 rounded-full bg-teal-500/[0.03] blur-smoke" />
+        <div className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/[0.035] blur-haze" />
       </motion.div>
 
       {/* The breathing light core — the heart of the atmosphere */}
@@ -80,14 +84,14 @@ export default function Hero() {
           animate={
             prefersReducedMotion
               ? undefined
-              : { scale: [1, 1.06, 1], opacity: [0.5, 0.75, 0.5] }
+              : { scale: [1, 1.06, 1], opacity: [0.45, 0.7, 0.45] }
           }
           transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="h-[60vmin] w-[60vmin] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.12)_0%,rgba(45,212,191,0.03)_30%,rgba(99,102,241,0.015)_50%,transparent_70%)] blur-3xl"
+          className="h-[62vmin] w-[62vmin] rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.11)_0%,rgba(45,212,191,0.025)_28%,rgba(99,102,241,0.012)_48%,transparent_68%)] blur-3xl"
         />
       </motion.div>
 
-      {/* Secondary atmosphere ring — teal accent, slower breathing */}
+      {/* Secondary atmosphere — teal accent ring, slower breathing */}
       <motion.div
         aria-hidden
         style={{ x: prefersReducedMotion ? 0 : coreX, y: prefersReducedMotion ? 0 : coreY }}
@@ -97,10 +101,10 @@ export default function Hero() {
           animate={
             prefersReducedMotion
               ? undefined
-              : { scale: [1.04, 1, 1.04], opacity: [0.25, 0.4, 0.25] }
+              : { scale: [1.04, 1, 1.04], opacity: [0.2, 0.35, 0.2] }
           }
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="h-[72vmin] w-[72vmin] rounded-full border border-teal-500/[0.03] bg-[radial-gradient(circle,transparent_35%,rgba(45,212,191,0.02)_55%,transparent_75%)]"
+          className="h-[74vmin] w-[74vmin] rounded-full border border-teal-500/[0.025] bg-[radial-gradient(circle,transparent_32%,rgba(45,212,191,0.015)_52%,transparent_72%)]"
         />
       </motion.div>
 
@@ -110,59 +114,60 @@ export default function Hero() {
         style={{ x: prefersReducedMotion ? 0 : starsX, y: prefersReducedMotion ? 0 : starsY }}
         className="pointer-events-none absolute inset-0"
       >
-        <StarField count={48} seed={3} />
+        <StarField count={50} seed={3} />
       </motion.div>
 
       <PresenceMemory />
+      <MultilingualFragments />
       <ParticleField count={14} seed={5} />
 
-      {/* Auri — the presence watching from the atmosphere */}
+      {/* Auri — the guardian watching from the atmosphere */}
       <motion.div
         aria-hidden
         style={{ x: prefersReducedMotion ? 0 : auriX, y: prefersReducedMotion ? 0 : auriY }}
-        className="pointer-events-none absolute right-[7%] top-[12%] hidden opacity-25 md:block"
+        className="pointer-events-none absolute right-[6%] top-[10%] hidden opacity-20 md:block"
       >
         <motion.div
           animate={
             prefersReducedMotion
               ? undefined
-              : { y: [0, -12, 0], scale: [1, 1.04, 1] }
+              : { y: [0, -14, 0], scale: [1, 1.05, 1] }
           }
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
         >
-          <AuriOwl size={60} state="curious" />
+          <AuriOwl size={64} state="curious" />
         </motion.div>
       </motion.div>
 
-      {/* Scroll-linked floating orb — depth accent */}
-      <Parallax offset={70} className="pointer-events-none absolute right-[10%] top-[16%] hidden lg:block">
+      {/* Floating orb — depth accent, scroll-linked */}
+      <Parallax offset={70} className="pointer-events-none absolute right-[8%] top-[14%] hidden lg:block">
         <motion.div
           aria-hidden
-          animate={prefersReducedMotion ? undefined : { y: [0, -16, 0], scale: [1, 1.05, 1] }}
+          animate={prefersReducedMotion ? undefined : { y: [0, -18, 0], scale: [1, 1.06, 1] }}
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-          className="h-36 w-36 rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(168,85,247,0.22),rgba(168,85,247,0.03)_55%,transparent_72%)] blur-soft"
+          className="h-40 w-40 rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(168,85,247,0.2),rgba(168,85,247,0.025)_52%,transparent_70%)] blur-soft"
         />
       </Parallax>
 
       {/* ── Light on Water — the signature WithIn motif ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2"
       >
         <motion.div
           animate={
             prefersReducedMotion
               ? undefined
-              : { opacity: [0.4, 0.7, 0.4], scale: [1, 1.2, 1] }
+              : { opacity: [0.35, 0.65, 0.35], scale: [1, 1.25, 1] }
           }
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="relative h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_16px_rgba(255,255,255,0.45),0_0_50px_rgba(var(--mood-rgb),0.25)]"
+          className="relative h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_14px_rgba(255,255,255,0.4),0_0_45px_rgba(var(--mood-rgb),0.22)]"
         />
         {!prefersReducedMotion && (
           <>
-            <span className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.05] [animation:rippleBreath_6s_ease-in-out_infinite]" />
-            <span className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.035] [animation:rippleBreath_6s_ease-in-out_1.5s_infinite]" />
-            <span className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.02] [animation:rippleBreath_6s_ease-in-out_3s_infinite]" />
+            <span className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.045] [animation:rippleBreath_6s_ease-in-out_infinite]" />
+            <span className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.03] [animation:rippleBreath_6s_ease-in-out_1.5s_infinite]" />
+            <span className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.018] [animation:rippleBreath_6s_ease-in-out_3s_infinite]" />
           </>
         )}
       </div>
@@ -170,14 +175,14 @@ export default function Hero() {
       {/* Horizontal light seam — thin luminous anchor */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-0 right-0 top-[44%] h-px bg-[linear-gradient(90deg,transparent_5%,rgba(var(--mood-rgb),0.06)_25%,rgba(var(--mood-rgb),0.12)_50%,rgba(var(--mood-rgb),0.06)_75%,transparent_95%)]"
+        className="pointer-events-none absolute left-0 right-0 top-[43%] h-px bg-[linear-gradient(90deg,transparent_5%,rgba(var(--mood-rgb),0.05)_22%,rgba(var(--mood-rgb),0.1)_50%,rgba(var(--mood-rgb),0.05)_78%,transparent_95%)]"
       />
 
       {/* Deep vignette — cinematic framing */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.72)_100%)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_32%,rgba(0,0,0,0.75)_100%)]" />
 
       {/* Bottom fade */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#03040a] via-[#03040a]/80 to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#02030a] via-[#02030a]/80 to-transparent" />
 
       <Navbar />
 
@@ -190,37 +195,34 @@ export default function Hero() {
           {/* Eyebrow — quiet, atmospheric */}
           <motion.p
             variants={blurUp}
-            className="text-[11px] font-semibold uppercase tracking-[0.5em] text-emerald-400/50 md:text-xs"
+            className="text-[11px] font-semibold uppercase tracking-[0.5em] text-emerald-400/45 md:text-xs"
           >
             A universe that feels you
           </motion.p>
 
           {/* WITHIN wordmark — atmospheric backdrop, iconic */}
-          <motion.div
-            variants={blurUp}
-            className="mt-6 md:mt-8"
-          >
+          <motion.div variants={blurUp} className="mt-5 md:mt-7">
             <motion.h1
               style={{ x: prefersReducedMotion ? 0 : wordmarkX, y: prefersReducedMotion ? 0 : wordmarkY }}
-              className="font-display text-[20vw] font-medium leading-[0.82] tracking-[-0.06em] text-white/[0.04] sm:text-[15vw] md:text-[13vw] lg:text-[12vw]"
+              className="font-display text-[22vw] font-medium leading-[0.8] tracking-[-0.06em] text-white/[0.035] sm:text-[16vw] md:text-[14vw] lg:text-[13vw]"
               aria-hidden
             >
               WITHIN
             </motion.h1>
           </motion.div>
 
-          {/* Main statement — Feel You. */}
+          {/* Main statement — the editorial headline */}
           <motion.h2
             variants={staggerContainer(0.22, 0.5)}
             initial="hidden"
             animate="show"
-            className="relative -mt-6 font-display text-[16vw] font-medium leading-[0.88] tracking-[-0.04em] sm:text-7xl md:text-8xl lg:text-[7.5rem]"
+            className="relative -mt-5 font-display text-[18vw] font-medium leading-[0.86] tracking-[-0.04em] sm:text-7xl md:text-8xl lg:text-[8rem]"
           >
-            <motion.span variants={blurUp} className="block text-white/90">
+            <motion.span variants={blurUp} className="block text-white/[0.88]">
               Feel
             </motion.span>
             <motion.span variants={blurUp} className="block relative">
-              <GradientText className="italic drop-shadow-[0_0_50px_rgba(var(--mood-rgb),0.35)]">
+              <GradientText className="italic drop-shadow-[0_0_50px_rgba(var(--mood-rgb),0.3)]">
                 You.
               </GradientText>
               {!prefersReducedMotion && (
@@ -233,24 +235,24 @@ export default function Hero() {
             </motion.span>
           </motion.h2>
 
-          {/* Subtitle */}
+          {/* Subtitle — editorial body */}
           <motion.p
             variants={blurUp}
-            className="mx-auto mt-10 max-w-lg text-[15px] leading-[1.7] text-gray-400/70 md:text-base"
+            className="mx-auto mt-10 max-w-lg text-[15px] leading-[1.75] text-gray-400/65 md:text-base"
           >
             Stories. Emotions. People. Imagination.
             <br className="hidden sm:block" />
             All connected. All WithIn.
           </motion.p>
 
-          {/* CTAs */}
+          {/* CTAs — tactile, inviting */}
           <motion.div
             variants={blurUp}
             className="mt-14 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Magnetic strength={0.25}>
               <div data-cta-entrance className="cta-entrance-glow rounded-full">
-                <Button href="/signup" variant="gradient" size="xl" className="shadow-brand-cta">
+                <Button href="/signup" variant="gradient" size="xl" className="shadow-brand-cta" onClick={(e) => fireRipple(e)}>
                   Enter WithIn
                 </Button>
               </div>
@@ -262,7 +264,7 @@ export default function Hero() {
             </Magnetic>
           </motion.div>
 
-          <motion.p variants={blurUp} className="mt-8 text-[11px] tracking-wide text-gray-500/60">
+          <motion.p variants={blurUp} className="mt-8 text-[11px] tracking-wide text-gray-500/50">
             No account needed to wander — save &amp; personalization come when you&apos;re ready.
           </motion.p>
         </motion.div>
@@ -276,8 +278,8 @@ export default function Hero() {
         transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
         className="absolute bottom-10 left-1/2 z-10"
       >
-        <span className="flex h-10 w-6 items-start justify-center rounded-full border border-white/12 p-1.5">
-          <span className="h-2 w-1 rounded-full bg-emerald-400/60" />
+        <span className="flex h-10 w-6 items-start justify-center rounded-full border border-white/10 p-1.5">
+          <span className="h-2 w-1 rounded-full bg-emerald-400/50" />
         </span>
       </motion.a>
     </section>
