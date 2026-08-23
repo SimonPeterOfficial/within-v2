@@ -13,6 +13,8 @@ import type { DiscoveryType } from "./types";
 
 /* ── Journey node ────────────────────────────────────────────────────── */
 
+export type JourneyNodeRarity = "discovered" | "unexpected" | "rare" | "between";
+
 export type JourneyNode = {
   id: string;
   /** Discovery title */
@@ -27,6 +29,8 @@ export type JourneyNode = {
   reason: string;
   /** ID of the previous node (null for the root) */
   parentId: string | null;
+  /** How rare this discovery was */
+  rarity?: JourneyNodeRarity;
   /** Cover gradient/emoji for visual rendering */
   cover?: { gradient: string; emoji: string };
 };

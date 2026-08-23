@@ -4,45 +4,46 @@ import { useCallback, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { fireRipple } from "@/lib/ripple";
-import { addToJourney, takeMeSomewhere, createExploreContext } from "@/lib/explore";
-import { reasonLabel } from "@/lib/explore";
+import { addToJourney } from "@/lib/explore";
+import { getDoorDestination, type ContentNode } from "@/lib/explore/graph";
+import { getUniverseState, markDoorDiscovered, recordDiscovery } from "@/lib/universe/state";
 import { useEnvironment } from "@/lib/environment";
 import Icon from "@/components/ui/Icon";
 
 /**
- * TheDoor — the signature WithIn interaction.
+ * TheDoor — the signature WithIn interaction, now graph-aware.
  *
- * A luminous circle that follows the pointer at a distance. When pressed
- * and held, the portal gathers light — concentric rings pulse outward,
- * the center brightens, and after a moment the universe reveals a
- * hidden destination. The whole screen briefly breathes as the
- * transition begins.
+ * The destination is no longer random. It comes from the content graph,
+ * considering:
+ *   - what the user has already visited
+ *   - their current mood
+ *   - their exploration depth
+ *   - their last content type
  *
- * The interaction should feel:
- *   - tactile (press → gather → reveal)
- *   - mysterious (what's inside?)
- *   - rewarding (every destination is meaningful)
+ * A music path could lead to: Photography → creator → story → Between
+ * A book path could lead to: Original → community → Journey
+ * A creator could lead somewhere unexpected.
  *
- * Architecture:
- *   On hold: gather (300ms) → reveal (destination card)
- *   On release before gather: the portal sighs and resets.
- *   Accessibility: keyboard activation with Enter/Space.
+ * The user should feel: "I followed one thing and somehow ended up
+ * somewhere completely different."
  */
 
 type DoorState = "idle" | "gathering" | "revealed";
+
+type DoorDestination = {
+  title: string;
+  type: string;
+  emoji: string;
+  destination: string;
+  reason: string;
+  cover?: { gradient: string; emoji: string };
+};
 
 export default function TheDoor() {
   const prefersReducedMotion = useReducedMotionSafe();
   const { moodId } = useEnvironment();
   const [state, setState] = useState<DoorState>("idle");
-  const [destination, setDestination] = useState<{
-    title: string;
-    type: string;
-    emoji: string;
-    destination: string;
-    reason: string;
-    cover?: { gradient: string; emoji: string };
-  } | null>(null);
+  const [destination, setDestination] = useState<DoorDestination | null>(null);
 
   const gatherTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,27 +72,36 @@ export default function TheDoor() {
     setState("gathering");
 
     gatherTimerRef.current = setTimeout(() => {
-      // Generate a destination
-      const ctx = createExploreContext({ mood: moodId });
-      const result = takeMeSomewhere(ctx);
-      const item = result.items[0];
-      if (item) {
+      // Use the content graph to pick a destination
+      const universeState = getUniverseState();
+      const node = getDoorDestination({
+        visited: universeState.visitedRoutes,
+        mood: moodId,
+        depth: universeState.maxDepth,
+        lastType: universeState.recentContentTypes[0],
+      });
+
+      if (node) {
+        const cover = getCoverForNode(node);
         addToJourney({
-          id: item.id,
-          title: item.title,
-          type: item.type,
-          destination: item.destination,
-          reason: reasonLabel(item.reason),
+          id: node.id,
+          title: node.title,
+          type: node.type,
+          destination: node.destination,
+          reason: getReasonForNode(node, universeState),
           parentId: null,
-          cover: item.cover,
+          cover,
         });
+        recordDiscovery(node.type);
+        markDoorDiscovered();
+
         setDestination({
-          title: item.title,
-          type: item.type,
-          emoji: item.cover?.emoji ?? "✦",
-          destination: item.destination,
-          reason: reasonLabel(item.reason),
-          cover: item.cover,
+          title: node.title,
+          type: node.type,
+          emoji: cover?.emoji ?? "✦",
+          destination: node.destination,
+          reason: getReasonForNode(node, universeState),
+          cover,
         });
         setState("revealed");
       } else {
@@ -258,4 +268,32 @@ export default function TheDoor() {
       )}
     </div>
   );
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────── */
+
+function getCoverForNode(node: ContentNode): { gradient: string; emoji: string } {
+  const covers: Record<string, { gradient: string; emoji: string }> = {
+    original: { gradient: "from-purple-600 to-indigo-600", emoji: "🎬" },
+    book: { gradient: "from-emerald-500 to-teal-700", emoji: "📚" },
+    music: { gradient: "from-cyan-500 to-blue-700", emoji: "🎧" },
+    photo: { gradient: "from-amber-500 to-orange-600", emoji: "📷" },
+    creator: { gradient: "from-purple-600 to-indigo-600", emoji: "✨" },
+    community: { gradient: "from-pink-500 to-rose-600", emoji: "🤝" },
+    reflection: { gradient: "from-indigo-600 to-purple-800", emoji: "🪞" },
+    "auri-moment": { gradient: "from-purple-600 to-indigo-700", emoji: "🦉" },
+  };
+  return covers[node.type] ?? { gradient: "from-gray-600 to-gray-800", emoji: "✦" };
+}
+
+function getReasonForNode(node: ContentNode, state: { visitedRoutes: string[]; maxDepth: number }): string {
+  if (node.rarity === "rare") return "You found something rare.";
+  if (node.rarity === "unexpected") return "An unexpected connection.";
+  if (node.category === "between") return "The space between things.";
+  if (state.maxDepth > 4 && node.type === "reflection") return "A thought worth sitting with.";
+  if (state.visitedRoutes.includes("/music") && node.type === "photo") return "From sound to stillness.";
+  if (state.visitedRoutes.includes("/books") && node.type === "original") return "From words to light.";
+  if (node.category === "cinematic") return "A story waiting in the dark.";
+  if (node.category === "quiet") return "Something gentle for you.";
+  return "The universe chose this for you.";
 }

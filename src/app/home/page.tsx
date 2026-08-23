@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
 import DepthLayers from "@/components/effects/DepthLayers";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import SanctuaryHero from "@/components/sanctuary/SanctuaryHero";
@@ -11,19 +10,10 @@ import Recommended from "@/components/sanctuary/Recommended";
 import MoodOrbit from "@/components/sanctuary/MoodOrbit";
 import MemoryCards from "@/components/sanctuary/MemoryCards";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
+import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
 
-// Below-the-fold sections are code-split so the first paint stays lean.
-const OriginalsShowcase = dynamic(() => import("@/components/sanctuary/OriginalsShowcase"));
-const MusicSection = dynamic(() => import("@/components/sanctuary/MusicSection"));
-const BooksSection = dynamic(() => import("@/components/sanctuary/BooksSection"));
-const PhotographySection = dynamic(() => import("@/components/sanctuary/PhotographySection"));
-const CommunitiesSection = dynamic(() => import("@/components/sanctuary/CommunitiesSection"));
-const DailyReflection = dynamic(() => import("@/components/sanctuary/DailyReflection"));
-const ImpossibleRecommendation = dynamic(() => import("@/components/sanctuary/ImpossibleRecommendation"));
-const TheDoor = dynamic(() => import("@/components/sanctuary/TheDoor"));
-const DiscoverSection = dynamic(() => import("@/components/sanctuary/DiscoverSection"));
-const FinaleCTA = dynamic(() => import("@/components/sanctuary/FinaleCTA"));
-const HomeHiddenDoor = dynamic(() => import("@/components/explore/HomeHiddenDoor"));
+// The feed shuffler — determines section order based on universe state
+const HomeFeed = dynamic(() => import("@/components/sanctuary/HomeFeed"));
 
 export const metadata: Metadata = {
   title: "WithIn — A universe within you",
@@ -49,69 +39,35 @@ const shellItems: SidebarItem[] = [
   { label: "Communities", href: "/communities", icon: "users", route: true },
   { label: "Creators", href: "/creators", icon: "sparkles", route: true },
   { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true }
+  { label: "Settings", href: "/settings", icon: "settings", route: true },
 ];
 
 export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* One living atmosphere: glow → fog → mesh → aurora → light rays →
-          particles → stars — the sanctuary room, calm and silver-violet.
-          Quieter than the landing by design: fewer motes, softer fog. */}
+      {/* One living atmosphere — the sanctuary room */}
       <DepthLayers preset="sanctuary" particles={7} stars={16} fog={0.5} />
 
       <AppShell items={shellItems}>
+        {/* ── Fixed upper: always present regardless of feed mode ── */}
         <SanctuaryHero />
         <QuickActions />
 
-        {/* Dreamscape hierarchy — the universe, in order: mood → continue →
-            featured original → recommended → memories → the arts → reflection
-            → the Auri moment → the door home */}
+        {/* ── Sanctuary core: mood, continue, because-you-chose, recommended ── */}
         <MoodOrbit />
         <ContinueJourney />
-        {/* Personalized first — chosen interests surface right after the journey */}
         <BecauseYouChose />
-        {/* The Door — hold and reveal a hidden destination */}
-        <Suspense fallback={null}>
-          <TheDoor />
-        </Suspense>
-        <Suspense fallback={null}>
-          <OriginalsShowcase />
-        </Suspense>
-        <Recommended />
+
+        {/* ── Curated feed: the universe decides what you see next ── */}
+        <HomeFeed />
+
+        {/* ── Memory & recommendations (always present) ── */}
         <MemoryCards />
-        <Suspense fallback={null}>
-          <MusicSection />
-        </Suspense>
-        <Suspense fallback={null}>
-          <BooksSection />
-        </Suspense>
-        <Suspense fallback={null}>
-          <PhotographySection />
-        </Suspense>
-        <Suspense fallback={null}>
-          <CommunitiesSection />
-        </Suspense>
-        <Suspense fallback={null}>
-          <DailyReflection />
-        </Suspense>
-        {/* Hidden door — a subtle discovery in the home feed */}
-        <Suspense fallback={null}>
-          <HomeHiddenDoor />
-        </Suspense>
-        {/* One impossible recommendation — timed to the hour, not like other cards */}
-        <Suspense fallback={null}>
-          <ImpossibleRecommendation />
-        </Suspense>
-        <Suspense fallback={null}>
-          <DiscoverSection />
-        </Suspense>
-        <Suspense fallback={null}>
-          <FinaleCTA />
-        </Suspense>
+        <Recommended />
       </AppShell>
 
       <AuriOrb />
+      <MicroDiscoveries />
     </div>
   );
 }

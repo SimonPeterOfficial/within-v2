@@ -5,13 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { useEnvironment } from "@/lib/environment";
 import { fireRipple } from "@/lib/ripple";
-import {
-  takeMeSomewhere,
-  addToJourney,
-  reasonLabel,
-  createExploreContext,
-} from "@/lib/explore";
-import { markBetweenVisited, recordDiscovery } from "@/lib/universe/state";
+import { addToJourney } from "@/lib/explore";
+import { getDoorDestination, type ContentNode } from "@/lib/explore/graph";
+import { markBetweenVisited, recordDiscovery, getUniverseState } from "@/lib/universe/state";
 import DepthLayers from "@/components/effects/DepthLayers";
 import StarField from "@/components/sanctuary/StarField";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
@@ -72,29 +68,33 @@ export default function BetweenExperience() {
     setShowPortal(true);
     fireRipple({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
 
-    const ctx = createExploreContext({ mood: moodId });
-    const result = takeMeSomewhere(ctx);
-    const item = result.items[0];
+    const state = getUniverseState();
+    const node = getDoorDestination({
+      visited: state.visitedRoutes,
+      mood: moodId,
+      depth: state.maxDepth,
+    });
 
-    if (item) {
+    if (node) {
+      const cover = getCoverForNode(node);
       addToJourney({
-        id: item.id,
-        title: item.title,
-        type: item.type,
-        destination: item.destination,
-        reason: reasonLabel(item.reason),
+        id: node.id,
+        title: node.title,
+        type: node.type,
+        destination: node.destination,
+        reason: "The space between revealed this.",
         parentId: null,
-        cover: item.cover,
+        cover,
       });
-      recordDiscovery(item.type);
+      recordDiscovery(node.type);
 
       setDestination({
-        title: item.title,
-        type: item.type,
-        emoji: item.cover?.emoji ?? "✦",
-        destination: item.destination,
-        reason: reasonLabel(item.reason),
-        cover: item.cover,
+        title: node.title,
+        type: node.type,
+        emoji: cover.emoji,
+        destination: node.destination,
+        reason: "The space between revealed this.",
+        cover,
       });
     }
 
@@ -297,4 +297,20 @@ export default function BetweenExperience() {
       </AnimatePresence>
     </div>
   );
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────── */
+
+function getCoverForNode(node: ContentNode): { gradient: string; emoji: string } {
+  const covers: Record<string, { gradient: string; emoji: string }> = {
+    original: { gradient: "from-purple-600 to-indigo-600", emoji: "🎬" },
+    book: { gradient: "from-emerald-500 to-teal-700", emoji: "📚" },
+    music: { gradient: "from-cyan-500 to-blue-700", emoji: "🎧" },
+    photo: { gradient: "from-amber-500 to-orange-600", emoji: "📷" },
+    creator: { gradient: "from-purple-600 to-indigo-600", emoji: "✨" },
+    community: { gradient: "from-pink-500 to-rose-600", emoji: "🤝" },
+    reflection: { gradient: "from-indigo-600 to-purple-800", emoji: "🪞" },
+    "auri-moment": { gradient: "from-purple-600 to-indigo-700", emoji: "🦉" },
+  };
+  return covers[node.type] ?? { gradient: "from-gray-600 to-gray-800", emoji: "✦" };
 }
