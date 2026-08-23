@@ -54,7 +54,7 @@ export default function GlassCard({
       style={style}
       className={`relative rounded-card border ${tones[tone]} ${
         hoverLift
-          ? "transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-white/[0.15] hover:bg-white/[0.06] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.12)] active:scale-[0.99]"
+          ? "transition-all duration-300 ease-out hover:-translate-y-[2px] hover:border-white/[0.14] hover:bg-white/[0.05] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.1),0_2px_8px_rgba(0,0,0,0.2)] active:scale-[0.995] active:translate-y-0"
           : ""
       } ${sheen ? "overflow-hidden" : ""} ${className}`}
     >

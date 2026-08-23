@@ -244,11 +244,11 @@ function MessageBubble({ message, auriState }: { message: Message; auriState: Au
         )}
 
         <div
-          className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${
+          className={`px-4 py-3 text-[13px] leading-relaxed ${
             isUser
-              ? "rounded-tr-md border border-[rgba(var(--mood-rgb),0.08)] bg-[rgba(var(--mood-rgb),0.04)] text-white/80"
+              ? "ml-auto max-w-[85%] rounded-2xl rounded-tr-md border border-[rgba(var(--mood-rgb),0.06)] bg-[rgba(var(--mood-rgb),0.03)] px-5 py-3.5 text-white/85"
               : isAuri
-              ? "rounded-tl-md border border-white/[0.04] bg-white/[0.02] text-gray-300/70"
+              ? "max-w-[85%] rounded-2xl rounded-tl-md border border-white/[0.03] bg-white/[0.015] text-gray-300/75 px-5 py-3.5"
               : "border border-white/[0.02] bg-white/[0.01] text-gray-500/50 text-center text-[12px] italic"
           }`}
         >
@@ -715,7 +715,7 @@ export default function WithinExperience() {
         </div>
       )}
 
-      {/* Input — whispering into the dark */}
+      {/* Input — an invitation, not a form */}
       <div className="relative z-10 border-t border-white/[0.03] bg-[#02030a]/60 px-6 py-4 backdrop-blur-xl">
         <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl gap-3">
           <input
@@ -727,8 +727,8 @@ export default function WithinExperience() {
               resetIdle();
             }}
             onFocus={resetIdle}
-            placeholder="Whisper something…"
-            className="flex-1 rounded-full border border-white/[0.05] bg-white/[0.02] px-5 py-3 text-[13px] text-white placeholder-gray-600/50 outline-none transition-all duration-500 focus:border-[rgba(var(--mood-rgb),0.15)] focus:bg-white/[0.03]"
+            placeholder={messages.length <= 1 ? "Tell Auri what you're feeling…" : "Whisper something…"}
+            className="flex-1 rounded-full border border-white/[0.05] bg-white/[0.02] px-5 py-3 text-[13px] text-white placeholder-gray-600/40 outline-none transition-all duration-500 focus:border-[rgba(var(--mood-rgb),0.12)] focus:bg-white/[0.03] focus:placeholder-gray-500/50"
             aria-label="Message Auri"
           />
           <button

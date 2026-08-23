@@ -248,7 +248,6 @@ function buildNodes(): ContentNode[] {
 
 function buildEdges(nodes: ContentNode[]): ContentEdge[] {
   const edges: ContentEdge[] = [];
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
   // Creator → their works
   for (const node of nodes) {

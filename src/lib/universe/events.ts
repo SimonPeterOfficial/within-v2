@@ -236,15 +236,21 @@ function getUniverseDepthSafe(state: UniverseState): number {
  */
 export function getAuriContextualMessage(state: UniverseState): string | null {
   const depth = getUniverseDepthSafe(state);
+  const hour = new Date().getHours();
 
   // Returning after deep exploration
   if (state.revisitCount > 3 && state.maxDepth > 4) {
     return "You left quite a trail.";
   }
 
-  // Returning to a previously visited route
-  if (state.revisitCount > 5) {
-    return "Somewhere you've already been.";
+  // After visiting The Between — a special acknowledgment
+  if (state.betweenVisited && depth > 3 && state.revisitCount > 1) {
+    const betweenMessages = [
+      "You found the space between.",
+      "That place doesn't open for everyone.",
+      "You carry something from between now.",
+    ];
+    return betweenMessages[Math.floor(seededRandom(String(state.revisitCount)) * betweenMessages.length)];
   }
 
   // After discovering The Door
@@ -252,9 +258,14 @@ export function getAuriContextualMessage(state: UniverseState): string | null {
     return "The door remembers.";
   }
 
-  // After visiting The Between
-  if (state.betweenVisited && depth > 3) {
-    return "You've been to the spaces between.";
+  // Returning to a previously visited route — subtle
+  if (state.revisitCount > 5) {
+    const revisitMessages = [
+      "Somewhere you've already been.",
+      "You came back.",
+      "Still here.",
+    ];
+    return revisitMessages[Math.floor(seededRandom(String(state.revisitCount * 7)) * revisitMessages.length)];
   }
 
   // Deep exploration
@@ -262,13 +273,36 @@ export function getAuriContextualMessage(state: UniverseState): string | null {
     return "You went farther than most.";
   }
 
-  // Heavy on one content type
+  // Heavy on one content type — a gentle observation
   if (state.recentContentTypes.length >= 4) {
     const last4 = state.recentContentTypes.slice(0, 4);
     const allSame = last4.every((t) => t === last4[0]);
     if (allSame) {
-      return "I think you've been here a while.";
+      const typeMessages: Record<string, string> = {
+        original: "The stories keep drawing you in.",
+        music: "The sound found you.",
+        book: "You're a reader. I can tell.",
+        photo: "You see things others walk past.",
+        creator: "You're looking for people, not things.",
+        community: "You're looking for belonging.",
+      };
+      return typeMessages[last4[0]] ?? "I think you've been here a while.";
     }
+  }
+
+  // Late night quiet visit
+  if ((hour >= 23 || hour < 4) && depth >= 2 && state.timeSpent > 120) {
+    return "It's quiet now. Just us.";
+  }
+
+  // After many discoveries — rare acknowledgment
+  if (state.totalDiscoveries > 15 && state.revisitCount < 2) {
+    return "You're collecting the universe, aren't you?";
+  }
+
+  // First time in Within
+  if (state.withinVisited && state.visitedRoutes.filter((r) => r === "/within").length <= 1) {
+    return "You found the inner room.";
   }
 
   return null;

@@ -139,8 +139,16 @@ export default function Sidebar({ items }: SidebarProps) {
       <nav
         aria-label="Primary"
         className="fixed left-5 top-1/2 z-50 hidden -translate-y-1/2 lg:block"
+        onMouseEnter={() => {
+          const rail = document.querySelector('.group/rail');
+          if (rail) rail.classList.add('rail-expanded');
+        }}
+        onMouseLeave={() => {
+          const rail = document.querySelector('.group/rail');
+          if (rail) rail.classList.remove('rail-expanded');
+        }}
       >
-        <div className="group/rail max-h-[calc(100dvh-4rem)] w-16 overflow-y-auto overflow-x-hidden rounded-full border border-white/10 bg-white/5 p-3 shadow-dock backdrop-blur-sm transition-[width] duration-500 ease-out [scrollbar-width:none] hover:w-60 [&::-webkit-scrollbar]:hidden">
+        <div className="group/rail max-h-[calc(100dvh-4rem)] w-16 overflow-y-auto overflow-x-hidden rounded-full border border-white/[0.07] bg-white/[0.03] p-3 shadow-dock backdrop-blur-xl transition-[width] duration-500 ease-out [scrollbar-width:none] hover:w-56 hover:border-white/[0.12] hover:bg-white/[0.06] [&::-webkit-scrollbar]:hidden">
           <Link
             href="/"
             aria-label="WithIn home"
@@ -192,15 +200,15 @@ export default function Sidebar({ items }: SidebarProps) {
         <ThemeToggle />
       </div>
 
-      {/* ── Mobile: floating menu trigger ───────────────────────────── */}
+      {/* ── Mobile: floating menu trigger (secondary nav access) ──── */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white shadow-dock backdrop-blur-sm transition hover:bg-white/10 lg:hidden"
+        className="fixed bottom-24 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/60 shadow-dock backdrop-blur-sm transition hover:bg-white/10 hover:text-white lg:hidden"
       >
-        <Icon name="menu" size={20} />
+        <Icon name="menu" size={16} />
       </button>
 
       {/* ── Mobile drawer ───────────────────────────────────────────── */}

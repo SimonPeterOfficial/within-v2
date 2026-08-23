@@ -48,18 +48,25 @@ export default function BetweenExperience() {
   } | null>(null);
   const [showPortal, setShowPortal] = useState(false);
   const initializedRef = useRef(false);
+  const [isReturning] = useState(() => {
+    const state = getUniverseState();
+    return state.betweenVisited;
+  });
 
-  // Mark as visited on mount
+  // Mark as visited on mount — track revisit for universe state
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
     markBetweenVisited();
 
-    // Auri appears after a quiet moment
+    const state = getUniverseState();
+    const isReturning = state.betweenVisited;
+
+    // Auri appears after a quiet moment — message varies on return
     const timer = setTimeout(() => {
       setAuriState("greeting");
       setTimeout(() => setAuriState("observing"), 3000);
-    }, 2000);
+    }, isReturning ? 1500 : 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -151,14 +158,14 @@ export default function BetweenExperience() {
 
       {/* The central space — quiet, minimal */}
       <div className="relative z-10 flex flex-col items-center px-6 py-20">
-        {/* Eyebrow */}
+        {/* Eyebrow — subtle revisit awareness */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
           className="mb-8 text-[10px] font-semibold uppercase tracking-[0.6em] text-white/10"
         >
-          The Between
+          {isReturning ? "The Between — again" : "The Between"}
         </motion.p>
 
         {/* The portal — a luminous circle */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
@@ -13,6 +14,7 @@ import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { addToShelf, isOnShelf, removeFromShelf } from "@/lib/library";
 import { useSession } from "@/lib/auth/session";
 import { useRouter } from "next/navigation";
+import { blurUp, staggerContainer } from "@/lib/animations";
 
 type ContentDetailBadge = { label: string; tone?: "mood" | "emerald" | "neutral" | "warm" };
 
@@ -91,8 +93,34 @@ export default function ContentDetail({
 
   return (
     <Container className="pb-28 pt-10">
+      {/* Back navigation — never lose your place */}
+      <motion.div
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+        className="mb-6"
+      >
+        <Link
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            router.back();
+          }}
+          className="inline-flex items-center gap-2 text-[12px] font-medium text-gray-500 transition-colors hover:text-gray-300"
+          aria-label="Go back"
+        >
+          <Icon name="back" size={14} />
+          <span>Back</span>
+        </Link>
+      </motion.div>
+
       {/* Hero — the artwork IS the poster */}
-      <div className="relative overflow-hidden rounded-modal">
+      <motion.div
+        variants={blurUp}
+        initial="hidden"
+        animate="show"
+        className="relative overflow-hidden rounded-modal"
+      >
         <div className={`relative h-[26rem] bg-linear-to-br ${gradient} sm:h-[30rem]`}>
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-black/20" />
           <MeshGradient preset="originals" />
@@ -118,9 +146,14 @@ export default function ContentDetail({
             {kind} by {creator} · {meta}
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem]">
+      <motion.div
+        variants={staggerContainer(0.08, 0.2)}
+        initial="hidden"
+        animate="show"
+        className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem]"
+      >
         <div>
           <p className="text-sm leading-relaxed text-gray-300 md:text-base">{description}</p>
           <p className="mt-4 text-xs leading-relaxed text-gray-500">
@@ -183,15 +216,18 @@ export default function ContentDetail({
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Related rail */}
+      {/* Related rail — with relationship language */}
       {related.length > 0 && (
         <div className="mt-20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400">
-            More from the studio
+            {related.length > 0 ? "From this path" : "More from the studio"}
           </p>
-          <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">Keep exploring</h2>
+          <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">Keep wandering</h2>
+          <p className="mt-2 text-[13px] text-gray-500/50">
+            Because you explored {title.toLowerCase()}, these may speak to you.
+          </p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((item, index) => (
               <ContentCard

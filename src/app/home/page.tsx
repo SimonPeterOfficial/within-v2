@@ -11,6 +11,7 @@ import MoodOrbit from "@/components/sanctuary/MoodOrbit";
 import MemoryCards from "@/components/sanctuary/MemoryCards";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
+import ReturningGreeting from "@/components/sanctuary/ReturningGreeting";
 
 // The feed shuffler — determines section order based on universe state
 const HomeFeed = dynamic(() => import("@/components/sanctuary/HomeFeed"));
@@ -66,6 +67,7 @@ export default function HomePage() {
         <Recommended />
       </AppShell>
 
+      <ReturningGreeting />
       <AuriOrb />
       <MicroDiscoveries />
     </div>

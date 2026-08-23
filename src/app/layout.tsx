@@ -10,6 +10,10 @@ import PointerLight from "@/components/effects/PointerLight";
 import PresenceField from "@/components/effects/PresenceField";
 import MemoryRipple from "@/components/effects/MemoryRipple";
 import UniverseTracker from "@/components/universe/UniverseTracker";
+import RouteAtmosphere from "@/components/transitions/RouteAtmosphere";
+import Breath from "@/components/effects/Breath";
+import ScrollProgress from "@/components/effects/ScrollProgress";
+import PulseTrail from "@/components/effects/PulseTrail";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -83,6 +87,10 @@ export default function RootLayout({
               <CustomCursor />
               <MemoryRipple />
               <UniverseTracker />
+              <RouteAtmosphere />
+              <Breath />
+              <ScrollProgress />
+              <PulseTrail />
               <SpeedInsights />
             </AuthProvider>
           </EnvironmentProvider>

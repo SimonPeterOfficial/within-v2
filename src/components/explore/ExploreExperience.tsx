@@ -20,12 +20,25 @@ import { fireRipple } from "@/lib/ripple";
 import DepthLayers from "@/components/effects/DepthLayers";
 import StarField from "@/components/sanctuary/StarField";
 import Button from "@/components/ui/Button";
-import GlassCard from "@/components/ui/GlassCard";
 import Icon from "@/components/ui/Icon";
 import GradientText from "@/components/ui/GradientText";
 import { blurUp, staggerContainer } from "@/lib/animations";
 import HiddenDoor from "@/components/explore/HiddenDoor";
+import FilterRail, { type FilterOption } from "@/components/ui/FilterRail";
+import { GlowTrailCard } from "@/components/ui/GlowTrail";
 import { recordExplorationDepth } from "@/lib/universe/state";
+import { saveScroll } from "@/lib/scrollMemory";
+
+/* ── Filter options for the Explore feed ───────────────────────────── */
+
+const EXPLORE_FILTERS: FilterOption[] = [
+  { id: "original", label: "Originals", icon: "🎬" },
+  { id: "book", label: "Books", icon: "📚" },
+  { id: "music", label: "Music", icon: "🎧" },
+  { id: "photo", label: "Photography", icon: "📷" },
+  { id: "creator", label: "Creators", icon: "✨" },
+  { id: "community", label: "Communities", icon: "🤝" },
+];
 
 /* ── Discovery card ──────────────────────────────────────────────────── */
 
@@ -46,7 +59,7 @@ function DiscoveryCard({
         onClick={(e) => { fireRipple(e); onSelect(item); }}
         className="w-full text-left"
       >
-        <GlassCard tone="soft" hoverLift sheen className="p-5 transition-all duration-300">
+        <GlowTrailCard className="rounded-card border border-white/[0.05] bg-white/[0.02] backdrop-blur-sm card-tactile p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.04] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.1)] active:scale-[0.99]">
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent"
@@ -88,7 +101,7 @@ function DiscoveryCard({
             <span>Explore</span>
             <Icon name="forward" size={10} />
           </div>
-        </GlassCard>
+        </GlowTrailCard>
       </button>
 
       {/* Thread connections */}
@@ -226,6 +239,7 @@ export default function ExploreExperience() {
   const [hasMore, setHasMore] = useState(true);
   const [doorShown, setDoorShown] = useState(false);
   const [anotherDoor, setAnotherDoor] = useState<ThreadConnection | null>(null);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const initialLoadDone = useRef(false);
 
@@ -312,6 +326,8 @@ export default function ExploreExperience() {
   }, []);
 
   const handleSelect = useCallback((item: ExploreItem) => {
+    // Save scroll position before navigating to content
+    saveScroll("/explore");
     addToJourney({
       id: item.id,
       title: item.title,
@@ -354,6 +370,20 @@ export default function ExploreExperience() {
           <motion.p variants={blurUp} className="mt-4 text-[15px] leading-relaxed text-gray-400/60">
             There&apos;s no end here. Only doors.
           </motion.p>
+        </motion.div>
+
+        {/* Filter rail */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mb-12"
+        >
+          <FilterRail
+            options={EXPLORE_FILTERS}
+            active={activeFilters}
+            onChange={setActiveFilters}
+          />
         </motion.div>
 
         {/* Take me somewhere */}
@@ -410,20 +440,43 @@ export default function ExploreExperience() {
           )}
         </AnimatePresence>
 
-        {/* Discovery feed */}
+        {/* Discovery feed — organic, filtered */}
         <motion.div
           variants={staggerContainer(0.06, 0.3)}
           initial="hidden"
           animate="show"
-          className="grid gap-4 sm:grid-cols-2"
+          className="space-y-5"
         >
-          {allItems.map((item) => (
-            <DiscoveryCard
-              key={item.id}
-              item={item}
-              onSelect={handleSelect}
-            />
-          ))}
+          {allItems
+            .filter((item) => activeFilters.length === 0 || activeFilters.includes(item.type))
+            .map((item) => (
+              <DiscoveryCard
+                key={item.id}
+                item={item}
+                onSelect={handleSelect}
+              />
+            ))}
+
+          {/* Empty filtered state */}
+          {activeFilters.length > 0 &&
+            allItems.filter((item) => activeFilters.includes(item.type)).length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="py-20 text-center"
+            >
+              <p className="text-[13px] text-gray-500/50">
+                Nothing here yet. Try a different path.
+              </p>
+              <button
+                type="button"
+                onClick={() => setActiveFilters([])}
+                className="mt-3 text-[12px] text-emerald-400/50 hover:text-emerald-300/70 transition-colors"
+              >
+                Show everything
+              </button>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Infinite scroll sentinel */}

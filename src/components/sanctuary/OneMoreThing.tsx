@@ -25,11 +25,6 @@ import Icon from "@/components/ui/Icon";
  * Never shown on every page.
  */
 
-type OneMoreThingProps = {
-  /** Where in the experience this appears */
-  context?: "home" | "explore" | "within" | "journey" | "section-end";
-};
-
 const INTRO_LINES = [
   "One more thing.",
   "Before you leave…",
@@ -39,7 +34,7 @@ const INTRO_LINES = [
   "This one found you.",
 ];
 
-export default function OneMoreThing(_props: OneMoreThingProps) {
+export default function OneMoreThing() {
   const prefersReducedMotion = useReducedMotionSafe();
   const [revealed, setRevealed] = useState(false);
   const [visited, setVisited] = useState(false);
@@ -115,7 +110,7 @@ export default function OneMoreThing(_props: OneMoreThingProps) {
                   title: destination.title,
                   type: destination.type,
                   destination: destination.destination,
-                  reason: getReasonForNode(destination),
+                  reason: getReasonForNode(),
                   parentId: null,
                   cover,
                 });
@@ -138,7 +133,7 @@ export default function OneMoreThing(_props: OneMoreThingProps) {
                     {destination.title}
                   </h4>
                   <p className="mt-1 text-[11px] italic text-emerald-400/35">
-                    {getReasonForNode(destination)}
+                    {getReasonForNode()}
                   </p>
                 </div>
                 <div className="shrink-0 text-white/10 group-hover:text-[rgba(var(--mood-rgb),0.4)]">
@@ -169,7 +164,7 @@ function getCoverForNode(node: ContentNode): { gradient: string; emoji: string }
   return covers[node.type] ?? { gradient: "from-gray-600 to-gray-800", emoji: "✦" };
 }
 
-function getReasonForNode(_node?: ContentNode): string {
+function getReasonForNode(): string {
   const reasons = [
     "The universe insists.",
     "You didn't know you needed this.",

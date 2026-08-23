@@ -294,6 +294,35 @@ html[data-time="night"] {
   }
 }
 
+/* ── Route atmosphere — data-route drives per-world environmental shifts ────
+   RouteAtmosphere.tsx sets data-route on <html> and each route
+   subtly reshapes the mesh + aurora so the room feels different. */
+html[data-route="sanctuary"] .mesh-gradient::before {
+  background:
+    radial-gradient(32% 42% at 22% 20%, rgba(139, 92, 246, 0.13), transparent 70%),
+    radial-gradient(36% 46% at 80% 30%, rgba(96, 130, 200, 0.11), transparent 70%);
+}
+html[data-route="originals"] .mesh-gradient::before {
+  background:
+    radial-gradient(34% 44% at 20% 20%, rgba(109, 40, 217, 0.18), transparent 70%),
+    radial-gradient(38% 48% at 80% 55%, rgba(37, 99, 235, 0.12), transparent 70%);
+}
+html[data-route="music"] .mesh-gradient::before {
+  background:
+    radial-gradient(32% 42% at 20% 25%, rgba(139, 92, 246, 0.14), transparent 70%),
+    radial-gradient(36% 46% at 78% 40%, rgba(34, 211, 238, 0.11), transparent 70%);
+}
+html[data-route="books"] .mesh-gradient::before {
+  background:
+    radial-gradient(32% 42% at 25% 20%, rgba(139, 92, 246, 0.11), transparent 70%),
+    radial-gradient(36% 46% at 75% 60%, rgba(217, 176, 120, 0.08), transparent 70%);
+}
+html[data-route="communities"] .mesh-gradient::before {
+  background:
+    radial-gradient(32% 42% at 20% 30%, rgba(52, 211, 153, 0.14), transparent 70%),
+    radial-gradient(36% 46% at 80% 60%, rgba(139, 92, 246, 0.11), transparent 70%);
+}
+
 /* Environment presets — each room of WithIn has its own atmosphere */
 .mesh-home::before {
   background:
@@ -599,6 +628,27 @@ html[data-theme-day="birthday"] .time-glow {
   --ripple-scale: 0;
 }
 
+/* ── Breath system — the ambient pulse of WithIn ─────────────────────────────
+   data-breath on <html> is set by Breath.tsx:
+   - "awake" = user is interacting, atmosphere responds to cursor
+   - "idle" = user is still, atmosphere begins slow breathing cycle
+   --breath-intensity (0–1) drives subtle aurora + mesh oscillation. */
+
+html[data-breath="idle"] .mesh-gradient {
+  opacity: calc(var(--atmos-mesh, 1) * (0.92 + var(--breath-intensity, 0.5) * 0.16));
+  transition: opacity 3s ease;
+}
+
+html[data-breath="idle"] .aurora-root {
+  opacity: calc(var(--atmos-aurora, 1) * (0.88 + var(--breath-intensity, 0.5) * 0.24));
+  transition: opacity 4s ease;
+}
+
+html[data-breath="awake"] .mesh-gradient,
+html[data-breath="awake"] .aurora-root {
+  transition: opacity 0.8s ease;
+}
+
 /* Presence-driven mesh shift — the room tilts toward the visitor */
 .mesh-gradient {
   transform: translate(
@@ -791,6 +841,15 @@ html[data-theme-day="birthday"] .time-glow {
   .section-ambient::after {
     transition: none;
   }
+}
+
+/* ── Glow trail card — cursor-following luminous response ──────────────
+   GlowTrail.tsx sets --glow-x, --glow-y, --glow-opacity on the card.
+   The radial gradient creates a soft light that follows the pointer.
+   Touch devices have no hover — the glow is permanently invisible. */
+.glow-trail-card {
+  position: relative;
+  overflow: hidden;
 }
 
 /* ── Editorial section dividers ─────────────────────────────────────── */

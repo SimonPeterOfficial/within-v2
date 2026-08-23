@@ -31,6 +31,27 @@ const TYPE_COLORS: Record<string, string> = {
   "auri-moment": "rgba(168, 85, 247, 0.8)",
 };
 
+/* Rarity modifiers — how the constellation distinguishes node types */
+
+const RARITY_GLOW: Record<string, { r: number; opacity: number; color: string }> = {
+  discovered: { r: 2.5, opacity: 0.15, color: "" }, // default — uses TYPE_COLORS
+  unexpected: { r: 3.5, opacity: 0.25, color: "rgba(168, 130, 255, 0.3)" },
+  rare: { r: 4.5, opacity: 0.35, color: "rgba(52, 211, 153, 0.35)" },
+  between: { r: 3, opacity: 0.12, color: "rgba(100, 100, 160, 0.2)" }, // dimmer, obscured
+};
+
+function getNodeRarity(node: JourneyNode): "discovered" | "unexpected" | "rare" | "between" {
+  // Infer rarity from metadata tags if available
+  const tags = (node as JourneyNode & { rarity?: string }).rarity;
+  if (tags === "between") return "between";
+  if (tags === "rare") return "rare";
+  if (tags === "unexpected") return "unexpected";
+  // Heuristic: if reason contains unusual words, it's likely unexpected
+  if (node.reason.includes("unexpected") || node.reason.includes("strange")) return "unexpected";
+  if (node.reason.includes("hidden") || node.reason.includes("between")) return "between";
+  return "discovered";
+}
+
 const TYPE_EMOJIS: Record<string, string> = {
   original: "🎬",
   book: "📚",
@@ -118,12 +139,18 @@ function Constellation({
           );
         })}
 
-        {/* Nodes */}
+        {/* Nodes — visually distinguished by rarity */}
         {nodes.map((node, index) => {
           const pos = positions[index];
           if (!pos) return null;
           const color = TYPE_COLORS[node.type] ?? "rgba(255,255,255,0.5)";
           const isSelected = node.id === selectedId;
+          const rarity = getNodeRarity(node);
+          const rarityStyle = RARITY_GLOW[rarity];
+          const coreR = isSelected ? 1.8 : rarity === "rare" ? 1.6 : rarity === "unexpected" ? 1.4 : 1.2;
+          const glowR = isSelected ? 4 : rarityStyle.r;
+          const coreOpacity = isSelected ? 1 : rarity === "between" ? 0.4 : rarity === "rare" ? 0.95 : 0.8;
+          const glowColor = rarityStyle.color || color;
 
           return (
             <motion.g
@@ -134,24 +161,44 @@ function Constellation({
               style={{ cursor: "pointer" }}
               onClick={() => onSelect(node.id)}
             >
-              {/* Glow */}
+              {/* Outer glow — rarity determines size and color */}
               <circle
                 cx={pos.x}
                 cy={pos.y}
-                r={isSelected ? 4 : 2.5}
-                fill={color}
-                opacity={isSelected ? 0.3 : 0.15}
+                r={glowR}
+                fill={glowColor || color}
+                opacity={isSelected ? 0.35 : rarityStyle.opacity}
                 style={{ transition: "all 0.5s ease" }}
               />
-              {/* Core */}
+              {/* Core — rare nodes pulse subtly */}
               <circle
                 cx={pos.x}
                 cy={pos.y}
-                r={isSelected ? 1.8 : 1.2}
+                r={coreR}
                 fill={color}
-                opacity={isSelected ? 1 : 0.8}
+                opacity={coreOpacity}
                 style={{ transition: "all 0.3s ease" }}
               />
+              {/* Between nodes: subtle dashed ring to indicate obscurity */}
+              {rarity === "between" && (
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r={2.2}
+                  fill="none"
+                  stroke="rgba(100,100,160,0.25)"
+                  strokeWidth="0.12"
+                  strokeDasharray="0.5 0.3"
+                  style={{ transition: "all 0.3s ease" }}
+                />
+              )}
+              {/* Rare nodes: tiny star spikes */}
+              {rarity === "rare" && !prefersReducedMotion && (
+                <>
+                  <line x1={pos.x - 2.5} y1={pos.y} x2={pos.x + 2.5} y2={pos.y} stroke="rgba(52,211,153,0.2)" strokeWidth="0.08" />
+                  <line x1={pos.x} y1={pos.y - 2.5} x2={pos.x} y2={pos.y + 2.5} stroke="rgba(52,211,153,0.2)" strokeWidth="0.08" />
+                </>
+              )}
             </motion.g>
           );
         })}

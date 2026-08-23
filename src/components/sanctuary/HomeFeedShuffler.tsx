@@ -45,6 +45,11 @@ function selectFeedMode(state: UniverseState, hour: number): FeedMode {
     return "first";
   }
 
+  // Returning user — the universe has changed since they left
+  if (state.revisitCount > 0 && depth > 2 && !state.betweenVisited) {
+    return "return";
+  }
+
   // Returning after Between — the universe shifted
   if (state.betweenVisited && state.revisitCount > 2) {
     return "deep";
@@ -53,6 +58,11 @@ function selectFeedMode(state: UniverseState, hour: number): FeedMode {
   // Deep exploration — show what they've built
   if (depth >= 5) {
     return "deep";
+  }
+
+  // Door discovered — reward curiosity with discovery mode
+  if (state.doorDiscovered && depth >= 3 && hour >= 12 && hour < 17) {
+    return "curious";
   }
 
   // Night + calm → quiet
@@ -75,7 +85,7 @@ function selectFeedMode(state: UniverseState, hour: number): FeedMode {
     return depth >= 3 ? "quiet" : "cinematic";
   }
 
-  // Default: return
+  // Default: return or first
   return state.visitedRoutes.length > 3 ? "return" : "first";
 }
 
@@ -226,8 +236,9 @@ export function useHomeFeedComposition(): HomeFeedComposition {
     const mode = selectFeedMode(state, hour);
     const sections = composeFeed(mode, state);
     return { mode, sections };
+    // period triggers re-evaluation when time of day changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [period]);
 }
 
 /**
