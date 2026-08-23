@@ -22,7 +22,11 @@ import type { NextRequest } from "next/server";
 const ADMIN_SESSION_COOKIE = "within-admin-session";
 const TOKEN_PREFIX = "admin_";
 
-/** The middleware only runs on /admin routes. */
+/**
+ * The middleware protects /admin routes — but NOT /admin/login or /api/admin/*.
+ * The login page must remain accessible without a session, and the API
+ * routes handle their own authentication.
+ */
 export const config = {
   matcher: ["/admin/:path*"],
 };
@@ -74,6 +78,13 @@ function verifyAdminSession(cookieValue: string): boolean {
 }
 
 export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Allow the admin login page and API routes through without checking
+  if (pathname === "/admin/login" || pathname.startsWith("/api/admin")) {
+    return NextResponse.next();
+  }
+
   const cookie = request.cookies.get(ADMIN_SESSION_COOKIE);
 
   if (!cookie?.value) {

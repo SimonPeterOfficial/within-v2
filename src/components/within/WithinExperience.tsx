@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
+import { useEnvironment } from "@/lib/environment";
 import {
   takeMeSomewhere,
   explore,
@@ -13,11 +14,14 @@ import {
   type ExploreItem,
   type ExploreContext,
 } from "@/lib/explore";
+import { fireRipple } from "@/lib/ripple";
+import { recordExplorationDepth, markWithinVisited, recordDiscovery, getUniverseState } from "@/lib/universe/state";
+import { getAuriContextualMessage } from "@/lib/universe/events";
 import DepthLayers from "@/components/effects/DepthLayers";
+import StarField from "@/components/sanctuary/StarField";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
-import GlassCard from "@/components/ui/GlassCard";
 import Icon from "@/components/ui/Icon";
-import GradientText from "@/components/ui/GradientText";
+import type { AuriState } from "@/lib/auri";
 
 /* ── Message types ───────────────────────────────────────────────────── */
 
@@ -27,41 +31,55 @@ type Message = {
   id: string;
   role: MessageRole;
   text: string;
-  /** Optional discovery attached to this message */
+  /** Optional discovery attached to this message — a door */
   discovery?: ExploreItem;
-  /** Optional suggested actions */
-  actions?: { label: string; action: string }[];
+  /** Optional door to another place */
+  door?: { label: string; destination: string; emoji: string };
   timestamp: number;
 };
 
-/* ── Auri's conversational responses ─────────────────────────────────── */
+/* ── Auri's conversational responses — curated, not pattern-matched ──── */
 
 const AURI_RESPONSES: Record<string, string[]> = {
   calm: [
     "Then let's not search. Let's just… be here.",
     "I know a quiet place. Come with me.",
+    "The light is slower here. Stay as long as you need.",
+    "Breathe. The room breathes with you.",
   ],
   curious: [
     "Curiosity is the best door.",
     "I've been saving something for this moment.",
+    "Follow that thread. It leads somewhere good.",
+    "You're asking the right question.",
+    "Let's go a little deeper.",
   ],
   inspired: [
     "Let that fire lead somewhere.",
     "I know who might feed that feeling.",
+    "When you're ready, there's a door open.",
+    "Hold onto that — it's rare.",
   ],
   lost: [
     "Being lost is sometimes the point.",
     "I'll hold the light while you wander.",
+    "There's no wrong path here — only different ones.",
+    "Sometimes not knowing is the beginning.",
   ],
   peaceful: [
     "Slow things are often the most beautiful.",
     "I found something gentle for you.",
+    "Let the world be quiet around you for a while.",
+    "This is yours. Take it.",
   ],
   default: [
     "I'm listening.",
     "Take your time.",
     "There's no rush here.",
     "Let's see where this goes.",
+    "I hear you.",
+    "Stay for a moment.",
+    "That's worth sitting with.",
   ],
 };
 
@@ -70,9 +88,28 @@ function getAuriResponse(mood: string | null): string {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-/* ── Suggestion chips ────────────────────────────────────────────────── */
+/* ── Ambient whispers — things Auri says between conversations ──────── */
 
-function SuggestionChips({
+const AMBIENT_WHISPERS = [
+  "There's something nearby.",
+  "You've been here before.",
+  "Want to wander somewhere unexpected?",
+  "I found a quieter place.",
+  "The light is different tonight.",
+  "There's a door you haven't opened.",
+  "This room remembers you.",
+  "You don't have to know where you're going.",
+  "Stay as long as you need.",
+  "There's more Within.",
+];
+
+function getRandomWhisper(): string {
+  return AMBIENT_WHISPERS[Math.floor(Math.random() * AMBIENT_WHISPERS.length)];
+}
+
+/* ── Suggestion chips — ambient, not pushy ────────────────────────────── */
+
+function AmbientSuggestions({
   onSelect,
   visible,
 }: {
@@ -81,152 +118,320 @@ function SuggestionChips({
 }) {
   const prefersReducedMotion = useReducedMotionSafe();
 
-  if (!visible) return null;
+  const suggestions = useMemo(() => {
+    const hour = new Date().getHours();
+    const start = hour % Math.max(1, AURI_SUGGESTIONS.length - 4);
+    return AURI_SUGGESTIONS.slice(start, start + 4);
+  }, []);
 
-  const suggestions = AURI_SUGGESTIONS.slice(0, 6);
+  if (!visible) return null;
 
   return (
     <motion.div
-      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.3 }}
+      transition={{ duration: 0.6, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="flex flex-wrap justify-center gap-2"
     >
-      {suggestions.map((s) => (
-        <button
+      {suggestions.map((s, i) => (
+        <motion.button
           key={s.id}
           type="button"
           onClick={() => onSelect(s.text)}
-          className="rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[12px] font-medium text-gray-400 transition-all duration-300 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.8 + i * 0.1 }}
+          className="rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-[11px] font-medium text-gray-500/60 transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.15)] hover:bg-white/[0.04] hover:text-gray-300/80"
         >
           {s.text}
-        </button>
+        </motion.button>
       ))}
     </motion.div>
   );
 }
 
-/* ── Discovery card (inline) ─────────────────────────────────────────── */
+/* ── Discovery door (inline in a message) ─────────────────────────────── */
 
-function InlineDiscovery({ item }: { item: ExploreItem }) {
+function DiscoveryDoor({ item }: { item: ExploreItem }) {
+  const prefersReducedMotion = useReducedMotionSafe();
+
+  const handleClick = (e: React.MouseEvent) => {
+    fireRipple(e);
+    addToJourney({
+      id: item.id,
+      title: item.title,
+      type: item.type,
+      destination: item.destination,
+      reason: reasonLabel(item.reason),
+      parentId: null,
+      cover: item.cover,
+    });
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8, filter: "blur(6px)" }}
+    <motion.a
+      href={item.destination}
+      onClick={handleClick}
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6, filter: "blur(4px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="mt-3"
+      className="group mt-3 block overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.12)] hover:bg-white/[0.04]"
     >
-      <a
-        href={item.destination}
-        className="group block"
-      >
-        <GlassCard tone="soft" hoverLift className="p-4">
-          {item.cover && (
-            <div
-              className={`mb-3 flex h-16 w-full items-center justify-center rounded-lg bg-gradient-to-br ${item.cover.gradient} text-2xl`}
-            >
-              {item.cover.emoji}
-            </div>
-          )}
-          <div className="flex items-center gap-2 mb-1">
-            <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400">
-              {item.type}
-            </span>
-          </div>
-          <h4 className="text-sm font-medium text-white/90 group-hover:text-white">
-            {item.title}
-          </h4>
-          <p className="mt-1 text-[12px] text-gray-400/60 line-clamp-2">
-            {item.description}
-          </p>
-          <p className="mt-2 text-[10px] font-medium text-emerald-400/45">
-            {reasonLabel(item.reason)}
-          </p>
-        </GlassCard>
-      </a>
-    </motion.div>
+      {item.cover && (
+        <div
+          className={`flex h-14 w-full items-center justify-center bg-gradient-to-br ${item.cover.gradient} text-2xl`}
+          style={{ opacity: 0.85 }}
+        >
+          {item.cover.emoji}
+        </div>
+      )}
+      <div className="p-3">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400/70">
+            {item.type}
+          </span>
+        </div>
+        <h4 className="mt-1.5 text-[13px] font-medium text-white/85 group-hover:text-white">
+          {item.title}
+        </h4>
+        <p className="mt-1 text-[11px] text-gray-400/50 line-clamp-2">
+          {item.description}
+        </p>
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-400/40 group-hover:text-emerald-300/60 transition-colors">
+          <span>Open this door</span>
+          <Icon name="forward" size={8} />
+        </div>
+      </div>
+    </motion.a>
   );
 }
 
-/* ── Chat bubble ─────────────────────────────────────────────────────── */
+/* ── Navigation door (inline link to another place) ───────────────────── */
 
-function ChatBubble({ message }: { message: Message }) {
+function NavDoor({ door }: { door: NonNullable<Message["door"]> }) {
+  return (
+    <a
+      href={door.destination}
+      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-gray-400/60 transition-all duration-300 hover:border-[rgba(var(--mood-rgb),0.12)] hover:bg-white/[0.04] hover:text-gray-300/80"
+    >
+      <span>{door.emoji}</span>
+      <span>{door.label}</span>
+      <Icon name="forward" size={8} />
+    </a>
+  );
+}
+
+/* ── Message bubble — floating in space ──────────────────────────────── */
+
+function MessageBubble({ message, auriState }: { message: Message; auriState: AuriState }) {
   const isAuri = message.role === "auri";
   const isUser = message.role === "user";
+  const prefersReducedMotion = useReducedMotionSafe();
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12, filter: "blur(6px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={`flex ${isUser ? "justify-end" : "justify-start"}`}
     >
-      <div className={`max-w-[85%] ${isUser ? "text-right" : ""}`}>
-        {/* Auri label */}
+      <div className={`max-w-[80%] ${isUser ? "text-right" : ""}`}>
         {isAuri && (
-          <div className="mb-1.5 flex items-center gap-1.5">
-            <AuriOwl size={16} particles={false} state="curious" />
-            <span className="text-[10px] font-medium text-emerald-400/50">Auri</span>
+          <div className="mb-2 flex items-center gap-2">
+            <AuriOwl size={18} particles={false} state={auriState} />
+            <span className="text-[10px] font-medium tracking-wide text-emerald-400/35">Auri</span>
           </div>
         )}
 
-        {/* Message text */}
         <div
           className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${
             isUser
-              ? "rounded-tr-md border border-[rgba(var(--mood-rgb),0.12)] bg-[rgba(var(--mood-rgb),0.06)] text-white/85"
+              ? "rounded-tr-md border border-[rgba(var(--mood-rgb),0.08)] bg-[rgba(var(--mood-rgb),0.04)] text-white/80"
               : isAuri
-              ? "rounded-tl-md border border-white/[0.05] bg-white/[0.025] text-gray-300/80"
-              : "border border-white/[0.03] bg-white/[0.01] text-gray-500/60 text-center text-[12px] italic"
+              ? "rounded-tl-md border border-white/[0.04] bg-white/[0.02] text-gray-300/70"
+              : "border border-white/[0.02] bg-white/[0.01] text-gray-500/50 text-center text-[12px] italic"
           }`}
         >
           {message.text}
         </div>
 
-        {/* Inline discovery */}
-        {message.discovery && <InlineDiscovery item={message.discovery} />}
+        {message.discovery && <DiscoveryDoor item={message.discovery} />}
+        {message.door && <NavDoor door={message.door} />}
       </div>
     </motion.div>
   );
 }
 
-/* ── Main experience ─────────────────────────────────────────────────── */
+/* ── Auri ambient whisper — appears between conversations ─────────────── */
+
+function AmbientWhisper({ visible }: { visible: boolean }) {
+  const prefersReducedMotion = useReducedMotionSafe();
+  const [whisper, setWhisper] = useState<string | null>(null);
+  const whisperTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const whisperHideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!visible) {
+      if (whisperTimerRef.current) clearTimeout(whisperTimerRef.current);
+      if (whisperHideRef.current) clearTimeout(whisperHideRef.current);
+      const frame = requestAnimationFrame(() => setWhisper(null));
+      return () => cancelAnimationFrame(frame);
+    }
+    whisperTimerRef.current = setTimeout(() => {
+      setWhisper(getRandomWhisper());
+      whisperHideRef.current = setTimeout(() => setWhisper(null), 6000);
+    }, 12000);
+    return () => {
+      if (whisperTimerRef.current) clearTimeout(whisperTimerRef.current);
+      if (whisperHideRef.current) clearTimeout(whisperHideRef.current);
+    };
+  }, [visible]);
+
+  return (
+    <AnimatePresence>
+      {whisper && (
+        <motion.div
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-none absolute bottom-28 left-0 right-0 text-center"
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.04] bg-white/[0.02] px-4 py-2 text-[11px] italic text-gray-500/40 backdrop-blur-sm">
+            <AuriOwl size={12} particles={false} state="sleeping" />
+            {whisper}
+          </span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ── Portal ripple — the door opening effect ─────────────────────────── */
+
+function PortalRipple({ active }: { active: boolean }) {
+  const prefersReducedMotion = useReducedMotionSafe();
+
+  if (prefersReducedMotion) return null;
+
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="pointer-events-none fixed inset-0 z-[5]"
+          aria-hidden
+        >
+          {/* Central light bloom */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: [0, 1.5, 2.5], opacity: [0, 0.15, 0] }}
+            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.3),transparent_70%)]"
+          />
+          {/* Concentric rings */}
+          {[1, 2, 3].map((ring) => (
+            <motion.div
+              key={ring}
+              initial={{ scale: 0, opacity: 0.3 }}
+              animate={{ scale: [0, 1 + ring * 0.5], opacity: [0.3, 0] }}
+              transition={{ duration: 1 + ring * 0.3, delay: ring * 0.1, ease: "easeOut" }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.06]"
+              style={{ width: `${ring * 120}px`, height: `${ring * 120}px` }}
+            />
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ── Main experience — the quiet room ─────────────────────────────────── */
 
 export default function WithinExperience() {
   const prefersReducedMotion = useReducedMotionSafe();
+  const { moodId } = useEnvironment();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [context, setContext] = useState<ExploreContext>(() => createExploreContext());
+  const [context, setContext] = useState<ExploreContext>(() =>
+    createExploreContext({ mood: moodId })
+  );
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+  const [auriState, setAuriState] = useState<AuriState>("idle");
+  const [idle, setIdle] = useState(true);
+  const [portalActive, setPortalActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
   }, [messages, prefersReducedMotion]);
 
-  // Opening message
+  // Mark /within as visited and record depth
   useEffect(() => {
+    markWithinVisited();
+    recordExplorationDepth(context.depth);
+  }, [context.depth]);
+
+  // Opening message — the room greets you, contextually
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setAuriState("greeting"));
+
+    // Check if there's a contextual Auri message based on universe state
+    const state = getUniverseState();
+    const contextualMsg = getAuriContextualMessage(state);
+
     const timer = setTimeout(() => {
       setMessages([
         {
           id: "opening",
           role: "auri",
-          text: "You don't have to know where you're going.",
+          text: contextualMsg ?? "You're inside now. The room knows you're here.",
           timestamp: Date.now(),
         },
       ]);
-    }, 800);
-    return () => clearTimeout(timer);
+      setTimeout(() => setAuriState("observing"), 1500);
+    }, 1200);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  // Reset idle timer on user activity
+  const resetIdle = useCallback(() => {
+    requestAnimationFrame(() => setIdle(false));
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(() => {
+      requestAnimationFrame(() => {
+        setIdle(true);
+        setAuriState("sleeping");
+      });
+    }, 30000);
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setIdle(false));
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
   }, []);
 
   const sendMessage = useCallback(
     (text: string) => {
       if (!text.trim()) return;
 
-      // Add user message
+      resetIdle();
+      setAuriState("listening");
+
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         role: "user",
@@ -239,87 +444,169 @@ export default function WithinExperience() {
       setShowSuggestions(false);
       setIsTyping(true);
 
-      // Auri "thinks" for a moment
-      const thinkDelay = prefersReducedMotion ? 300 : 800;
+      const thinkDelay = prefersReducedMotion ? 400 : 1000;
 
       setTimeout(() => {
-        // Generate Auri's response
-        const lower = text.toLowerCase();
-        let discovery: ExploreItem | null = null;
+        setAuriState("thinking");
 
-        // Check if this is a "take me somewhere" request
-        if (lower.includes("take me") || lower.includes("surprise") || lower.includes("wander")) {
-          const result = takeMeSomewhere(context);
-          discovery = result.items[0] ?? null;
+        setTimeout(() => {
+          const lower = text.toLowerCase();
+          let discovery: ExploreItem | null = null;
+          let door: Message["door"] = undefined;
 
-          addToJourney({
-            id: discovery?.id ?? `chat-${Date.now()}`,
-            title: discovery?.title ?? text,
-            type: discovery?.type ?? "auri-moment",
-            destination: discovery?.destination ?? "/within",
-            reason: discovery ? reasonLabel(discovery.reason) : "Conversation led here",
-            parentId: null,
-            cover: discovery?.cover,
-          });
+          // "Take me somewhere" / "surprise me" / "wander"
+          if (
+            lower.includes("take me") ||
+            lower.includes("surprise") ||
+            lower.includes("wander") ||
+            lower.includes("show me something") ||
+            lower.includes("what's within")
+          ) {
+            // Portal effect
+            setPortalActive(true);
+            fireRipple({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
+            setTimeout(() => setPortalActive(false), 2000);
 
-          setContext((prev) => ({
-            ...prev,
-            seen: [...prev.seen, discovery?.id ?? ""],
-            depth: prev.depth + 1,
-          }));
-        }
+            const result = takeMeSomewhere(context);
+            discovery = result.items[0] ?? null;
 
-        // Detect mood from text
-        const moodKeywords: Record<string, string> = {
-          calm: "calm", peaceful: "peaceful", quiet: "calm", relaxed: "calm",
-          curious: "curious", wonder: "curious", explore: "curious",
-          inspired: "inspired", motivated: "inspired", fire: "inspired",
-          lost: "lost", sad: "lost", wandering: "lost",
-          beautiful: "peaceful", gentle: "calm",
-        };
+            if (discovery) {
+              recordDiscovery(discovery.type);
+              addToJourney({
+                id: discovery.id,
+                title: discovery.title,
+                type: discovery.type,
+                destination: discovery.destination,
+                reason: reasonLabel(discovery.reason),
+                parentId: null,
+                cover: discovery.cover,
+              });
+            }
 
-        let detectedMood: string | null = null;
-        for (const [keyword, mood] of Object.entries(moodKeywords)) {
-          if (lower.includes(keyword)) {
-            detectedMood = mood;
-            break;
+            setContext((prev) => ({
+              ...prev,
+              seen: [...prev.seen, discovery?.id ?? ""],
+              depth: prev.depth + 1,
+            }));
           }
-        }
 
-        // Special responses
-        let responseText: string;
-        if (discovery) {
-          responseText = getAuriResponse(detectedMood);
-        } else if (lower.includes("who") || lower.includes("discover")) {
-          responseText = "Let me find someone you should meet.";
-          // Also generate a discovery
-          const result = explore({ ...context, depth: context.depth + 1 }, 1);
-          discovery = result.items[0] ?? null;
-        } else if (lower.includes("story") || lower.includes("read")) {
-          responseText = "Stories are my favorite doors.";
-          const result = explore({ ...context, depth: context.depth + 1, interests: [...context.interests, "stories"] }, 1);
-          discovery = result.items[0] ?? null;
-        } else if (lower.includes("music") || lower.includes("play") || lower.includes("listen")) {
-          responseText = "Let the sound find you.";
-          const result = explore({ ...context, depth: context.depth + 1, interests: [...context.interests, "music"] }, 1);
-          discovery = result.items[0] ?? null;
-        } else {
-          responseText = getAuriResponse(detectedMood);
-        }
+          // Detect mood
+          const moodKeywords: Record<string, string> = {
+            calm: "calm",
+            peaceful: "peaceful",
+            quiet: "calm",
+            curious: "curious",
+            wonder: "curious",
+            explore: "curious",
+            inspired: "inspired",
+            motivated: "inspired",
+            lost: "lost",
+            sad: "lost",
+            beautiful: "peaceful",
+            gentle: "calm",
+          };
 
-        const auriMsg: Message = {
-          id: `auri-${Date.now()}`,
-          role: "auri",
-          text: responseText,
-          discovery: discovery ?? undefined,
-          timestamp: Date.now(),
-        };
+          let detectedMood: string | null = null;
+          for (const [keyword, mood] of Object.entries(moodKeywords)) {
+            if (lower.includes(keyword)) {
+              detectedMood = mood;
+              break;
+            }
+          }
 
-        setMessages((prev) => [...prev, auriMsg]);
-        setIsTyping(false);
+          // Build response with optional door
+          let responseText: string;
+
+          if (discovery) {
+            responseText = getAuriResponse(detectedMood);
+          } else if (lower.includes("who") || lower.includes("discover")) {
+            responseText = "Let me find someone you should meet.";
+            const result = explore(
+              { ...context, depth: context.depth + 1 },
+              1
+            );
+            discovery = result.items[0] ?? null;
+          } else if (lower.includes("story") || lower.includes("read")) {
+            responseText = "Stories are my favorite doors.";
+            const result = explore(
+              {
+                ...context,
+                depth: context.depth + 1,
+                interests: [...context.interests, "stories"],
+              },
+              1
+            );
+            discovery = result.items[0] ?? null;
+          } else if (
+            lower.includes("music") ||
+            lower.includes("play") ||
+            lower.includes("listen")
+          ) {
+            responseText = "Let the sound find you.";
+            door = { label: "The music room", destination: "/music", emoji: "🎵" };
+          } else if (lower.includes("book") || lower.includes("library")) {
+            responseText = "Some pages understand you.";
+            door = { label: "The library", destination: "/books", emoji: "📚" };
+          } else if (lower.includes("community") || lower.includes("people")) {
+            responseText = "There are kindred souls nearby.";
+            door = {
+              label: "Quiet rooms",
+              destination: "/communities",
+              emoji: "🤝",
+            };
+          } else if (lower.includes("photo") || lower.includes("image")) {
+            responseText = "Light, held still for a moment.";
+            door = {
+              label: "The gallery",
+              destination: "/photography",
+              emoji: "📷",
+            };
+          } else if (
+            lower.includes("original") ||
+            lower.includes("film") ||
+            lower.includes("movie")
+          ) {
+            responseText = "The originals are waiting.";
+            door = {
+              label: "WithIn Originals",
+              destination: "/originals",
+              emoji: "🎬",
+            };
+          } else if (lower.includes("journey") || lower.includes("map")) {
+            responseText = "Your constellation is forming.";
+            door = {
+              label: "Your journey",
+              destination: "/journey",
+              emoji: "✨",
+            };
+          } else if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
+            responseText = "Hello. I'm glad you're here.";
+          } else if (lower.includes("thank")) {
+            responseText = "Always. I'll be here when you need me.";
+          } else if (lower.includes("who are you") || lower.includes("what are you")) {
+            responseText = "I'm Auri — the guardian who keeps the light here. I watch how you feel and keep the corners ready.";
+          } else {
+            responseText = getAuriResponse(detectedMood);
+          }
+
+          const auriMsg: Message = {
+            id: `auri-${Date.now()}`,
+            role: "auri",
+            text: responseText,
+            discovery: discovery ?? undefined,
+            door: door ?? undefined,
+            timestamp: Date.now(),
+          };
+
+          setMessages((prev) => [...prev, auriMsg]);
+          setIsTyping(false);
+          setAuriState("responding");
+
+          setTimeout(() => setAuriState("observing"), 2000);
+        }, 600);
       }, thinkDelay);
     },
-    [context, prefersReducedMotion]
+    [context, prefersReducedMotion, resetIdle]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -331,76 +618,126 @@ export default function WithinExperience() {
     sendMessage(text);
   };
 
+  const showAmbientWhisper = idle && messages.length > 0 && !isTyping;
+
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#02030a] text-white">
-      <DepthLayers preset="sanctuary" particles={4} stars={10} fog={0.3} />
+      {/* Living atmosphere — deeper, quieter than other rooms */}
+      <DepthLayers preset="sanctuary" particles={3} stars={12} fog={0.3} />
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-white/[0.04] bg-[#02030a]/80 px-6 py-4 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
-          <AuriOwl size={28} particles={false} state="curious" />
-          <div>
-            <h1 className="font-display text-lg font-medium tracking-[-0.01em]">
-              <GradientText>Within</GradientText>
-            </h1>
-            <p className="text-[11px] text-gray-500/60">Talk. Wonder. Wander.</p>
-          </div>
-        </div>
-      </header>
+      {/* Soft vignette — the room feels enclosed */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]"
+      />
 
-      {/* Messages */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-6 py-8">
-        <div className="mx-auto max-w-2xl space-y-5">
+      {/* Star field — the room has its own sky */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
+        <StarField count={16} seed={42} />
+      </div>
+
+      {/* Portal ripple effect */}
+      <PortalRipple active={portalActive} />
+
+      {/* The room — no header chrome, just space */}
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-xl">
+          {/* Opening — Auri's presence in the room */}
           <AnimatePresence>
-            {messages.map((msg) => (
-              <ChatBubble key={msg.id} message={msg} />
-            ))}
+            {messages.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="flex flex-col items-center py-16"
+              >
+                <motion.div
+                  animate={
+                    prefersReducedMotion
+                      ? undefined
+                      : { scale: [1, 1.05, 1], opacity: [0.7, 1, 0.7] }
+                  }
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <AuriOwl size={64} particles state={auriState} />
+                </motion.div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  className="mt-6 text-center text-[13px] italic text-gray-500/40"
+                >
+                  Auri is here.
+                </motion.p>
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* Typing indicator */}
-          {isTyping && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-1.5 text-gray-500/50"
-            >
-              <AuriOwl size={16} particles={false} state="thinking" />
-              <span className="text-[12px] italic">thinking…</span>
-            </motion.div>
-          )}
+          {/* Messages — floating in space */}
+          {messages.length > 0 && (
+            <div className="space-y-5">
+              <AnimatePresence>
+                {messages.map((msg) => (
+                  <MessageBubble key={msg.id} message={msg} auriState={auriState} />
+                ))}
+              </AnimatePresence>
 
-          <div ref={messagesEndRef} />
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-2 text-gray-500/40"
+                >
+                  <AuriOwl size={16} particles={false} state="thinking" />
+                  <span className="text-[11px] italic">thinking…</span>
+                </motion.div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Suggestion chips */}
+      {/* Ambient whisper — appears when the room is quiet */}
+      <AmbientWhisper visible={showAmbientWhisper} />
+
+      {/* Suggestions — ambient, not pushy */}
       {showSuggestions && messages.length > 0 && (
         <div className="relative z-10 px-6 pb-4">
-          <div className="mx-auto max-w-2xl">
-            <SuggestionChips onSelect={handleSuggestion} visible={showSuggestions} />
+          <div className="mx-auto max-w-xl">
+            <AmbientSuggestions
+              onSelect={handleSuggestion}
+              visible={showSuggestions}
+            />
           </div>
         </div>
       )}
 
-      {/* Input */}
-      <div className="relative z-10 border-t border-white/[0.04] bg-[#02030a]/80 px-6 py-4 backdrop-blur-xl">
-        <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl gap-3">
+      {/* Input — whispering into the dark */}
+      <div className="relative z-10 border-t border-white/[0.03] bg-[#02030a]/60 px-6 py-4 backdrop-blur-xl">
+        <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl gap-3">
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Say something…"
-            className="flex-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-3 text-[13px] text-white placeholder-gray-500/50 outline-none transition-all duration-300 focus:border-[rgba(var(--mood-rgb),0.3)] focus:bg-white/[0.05]"
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              resetIdle();
+            }}
+            onFocus={resetIdle}
+            placeholder="Whisper something…"
+            className="flex-1 rounded-full border border-white/[0.05] bg-white/[0.02] px-5 py-3 text-[13px] text-white placeholder-gray-600/50 outline-none transition-all duration-500 focus:border-[rgba(var(--mood-rgb),0.15)] focus:bg-white/[0.03]"
             aria-label="Message Auri"
           />
           <button
             type="submit"
             disabled={!inputValue.trim()}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.8)] text-black transition-all duration-300 hover:bg-[rgba(var(--mood-rgb),1)] disabled:opacity-30 disabled:hover:bg-[rgba(var(--mood-rgb),0.8)]"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-gray-400 transition-all duration-300 hover:border-[rgba(var(--mood-rgb),0.2)] hover:bg-[rgba(var(--mood-rgb),0.06)] hover:text-white disabled:opacity-20 disabled:hover:border-white/[0.06] disabled:hover:bg-white/[0.03]"
             aria-label="Send message"
           >
-            <Icon name="forward" size={16} />
+            <Icon name="forward" size={14} />
           </button>
         </form>
       </div>

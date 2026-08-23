@@ -3,20 +3,19 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 
 /**
- * Admin login form — password-only authentication.
+ * Admin login form — password-only, server-side verification.
  *
- * Verifies credentials against the server-side API route (/api/admin/login)
- * which checks the ADMIN_PASSWORD environment variable. No admin credentials
- * are ever exposed to client-side JavaScript.
+ * Design: minimal, precise, premium. The form should feel like entering
+ * a code, not filling out a survey.
  */
 export default function AdminLoginForm() {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +24,7 @@ export default function AdminLoginForm() {
     setError(null);
 
     if (!password.trim()) {
-      setError("Enter the admin password.");
+      setError("Enter the access code.");
       return;
     }
 
@@ -46,7 +45,6 @@ export default function AdminLoginForm() {
         return;
       }
 
-      // Success — redirect to admin dashboard
       router.push("/admin");
     } catch {
       setError("Connection error. Please try again.");
@@ -62,10 +60,10 @@ export default function AdminLoginForm() {
           <motion.div
             ref={errorRef}
             tabIndex={-1}
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 text-[13px] text-red-400/90 outline-none"
+            className="rounded-lg border border-red-500/15 bg-red-500/[0.04] px-4 py-3 text-[12px] text-red-400/80 outline-none"
           >
             {error}
           </motion.div>
@@ -75,28 +73,49 @@ export default function AdminLoginForm() {
       <div>
         <label
           htmlFor="admin-password"
-          className="mb-1.5 block text-[12px] font-medium text-gray-400/70"
+          className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.25em] text-white/30"
         >
-          Password
+          Access code
         </label>
-        <input
-          id="admin-password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          required
-          value={password}
-          onChange={(e) => { setPassword(e.target.value); setError(null); }}
-          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-[13px] text-white placeholder-gray-600 outline-none transition-all duration-300 focus:border-[rgba(var(--mood-rgb),0.3)] focus:bg-white/[0.05]"
-        />
+        <div className="relative">
+          <input
+            id="admin-password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="••••••••"
+            required
+            value={password}
+            onChange={(e) => { setPassword(e.target.value); setError(null); }}
+            className="w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3.5 pr-11 text-[13px] text-white placeholder-white/15 outline-none transition-all duration-300 focus:border-white/[0.12] focus:bg-white/[0.04]"
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 transition-colors hover:text-white/50"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            <Icon name={showPassword ? "close" : "forward"} size={14} />
+          </button>
+        </div>
       </div>
 
-      <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
-        {loading && <Icon name="loader" size={15} className="mr-2 animate-spin" />}
-        {loading ? "Verifying…" : "Enter Command Center"}
-      </Button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-lg bg-white/[0.06] py-3.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-white/70 transition-all duration-300 hover:bg-white/[0.1] hover:text-white active:scale-[0.98] disabled:opacity-40 disabled:hover:bg-white/[0.06]"
+      >
+        {loading ? (
+          <span className="inline-flex items-center gap-2">
+            <span className="h-3 w-3 animate-spin rounded-full border border-white/20 border-t-white/60" />
+            Verifying
+          </span>
+        ) : (
+          "Enter control room"
+        )}
+      </button>
 
-      <p className="text-center text-[11px] text-gray-600/40">
+      <p className="text-center text-[10px] text-white/10">
         Admin access is restricted. All activity is logged.
       </p>
     </form>

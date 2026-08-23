@@ -21,6 +21,35 @@ import { rankAndSelect } from "./ranking";
 const DEFAULT_BATCH_SIZE = 6;
 const MAX_EXPLORATIONS = 200; // hard cap per session to prevent infinite loops
 
+/* ── "Take me somewhere" transition whispers — Auri speaks as the door opens ── */
+
+const TAKE_ME_WHISPERS = [
+  "Come with me.",
+  "There's something here.",
+  "I've been watching this one.",
+  "This feels right.",
+  "Close your eyes for a moment.",
+  "The light is different here.",
+  "You haven't seen this part yet.",
+  "Trust me on this one.",
+  "Step through.",
+  "Let the universe choose.",
+];
+
+/** Select a whisper that feels contextual, not random. */
+function pickTakeMeSomewhereWhisper(ctx: ExploreContext): string {
+  const index = (ctx.depth + Math.floor(seededRandom(JSON.stringify(ctx.seen)) * TAKE_ME_WHISPERS.length)) % TAKE_ME_WHISPERS.length;
+  return TAKE_ME_WHISPERS[index];
+}
+
+function seededRandom(seed: string): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  }
+  return (hash & 0x7fffffff) / 0x7fffffff;
+}
+
 /* ── Session seed (deterministic per session) ────────────────────────── */
 
 let sessionSeed = "";
@@ -84,14 +113,11 @@ export function takeMeSomewhere(ctx: ExploreContext): ExploreResult {
   const pool = getSeedPool();
   const items = rankAndSelect(pool, ctx, 1, getSessionSeed());
 
-  const whispers = AURI_WHISPERS.discovery;
-  const whisperIndex = ctx.depth % whispers.length;
-
   return {
     items,
     context: ctx,
     hasMore: true,
-    auriSuggestion: whispers[whisperIndex],
+    auriSuggestion: pickTakeMeSomewhereWhisper(ctx),
   };
 }
 

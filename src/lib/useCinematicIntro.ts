@@ -3,35 +3,40 @@
 import { useEffect, useState } from "react";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
-/** Session key — the cinematic plays at most once per tab session. */
+/**
+ * Session key — the cinematic plays at most once per tab session.
+ * Stored in sessionStorage so it resets when the tab closes.
+ */
 const GATE_KEY = "within:cinematic:seen";
 
 /**
  * Session gate + reduced-motion guard for the cinematic loader.
  *
- * Returns `play` (whether the sequence should run) and `markSeen` (call once
- * the sequence finishes or is skipped, so it never plays again this session).
+ * Returns:
+ *   `play` — whether the sequence should run (always true for first visit)
+ *   `reduced` — whether reduced motion is active (skip animations, use fades)
+ *   `markSeen` — call when the sequence finishes so it doesn't repeat
  *
  * Hydration-safe: `play` is always `false` during SSR and the first client
  * pass — the sessionStorage check happens inside an effect, so server HTML
- * always matches hydration. The state flip is deferred into a
- * requestAnimationFrame so it never runs synchronously in the effect body.
+ * always matches hydration.
  */
 export function useCinematicIntro() {
   const prefersReducedMotion = useReducedMotionSafe();
   const [play, setPlay] = useState(false);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    // Check if already seen this session
     try {
       if (sessionStorage.getItem(GATE_KEY)) return;
     } catch {
       return; // storage unavailable — skip the cinematic
     }
 
+    // Defer state update to avoid hydration mismatch
     const frame = requestAnimationFrame(() => setPlay(true));
     return () => cancelAnimationFrame(frame);
-  }, [prefersReducedMotion]);
+  }, []);
 
   const markSeen = () => {
     try {
@@ -41,5 +46,5 @@ export function useCinematicIntro() {
     }
   };
 
-  return { play, markSeen };
+  return { play, reduced: prefersReducedMotion, markSeen };
 }

@@ -3,20 +3,17 @@
 import { motion } from "framer-motion";
 
 type LoaderRipplesProps = {
-  /** When true the ripples appear, expanding outward from the core */
   visible?: boolean;
-  /** When true the ripples scatter and fade during the dissolve */
   dissolving?: boolean;
+  reduced?: boolean;
 };
 
 /**
  * Concentric water-like rings — light behaving like memory.
  *
- * Three thin, luminous rings expand outward from the center, each slightly
- * delayed, creating an organic ripple effect. The rings are pure CSS border
- * animations — no JavaScript loops, no expensive filters.
+ * For reduced motion: static rings that fade in once (no infinite animation).
  */
-export default function LoaderRipples({ visible = false, dissolving = false }: LoaderRipplesProps) {
+export default function LoaderRipples({ visible = false, dissolving = false, reduced = false }: LoaderRipplesProps) {
   if (!visible) return null;
 
   return (
@@ -26,18 +23,20 @@ export default function LoaderRipples({ visible = false, dissolving = false }: L
           key={index}
           initial={{ scale: 0, opacity: 0 }}
           animate={
-            dissolving
-              ? { scale: 1.8, opacity: 0 }
-              : {
-                  scale: [0, 1, 1],
-                  opacity: [0, 0.4, 0.15],
-                }
+            reduced
+              ? { scale: 1, opacity: 0.2 - index * 0.05 }
+              : dissolving
+                ? { scale: 1.8, opacity: 0 }
+                : {
+                    scale: [0, 1, 1],
+                    opacity: [0, 0.4, 0.15],
+                  }
           }
           transition={{
-            duration: dissolving ? 0.8 : 3.5,
-            delay: dissolving ? index * 0.1 : index * 0.6,
+            duration: reduced ? 0.5 : dissolving ? 0.8 : 3.5,
+            delay: reduced ? index * 0.15 : dissolving ? index * 0.1 : index * 0.6,
             ease: dissolving ? "easeOut" : [0.16, 1, 0.3, 1],
-            repeat: dissolving ? 0 : Infinity,
+            repeat: reduced ? 0 : dissolving ? 0 : Infinity,
             repeatDelay: 1.2,
           }}
           className="absolute h-24 w-24 rounded-full border border-white/[0.08]"

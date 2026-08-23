@@ -30,6 +30,10 @@ export const AURI_SUGGESTIONS: AuriSuggestion[] = [
   { id: "inspired", text: "I want to feel inspired.", contexts: ["morning", "motivated"] },
   { id: "surprise", text: "Surprise me.", contexts: ["start", "bored", "adventurous"] },
   { id: "deep", text: "Something deep.", contexts: ["night", "reflective", "lost"] },
+  { id: "lost", text: "I feel a little lost.", contexts: ["lost", "night", "reflective"] },
+  { id: "quiet", text: "Something quiet.", contexts: ["calm", "morning", "night"] },
+  { id: "wonder", text: "I wonder what's here.", contexts: ["start", "curious", "morning"] },
+  { id: "warmth", text: "Something warm.", contexts: ["evening", "night", "inspired"] },
 ];
 
 /* ── Auri's whispered transitions ────────────────────────────────────── */
@@ -41,20 +45,28 @@ export const AURI_WHISPERS = {
     "Come with me.",
     "There's a door here.",
     "Look at this.",
+    "This one chose you.",
+    "Trust me on this one.",
+    "Step through.",
   ],
   unexpected: [
     "This wasn't what you asked for.",
     "Maybe that's the point.",
     "Something different.",
     "A side path.",
+    "The universe insists.",
+    "You didn't know you needed this.",
   ],
   journey: [
     "Here's where you've been.",
     "You found this because...",
     "Your universe is forming.",
+    "Every path led here.",
   ],
   door: [
     "There's something I didn't show you.",
+    "You haven't seen this part yet.",
+    "One more door.",
   ],
 };
 

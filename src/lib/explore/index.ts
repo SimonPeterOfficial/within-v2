@@ -2,12 +2,7 @@
  * Explore — the endless universe module.
  *
  * Usage:
- *   import { explore, createExploreContext } from "@/lib/explore";
- *
- *   const ctx = createExploreContext({ mood: "calm" });
- *   const result = explore(ctx);
- *   // result.items → ExploreItem[]
- *   // result.auriSuggestion → "Take me somewhere."
+ *   import { explore, createExploreContext, getThread } from "@/lib/explore";
  */
 
 export { explore, takeMeSomewhere, unexpectedDoor, getAllDiscoveries } from "./engine";
@@ -16,3 +11,5 @@ export type { JourneyNode } from "./journey";
 export { reasonLabel, createExploreContext } from "./types";
 export type { ExploreItem, ExploreContext, ExploreResult, ExploreReason, DiscoveryType } from "./types";
 export { getSeedPool, AURI_SUGGESTIONS, AURI_WHISPERS } from "./seed";
+export { getThread, getAnotherDoor } from "./thread";
+export type { ThreadConnection } from "./thread";

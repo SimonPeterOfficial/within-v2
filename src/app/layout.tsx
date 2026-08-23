@@ -9,6 +9,7 @@ import GrainOverlay from "@/components/effects/GrainOverlay";
 import PointerLight from "@/components/effects/PointerLight";
 import PresenceField from "@/components/effects/PresenceField";
 import MemoryRipple from "@/components/effects/MemoryRipple";
+import UniverseTracker from "@/components/universe/UniverseTracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -81,6 +82,7 @@ export default function RootLayout({
               <PointerLight />
               <CustomCursor />
               <MemoryRipple />
+              <UniverseTracker />
               <SpeedInsights />
             </AuthProvider>
           </EnvironmentProvider>

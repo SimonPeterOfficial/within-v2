@@ -15,6 +15,7 @@ import {
   type ExploreContext,
   type ExploreResult,
 } from "@/lib/explore";
+import { getThread, getAnotherDoor, type ThreadConnection } from "@/lib/explore/thread";
 import { fireRipple } from "@/lib/ripple";
 import DepthLayers from "@/components/effects/DepthLayers";
 import StarField from "@/components/sanctuary/StarField";
@@ -23,6 +24,8 @@ import GlassCard from "@/components/ui/GlassCard";
 import Icon from "@/components/ui/Icon";
 import GradientText from "@/components/ui/GradientText";
 import { blurUp, staggerContainer } from "@/lib/animations";
+import HiddenDoor from "@/components/explore/HiddenDoor";
+import { recordExplorationDepth } from "@/lib/universe/state";
 
 /* ── Discovery card ──────────────────────────────────────────────────── */
 
@@ -33,6 +36,9 @@ function DiscoveryCard({
   item: ExploreItem;
   onSelect: (item: ExploreItem) => void;
 }) {
+  const [showThread, setShowThread] = useState(false);
+  const thread = getThread(item.type, item.id).slice(0, 3);
+
   return (
     <motion.div variants={blurUp} className="group">
       <button
@@ -84,7 +90,56 @@ function DiscoveryCard({
           </div>
         </GlassCard>
       </button>
+
+      {/* Thread connections */}
+      {thread.length > 0 && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setShowThread(!showThread); }}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[11px] text-gray-500/50 transition-colors hover:bg-white/[0.02] hover:text-gray-400/60"
+          >
+            <span className="text-emerald-400/40">🧵</span>
+            <span>{showThread ? "Hide thread" : "Follow the thread"}</span>
+            <Icon name={showThread ? "refresh" : "forward"} size={8} />
+          </button>
+
+          <AnimatePresence>
+            {showThread && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-1.5 pt-1">
+                  {thread.map((conn) => (
+                    <ThreadLinkMini key={conn.id} connection={conn} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </motion.div>
+  );
+}
+
+/* ── Mini thread link ─────────────────────────────────────────────────── */
+
+function ThreadLinkMini({ connection }: { connection: ThreadConnection }) {
+  return (
+    <a
+      href={connection.destination}
+      className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] text-gray-500/60 transition-colors hover:bg-white/[0.02] hover:text-gray-300/70"
+    >
+      {connection.cover && (
+        <span className="text-sm">{connection.cover.emoji}</span>
+      )}
+      <span className="truncate">{connection.label}</span>
+      <span className="ml-auto text-[10px] text-gray-600/40">{connection.reason}</span>
+    </a>
   );
 }
 
@@ -170,10 +225,11 @@ export default function ExploreExperience() {
   const [allItems, setAllItems] = useState<ExploreItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [doorShown, setDoorShown] = useState(false);
+  const [anotherDoor, setAnotherDoor] = useState<ThreadConnection | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const initialLoadDone = useRef(false);
 
-  // Initial exploration — run once on mount
+  // Initial exploration
   useEffect(() => {
     if (initialLoadDone.current) return;
     initialLoadDone.current = true;
@@ -189,6 +245,7 @@ export default function ExploreExperience() {
     const nextCtx = { ...context, seen, depth: context.depth + 1 };
     const result = explore(nextCtx);
 
+    // Check for unexpected door
     if (!doorShown) {
       const door = unexpectedDoor(nextCtx);
       if (door) {
@@ -198,10 +255,20 @@ export default function ExploreExperience() {
       }
     }
 
+    // Show "Another Door" after 3+ explorations
+    if (nextCtx.depth >= 3 && !anotherDoor) {
+      setAnotherDoor(getAnotherDoor());
+    }
+
     setContext(nextCtx);
     setAllItems((prev) => [...prev, ...result.items]);
     setHasMore(result.hasMore);
-  }, [context, allItems, doorShown]);
+  }, [context, allItems, doorShown, anotherDoor]);
+
+  // Record exploration depth for the universe state
+  useEffect(() => {
+    recordExplorationDepth(context.depth);
+  }, [context.depth]);
 
   // Infinite scroll
   useEffect(() => {
@@ -266,6 +333,7 @@ export default function ExploreExperience() {
       />
 
       <div className="relative z-10 mx-auto max-w-2xl px-6 py-24">
+        {/* Header */}
         <motion.div
           variants={staggerContainer(0.15, 0.1)}
           initial="hidden"
@@ -288,6 +356,7 @@ export default function ExploreExperience() {
           </motion.p>
         </motion.div>
 
+        {/* Take me somewhere */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -297,6 +366,51 @@ export default function ExploreExperience() {
           <TakeMeSomewhere onDiscover={handleTakeMeSomewhere} />
         </motion.div>
 
+        {/* Another Door prompt */}
+        <AnimatePresence>
+          {anotherDoor && (
+            <div className="mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-[rgba(var(--mood-rgb),0.15)] blur-xl" />
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04]">
+                    <span className="text-lg">🚪</span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-medium text-white/70">Another door</p>
+                  <p className="text-[11px] text-gray-500/50 truncate">{anotherDoor.reason}</p>
+                </div>
+                <a
+                  href={anotherDoor.destination}
+                  onClick={() => {
+                    fireRipple(new MouseEvent("click"));
+                    addToJourney({
+                      id: anotherDoor.id,
+                      title: anotherDoor.label,
+                      type: anotherDoor.type,
+                      destination: anotherDoor.destination,
+                      reason: anotherDoor.reason,
+                      parentId: null,
+                      cover: anotherDoor.cover,
+                    });
+                    setAnotherDoor(null);
+                  }}
+                  className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-gray-400 transition-all duration-300 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white"
+                >
+                  Go →
+                </a>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Discovery feed */}
         <motion.div
           variants={staggerContainer(0.06, 0.3)}
           initial="hidden"
@@ -312,6 +426,7 @@ export default function ExploreExperience() {
           ))}
         </motion.div>
 
+        {/* Infinite scroll sentinel */}
         {hasMore && (
           <div ref={loadMoreRef} className="mt-12 flex justify-center py-8">
             <motion.div
@@ -324,11 +439,23 @@ export default function ExploreExperience() {
           </div>
         )}
 
+        {/* End cap */}
         {!hasMore && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-16 text-center">
             <p className="text-[13px] italic text-gray-500/40">
               You&apos;ve wandered far. Take a breath.
             </p>
+            {/* Hidden door — appears at the end of exploration */}
+            <div className="mt-8 flex justify-center">
+              <HiddenDoor
+                destination="/between"
+                label="There is more"
+                variant="portal"
+                contentType="reflection"
+                reason="You found the space between."
+                cooldownMs={60 * 60 * 1000}
+              />
+            </div>
           </motion.div>
         )}
       </div>

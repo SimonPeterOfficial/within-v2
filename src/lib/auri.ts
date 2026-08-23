@@ -134,6 +134,16 @@ export function auriLocationLine(pathname: string): string {
   if (pathname === "/") return "The landing is quiet — the universe is just waking.";
   if (pathname === "/login" || pathname === "/signup") return "The door is open whenever you're ready.";
   if (pathname === "/onboarding") return "Almost there — your sanctuary is being tuned.";
+  if (pathname === "/explore") return "We're in the discovery room — everything connects here.";
+  if (pathname === "/within") return "This is the quiet room — speak freely.";
+  if (pathname === "/journey") return "Your constellation is forming — look at the stars.";
+  if (pathname === "/sanctuary") return "You're home. The light remembers you.";
+  if (pathname === "/originals") return "The originals are lit — cinema that breathes.";
+  if (pathname === "/music") return "The music room — let the sound find you.";
+  if (pathname === "/books") return "The library — some pages understand you.";
+  if (pathname === "/photography") return "The gallery — light, held still.";
+  if (pathname === "/communities") return "Kindred souls are nearby.";
+  if (pathname === "/creators") return "The people who make the universe.";
   return "I'm here, in whatever corner of WithIn you're in.";
 }
 

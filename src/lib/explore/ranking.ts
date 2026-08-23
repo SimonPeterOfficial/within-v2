@@ -6,8 +6,14 @@
  *   ~20% adjacent   (related but not obvious)
  *   ~10% surprising  (serendipitous, low-probability)
  *
- * This ratio is deterministic for testing and will be replaced by a
- * real ranking service in the future.
+ * The ratios gently shift as the user explores deeper — the universe
+ * rewards wandering by offering more surprising finds after the third
+ * or fourth exploration, making WithIn feel progressively more alive.
+ *
+ * ── INTEGRATION POINT ──────────────────────────────────────────────────
+ * When a real backend exists, replace `rankAndSelect` with a server-side
+ * call. The signature is: (pool, context, batchSize, seed) → items[].
+ * ───────────────────────────────────────────────────────────────────────
  */
 
 import type { ExploreItem, ExploreContext } from "./types";
@@ -16,11 +22,57 @@ import type { ExploreItem, ExploreContext } from "./types";
 
 type Bucket = "relevant" | "adjacent" | "surprising";
 
-const BUCKET_RATIOS: Record<Bucket, number> = {
+const BASE_BUCKET_RATIOS: Record<Bucket, number> = {
   relevant: 0.7,
   adjacent: 0.2,
   surprising: 0.1,
 };
+
+/**
+ * As the user goes deeper, the universe opens wider.
+ * At depth 0-2: 70/20/10 (familiar, guided)
+ * At depth 3-6: 60/25/15 (more adjacent, more surprise)
+ * At depth 7+:  50/25/25 (the universe is wide open)
+ */
+function getBucketRatios(depth: number): Record<Bucket, number> {
+  if (depth >= 7) return { relevant: 0.5, adjacent: 0.25, surprising: 0.25 };
+  if (depth >= 3) return { relevant: 0.6, adjacent: 0.25, surprising: 0.15 };
+  return BASE_BUCKET_RATIOS;
+}
+
+/* ── Time-of-day affinity ────────────────────────────────────────────── */
+
+/**
+ * Certain content types and moods feel more natural at certain hours.
+ * This is a gentle nudge, not a hard filter.
+ */
+function timeAffinity(item: ExploreItem): number {
+  const hour = new Date().getHours();
+  let bonus = 0;
+
+  // Night favors: music, reflection, calm, melancholic stories
+  if (hour >= 22 || hour < 5) {
+    if (item.type === "music") bonus += 0.06;
+    if (item.type === "reflection") bonus += 0.08;
+    if (item.mood === "calm" || item.mood === "lost") bonus += 0.05;
+  }
+  // Morning favors: inspiration, hope, books
+  else if (hour >= 5 && hour < 12) {
+    if (item.mood === "inspired" || item.mood === "hopeful") bonus += 0.06;
+    if (item.type === "book") bonus += 0.04;
+  }
+  // Afternoon favors: discovery, creators, communities
+  else if (hour >= 12 && hour < 17) {
+    if (item.type === "creator" || item.type === "community") bonus += 0.05;
+  }
+  // Evening favors: originals, stories, film
+  else if (hour >= 17 && hour < 22) {
+    if (item.type === "original") bonus += 0.06;
+    if (item.type === "book") bonus += 0.04;
+  }
+
+  return bonus;
+}
 
 /* ── Scoring helpers ─────────────────────────────────────────────────── */
 
@@ -55,7 +107,15 @@ function scoreRelevance(item: ExploreItem, ctx: ExploreContext): number {
     if (item.serendipity === "surprising") score += 0.08;
   }
 
-  return Math.min(score, 1);
+  // Content type variety — after seeing many of the same type, reward others
+  if (ctx.lastType && item.type === ctx.lastType) {
+    score -= 0.03; // slight penalty for repetition
+  }
+
+  // Time-of-day affinity
+  score += timeAffinity(item);
+
+  return Math.min(Math.max(score, 0), 1);
 }
 
 /** Deterministic pseudo-random based on a seed string. */
@@ -65,14 +125,14 @@ function seededRandom(seed: string): number {
     const char = seed.charCodeAt(i);
     hash = (hash * 31 + char) | 0;
   }
-  return ((hash & 0x7fffffff) / 0x7fffffff);
+  return (hash & 0x7fffffff) / 0x7fffffff;
 }
 
 /* ── Main ranking function ───────────────────────────────────────────── */
 
 /**
  * Ranks a pool of items by relevance + serendipity, then selects a
- * balanced batch respecting the 70/20/10 bucket ratios.
+ * balanced batch respecting the depth-adjusted bucket ratios.
  *
  * @param pool - All available ExploreItems
  * @param ctx - Current exploration context
@@ -101,6 +161,9 @@ export function rankAndSelect(
   // Sort by combined score
   scored.sort((a, b) => (b.score + b.noise) - (a.score + a.noise));
 
+  // Get depth-aware bucket ratios
+  const ratios = getBucketRatios(ctx.depth);
+
   // Distribute into buckets
   const buckets: Record<Bucket, typeof scored> = {
     relevant: [],
@@ -115,9 +178,9 @@ export function rankAndSelect(
   // Select items respecting the ratio
   const selected: ExploreItem[] = [];
   const counts: Record<Bucket, number> = {
-    relevant: Math.ceil(batchSize * BUCKET_RATIOS.relevant),
-    adjacent: Math.ceil(batchSize * BUCKET_RATIOS.adjacent),
-    surprising: Math.ceil(batchSize * BUCKET_RATIOS.surprising),
+    relevant: Math.ceil(batchSize * ratios.relevant),
+    adjacent: Math.ceil(batchSize * ratios.adjacent),
+    surprising: Math.ceil(batchSize * ratios.surprising),
   };
 
   // Fill each bucket

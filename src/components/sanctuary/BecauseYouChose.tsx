@@ -8,6 +8,15 @@ import ContentCard from "@/components/ui/cards/ContentCard";
 import { useStoredInterests, getInterest, interestSummary, type InterestId } from "@/lib/interests";
 import { UNIVERSE } from "@/lib/search";
 
+/** Varied narratives — the home feed feels different at different hours. */
+const NARRATIVES = [
+  { title: "Because you chose…", subtitle: "You picked", fallback: "A few corners set out to match the way you feel." },
+  { title: "Curated for the way you feel", subtitle: "Your choices led to", fallback: "Corners shaped by the way you feel right now." },
+  { title: "Because you stayed a while", subtitle: "You explored", fallback: "The universe noticed what you lingered near." },
+  { title: "A quiet corner, just for you", subtitle: "You were drawn to", fallback: "Spaces that match the light you carry." },
+  { title: "Because something belongs here", subtitle: "You chose", fallback: "A few paths set out for where you're headed." },
+];
+
 /** Picks up to `count` entries per chosen shelf, in catalog order. */
 function picksForInterests(ids: InterestId[], count = 2) {
   const picks: typeof UNIVERSE = [];
@@ -35,17 +44,22 @@ export default function BecauseYouChose() {
   if (picks.length === 0) return null;
   const summary = interestSummary(interests);
 
+  // Varied narratives — rotate based on the hour so the same page feels different
+  const hour = new Date().getHours();
+  const narrativeIndex = hour % NARRATIVES.length;
+  const narrative = NARRATIVES[narrativeIndex];
+
   return (
     <section id="because-you-chose" className="scroll-mt-24 py-24 text-white">
       <Container>
         <SectionHeader
           align="left"
           eyebrow="For you"
-          title="Because you chose…"
+          title={narrative.title}
           subtitle={
             summary
-              ? `You picked ${summary.toLowerCase()} during onboarding — here are a few corners set out to match.`
-              : "A few corners set out to match the way you feel."
+              ? `${narrative.subtitle} ${summary.toLowerCase()} — here are a few corners set out to match.`
+              : narrative.fallback
           }
           action={
             <Button href="/discover" variant="ghost" size="md">

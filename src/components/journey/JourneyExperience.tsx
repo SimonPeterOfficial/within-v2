@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import {
@@ -15,6 +15,7 @@ import AuriOwl from "@/components/sanctuary/AuriOwl";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import GradientText from "@/components/ui/GradientText";
+import Icon from "@/components/ui/Icon";
 import { blurUp, staggerContainer } from "@/lib/animations";
 
 /* ── Type colors ─────────────────────────────────────────────────────── */
@@ -159,6 +160,93 @@ function Constellation({
   );
 }
 
+/* ── Timeline view — chronological path ──────────────────────────────── */
+
+function Timeline({
+  nodes,
+  selectedId,
+  onSelect,
+}: {
+  nodes: JourneyNode[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  const prefersReducedMotion = useReducedMotionSafe();
+  const sorted = useMemo(() => [...nodes].sort((a, b) => a.timestamp - b.timestamp), [nodes]);
+
+  return (
+    <div className="relative pl-6">
+      {/* Vertical line */}
+      <div className="absolute left-[11px] top-0 bottom-0 w-px bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-transparent" />
+
+      <div className="space-y-1">
+        {sorted.map((node, index) => {
+          const color = TYPE_COLORS[node.type] ?? "rgba(255,255,255,0.5)";
+          const isSelected = node.id === selectedId;
+
+          return (
+            <motion.button
+              key={node.id}
+              type="button"
+              onClick={() => onSelect(node.id)}
+              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+              className={`group relative flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all duration-300 ${
+                isSelected
+                  ? "bg-white/[0.05]"
+                  : "hover:bg-white/[0.02]"
+              }`}
+            >
+              {/* Timeline dot */}
+              <div
+                className="relative mt-0.5 shrink-0"
+                style={{ width: 8, height: 8 }}
+              >
+                <span
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: color,
+                    opacity: isSelected ? 1 : 0.6,
+                    boxShadow: isSelected ? `0 0 12px ${color}` : "none",
+                    transition: "all 0.3s ease",
+                  }}
+                />
+                <span
+                  className="absolute -inset-1.5 rounded-full"
+                  style={{
+                    background: color,
+                    opacity: isSelected ? 0.15 : 0,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+              </div>
+
+              {/* Content */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{TYPE_EMOJIS[node.type] ?? "✦"}</span>
+                  <span className="truncate text-[12px] font-medium text-white/70 group-hover:text-white/90">
+                    {node.title}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[10px] text-gray-500/50">
+                  {new Date(node.timestamp).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── Node detail panel ───────────────────────────────────────────────── */
 
 function NodeDetail({ node, onClose }: { node: JourneyNode; onClose: () => void }) {
@@ -194,7 +282,7 @@ function NodeDetail({ node, onClose }: { node: JourneyNode; onClose: () => void 
           href={node.destination}
           className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-400/60 hover:text-emerald-300 transition-colors"
         >
-          Return there →
+          Return there <Icon name="forward" size={10} />
         </a>
 
         <p className="mt-2 text-[10px] text-gray-600/40">
@@ -210,12 +298,18 @@ function NodeDetail({ node, onClose }: { node: JourneyNode; onClose: () => void 
   );
 }
 
+/* ── View toggle ─────────────────────────────────────────────────────── */
+
+type ViewMode = "constellation" | "timeline";
+
 /* ── Main experience ─────────────────────────────────────────────────── */
 
 export default function JourneyExperience() {
+  const prefersReducedMotion = useReducedMotionSafe();
   const [journey, setJourney] = useState<JourneyNode[]>(() => getJourney());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("constellation");
 
   const positions = computeNodePositions(journey);
   const stats = getJourneyStats();
@@ -268,11 +362,23 @@ export default function JourneyExperience() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center py-20"
           >
-            <AuriOwl size={80} state="curious" />
+            <motion.div
+              animate={
+                prefersReducedMotion
+                  ? undefined
+                  : { scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }
+              }
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <AuriOwl size={80} state="curious" />
+            </motion.div>
             <p className="mt-6 text-center text-[15px] text-gray-400/60">
               No stars yet. Your constellation begins with the first discovery.
             </p>
-            <div className="mt-8 flex gap-4">
+            <p className="mt-2 text-center text-[13px] text-gray-500/40 italic">
+              &ldquo;The first step is the only one you need to decide.&rdquo;
+            </p>
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
               <Button href="/explore" variant="primary" size="lg">
                 Start exploring
               </Button>
@@ -280,23 +386,74 @@ export default function JourneyExperience() {
                 Talk to Auri
               </Button>
             </div>
+            <p className="mt-8 max-w-md text-center text-[12px] italic text-gray-500/35">
+              &ldquo;The first step is the only one you need to decide. The rest follows.&rdquo;
+            </p>
           </motion.div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-            {/* ── Constellation ── */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <StarField count={30} seed={7} />
-              <Constellation
-                nodes={journey}
-                positions={positions}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-              />
-            </motion.div>
+            {/* ── Main view ── */}
+            <div>
+              {/* View toggle */}
+              <div className="mb-6 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("constellation")}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all duration-300 ${
+                    viewMode === "constellation"
+                      ? "border border-white/[0.1] bg-white/[0.06] text-white/80"
+                      : "text-gray-500/50 hover:text-gray-400/70"
+                  }`}
+                >
+                  <Icon name="sparkles" size={12} />
+                  Constellation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("timeline")}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all duration-300 ${
+                    viewMode === "timeline"
+                      ? "border border-white/[0.1] bg-white/[0.06] text-white/80"
+                      : "text-gray-500/50 hover:text-gray-400/70"
+                  }`}
+                >
+                  <Icon name="forward" size={12} />
+                  Timeline
+                </button>
+              </div>
+
+              {/* Constellation view */}
+              {viewMode === "constellation" && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <StarField count={30} seed={7} />
+                  <Constellation
+                    nodes={journey}
+                    positions={positions}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
+                </motion.div>
+              )}
+
+              {/* Timeline view */}
+              {viewMode === "timeline" && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Timeline
+                    nodes={journey}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
+                </motion.div>
+              )}
+            </div>
 
             {/* ── Sidebar ── */}
             <div className="space-y-4">
@@ -346,17 +503,20 @@ export default function JourneyExperience() {
                   Recent path
                 </h3>
                 <div className="mt-3 space-y-2">
-                  {journey.slice(-5).reverse().map((node) => (
-                    <button
-                      key={node.id}
-                      type="button"
-                      onClick={() => setSelectedId(node.id)}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.03]"
-                    >
-                      <span className="text-sm">{TYPE_EMOJIS[node.type] ?? "✦"}</span>
-                      <span className="truncate text-[12px] text-gray-400/70">{node.title}</span>
-                    </button>
-                  ))}
+                  {journey
+                    .slice(-5)
+                    .reverse()
+                    .map((node) => (
+                      <button
+                        key={node.id}
+                        type="button"
+                        onClick={() => setSelectedId(node.id)}
+                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.03]"
+                      >
+                        <span className="text-sm">{TYPE_EMOJIS[node.type] ?? "✦"}</span>
+                        <span className="truncate text-[12px] text-gray-400/70">{node.title}</span>
+                      </button>
+                    ))}
                 </div>
               </GlassCard>
 
@@ -388,6 +548,29 @@ export default function JourneyExperience() {
                   Reset journey
                 </button>
               )}
+
+              {/* Continue exploring prompt */}
+              <GlassCard tone="soft" className="p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gray-400/60">
+                  Your constellation
+                </p>
+                <p className="mt-2 text-[12px] text-gray-500/50">
+                  {journey.length < 5
+                    ? "Every discovery adds a new star. The more you wander, the brighter it gets."
+                    : journey.length < 15
+                    ? "Your universe is growing. There are doors you haven't opened yet."
+                    : "You've wandered far. Your constellation tells a story."
+                  }
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <Button href="/explore" variant="outline" size="sm">
+                    Explore more
+                  </Button>
+                  <Button href="/within" variant="ghost" size="sm">
+                    Talk to Auri
+                  </Button>
+                </div>
+              </GlassCard>
             </div>
           </div>
         )}

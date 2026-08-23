@@ -19,8 +19,11 @@ const BooksSection = dynamic(() => import("@/components/sanctuary/BooksSection")
 const PhotographySection = dynamic(() => import("@/components/sanctuary/PhotographySection"));
 const CommunitiesSection = dynamic(() => import("@/components/sanctuary/CommunitiesSection"));
 const DailyReflection = dynamic(() => import("@/components/sanctuary/DailyReflection"));
+const ImpossibleRecommendation = dynamic(() => import("@/components/sanctuary/ImpossibleRecommendation"));
+const TheDoor = dynamic(() => import("@/components/sanctuary/TheDoor"));
 const DiscoverSection = dynamic(() => import("@/components/sanctuary/DiscoverSection"));
 const FinaleCTA = dynamic(() => import("@/components/sanctuary/FinaleCTA"));
+const HomeHiddenDoor = dynamic(() => import("@/components/explore/HomeHiddenDoor"));
 
 export const metadata: Metadata = {
   title: "WithIn — A universe within you",
@@ -38,7 +41,7 @@ const shellItems: SidebarItem[] = [
   { label: "Mood", href: "#mood", icon: "moon" },
   { label: "Continue", href: "#continue", icon: "play" },
   { label: "Recommended", href: "#recommended", icon: "sparkles" },
-  /* ── The universe — real routes ── */
+  /* ── The universe — secondary routes ── */
   { label: "Originals", href: "/originals", icon: "originals", route: true },
   { label: "Music", href: "/music", icon: "music", route: true },
   { label: "Books", href: "/books", icon: "book", route: true },
@@ -68,6 +71,10 @@ export default function HomePage() {
         <ContinueJourney />
         {/* Personalized first — chosen interests surface right after the journey */}
         <BecauseYouChose />
+        {/* The Door — hold and reveal a hidden destination */}
+        <Suspense fallback={null}>
+          <TheDoor />
+        </Suspense>
         <Suspense fallback={null}>
           <OriginalsShowcase />
         </Suspense>
@@ -87,6 +94,14 @@ export default function HomePage() {
         </Suspense>
         <Suspense fallback={null}>
           <DailyReflection />
+        </Suspense>
+        {/* Hidden door — a subtle discovery in the home feed */}
+        <Suspense fallback={null}>
+          <HomeHiddenDoor />
+        </Suspense>
+        {/* One impossible recommendation — timed to the hour, not like other cards */}
+        <Suspense fallback={null}>
+          <ImpossibleRecommendation />
         </Suspense>
         <Suspense fallback={null}>
           <DiscoverSection />
