@@ -15,9 +15,10 @@ type NavItem = {
 
 const PRIMARY_NAV: NavItem[] = [
   { label: "Home", href: "/home", icon: "home" },
-  { label: "Explore", href: "/explore", icon: "discover" },
+  { label: "Discover", href: "/discover", icon: "discover" },
+  { label: "People", href: "/connections", icon: "users" },
   { label: "Within", href: "/within", icon: "sparkles" },
-  { label: "Journey", href: "/journey", icon: "heart" },
+  { label: "Profile", href: "/profile", icon: "profile" },
 ];
 
 /**

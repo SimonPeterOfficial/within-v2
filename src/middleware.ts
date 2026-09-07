@@ -1,105 +1,75 @@
 /**
- * Middleware — the server-side gate for admin routes.
+ * Middleware — the server-side gate for protected routes.
  *
- * SECURITY ARCHITECTURE:
- *   1. Reads the admin session cookie (set by /api/admin/login)
- *   2. Verifies the HMAC signature using the server-side ADMIN_PASSWORD
- *   3. Rejects unsigned, tampered, or expired sessions
- *   4. Redirects unauthenticated users to /admin/login
- *   5. No admin credentials or secrets are exposed to client JavaScript
+ * Two independent gates, one shared signing primitive (HMAC-SHA256 via Web
+ * Crypto, so this edge-runtime file and the Node route handlers verify
+ * identically):
+ *
+ *   /admin/:path*   → requires a valid, unexpired admin session cookie
+ *                     (`within-admin-session`, set by /api/admin/login)
+ *   /profile, /settings → requires a valid, unexpired user session cookie
+ *                     (`within-session`, set by /api/auth/{signin,signup})
+ *
+ * API routes are NOT gated here — they authenticate themselves server-side
+ * (see /api/auth/server.ts) so every mutation re-checks the user against
+ * the database. Nothing here ever trusts client-declared roles.
  *
  * PRODUCTION NOTE:
- *   This uses a signed cookie for development security. For production:
- *   - Use signed/encrypted JWTs with a proper secret
- *   - Implement server-side session revocation
- *   - Add rate limiting for login attempts
- *   - Consider adding CSRF protection
+ *   Tokens are HMAC-SHA256 signed with SESSION_SECRET (hard-required in
+ *   production). For multi-instance deployments with revocation, move to a
+ *   server-side session store — the verification boundary stays the same.
  */
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  SESSION_COOKIE,
+  verifySessionToken,
+  verifySignedToken,
+} from "@/lib/auth/session-token";
 
 const ADMIN_SESSION_COOKIE = "within-admin-session";
 const TOKEN_PREFIX = "admin_";
+const ADMIN_MAX_AGE_MS = 60 * 60 * 24 * 1000; // 24 hours
 
-/**
- * The middleware protects /admin routes — but NOT /admin/login or /api/admin/*.
- * The login page must remain accessible without a session, and the API
- * routes handle their own authentication.
- */
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/profile", "/settings"],
 };
 
-/**
- * Verify the admin session token — mirrors the server-side verification.
- * In production, this would verify a signed JWT with a proper secret.
- */
-function verifyAdminSession(cookieValue: string): boolean {
+async function verifyAdminSession(cookieValue: string): Promise<boolean> {
   if (!cookieValue.startsWith(TOKEN_PREFIX)) return false;
-
   const token = cookieValue.slice(TOKEN_PREFIX.length);
-  const dotIndex = token.lastIndexOf(".");
-  if (dotIndex === -1) return false;
-
-  const payload = token.slice(0, dotIndex);
-
-  // Verify the signature — uses ADMIN_PASSWORD as the signing secret
-  const secret = process.env.ADMIN_PASSWORD ?? "dev-password-not-set";
-  let hash = 0;
-  const combined = `${secret}:${payload}`;
-  for (let i = 0; i < combined.length; i++) {
-    hash = (hash * 31 + combined.charCodeAt(i)) | 0;
-  }
-  const expected = `${payload}.${(hash >>> 0).toString(36)}`;
-
-  // Timing-safe comparison
-  if (cookieValue.length !== expected.length) return false;
-  let result = 0;
-  for (let i = 0; i < cookieValue.length; i++) {
-    result |= cookieValue.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  if (result !== 0) return false;
-
-  // Parse and check expiry
-  try {
-    const payloadData = JSON.parse(atob(payload)) as {
-      authenticated: boolean;
-      loginTime: number;
-    };
-    if (!payloadData.authenticated) return false;
-    // Session expires after 24 hours
-    const maxAge = 60 * 60 * 24 * 1000;
-    if (Date.now() - payloadData.loginTime > maxAge) return false;
-    return true;
-  } catch {
-    return false;
-  }
+  const payload = await verifySignedToken<{ authenticated: boolean; loginTime: number }>(token);
+  if (!payload?.authenticated) return false;
+  return Date.now() - payload.loginTime <= ADMIN_MAX_AGE_MS;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Allow the admin login page and API routes through without checking
-  if (pathname === "/admin/login" || pathname.startsWith("/api/admin")) {
+  // ── Admin gate ────────────────────────────────────────────────────
+  if (pathname.startsWith("/admin")) {
+    // Login page and admin API routes authenticate themselves.
+    if (pathname === "/admin/login" || pathname.startsWith("/api/admin")) {
+      return NextResponse.next();
+    }
+    const cookie = request.cookies.get(ADMIN_SESSION_COOKIE);
+    if (!cookie?.value || !(await verifyAdminSession(cookie.value))) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
     return NextResponse.next();
   }
 
-  const cookie = request.cookies.get(ADMIN_SESSION_COOKIE);
-
-  if (!cookie?.value) {
-    // No session cookie — redirect to admin login
-    const loginUrl = new URL("/admin/login", request.url);
+  // ── User gate — /profile and /settings require a real session ─────
+  const loginUrl = new URL(`/login?next=${encodeURIComponent(pathname)}`, request.url);
+  const userCookie = request.cookies.get(SESSION_COOKIE);
+  if (!userCookie?.value) {
+    return NextResponse.redirect(loginUrl);
+  }
+  const payload = await verifySessionToken(userCookie.value);
+  if (!payload) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify the signed session cookie
-  if (!verifyAdminSession(cookie.value)) {
-    // Invalid or expired session — redirect to admin login
-    const loginUrl = new URL("/admin/login", request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Valid admin session — proceed
   return NextResponse.next();
 }

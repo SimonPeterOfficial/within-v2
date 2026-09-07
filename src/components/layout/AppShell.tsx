@@ -1,5 +1,6 @@
 import Sidebar, { type SidebarItem } from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
+import CommandPalette from "@/components/layout/CommandPalette";
 
 /** Re-exported so shell consumers can type their nav items in one import. */
 export type { SidebarItem } from "@/components/layout/Sidebar";
@@ -21,6 +22,7 @@ export default function AppShell({ items, children }: AppShellProps) {
     <div className="min-h-screen">
       <Sidebar items={items} />
       <BottomNav />
+      <CommandPalette />
       <div className="pb-20 lg:pl-24 lg:pb-0">
         <main id="main">{children}</main>
       </div>

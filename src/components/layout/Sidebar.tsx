@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { useSession } from "@/lib/auth/session";
+import { COMMAND_PALETTE_EVENT } from "@/components/layout/CommandPalette";
+import NotificationsBell from "@/components/layout/NotificationsBell";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import Logo from "@/components/ui/Logo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -178,6 +180,16 @@ export default function Sidebar({ items }: SidebarProps) {
 
       {/* ── Desktop corner cluster: session + theme ─────────────────── */}
       <div className="fixed bottom-6 left-6 z-50 hidden items-center gap-3 lg:flex">
+        <NotificationsBell />
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event(COMMAND_PALETTE_EVENT))}
+          aria-label="Open command palette"
+          title="Search & navigate (⌘K)"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 shadow-dock backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+        >
+          <Icon name="search" size={16} />
+        </button>
         {isAuthenticated && (
           <button
             type="button"

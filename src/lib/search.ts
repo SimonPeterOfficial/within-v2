@@ -152,21 +152,37 @@ function matches(entry: UniverseEntry, needle: string): boolean {
 }
 
 /**
- * Filters + searches the universe. Pure and deterministic:
+ * Filters + searches any entry collection. Pure and deterministic:
  * `query` matches title/creator/description/tags; `filter` narrows the shelf.
  * Empty query returns the whole (filtered) shelf — the /discover browsing state.
+ *
+ * Accepts any `UniverseEntry[]`, so the same UI searches the static catalog
+ * (`searchUniverse`) or live server data (`listPublishedContent`) unchanged.
  */
-export function searchUniverse(query: string, filter: UniverseFilter = "All"): UniverseEntry[] {
+export function searchEntries(entries: UniverseEntry[], query: string, filter: UniverseFilter = "All"): UniverseEntry[] {
   const needle = normalize(query);
-  const filtered = filter === "All" ? UNIVERSE : UNIVERSE.filter((entry) => entry.category === filter);
+  const filtered = filter === "All" ? entries : entries.filter((entry) => entry.category === filter);
   if (!needle) return filtered;
   return filtered.filter((entry) => matches(entry, needle));
 }
 
-/** Counts per shelf — the discovery page shows how much lives in each corner. */
-export function universeCounts(): Record<UniverseFilter, number> {
+/** Filters + searches the static catalog — the original browsing state. */
+export function searchUniverse(query: string, filter: UniverseFilter = "All"): UniverseEntry[] {
+  return searchEntries(UNIVERSE, query, filter);
+}
+
+/** Counts per shelf for any collection — how much lives in each corner. */
+export function entryCounts(entries: UniverseEntry[]): Record<UniverseFilter, number> {
   const counts = Object.fromEntries(UNIVERSE_FILTERS.map((f) => [f, 0])) as Record<UniverseFilter, number>;
-  for (const entry of UNIVERSE) counts[entry.category as UniverseFilter] += 1;
-  counts.All = UNIVERSE.length;
+  for (const entry of entries) {
+    const key = entry.category as UniverseFilter;
+    if (key in counts) counts[key] += 1;
+  }
+  counts.All = entries.length;
   return counts;
+}
+
+/** Counts per shelf over the static catalog. */
+export function universeCounts(): Record<UniverseFilter, number> {
+  return entryCounts(UNIVERSE);
 }

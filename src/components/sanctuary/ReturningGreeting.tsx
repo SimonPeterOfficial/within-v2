@@ -8,6 +8,7 @@ import {
   getUniverseDepth,
   getDominantInterest,
 } from "@/lib/universe/state";
+import { openReturnSession } from "@/lib/return";
 
 /**
  * ReturningGreeting — a subtle atmospheric moment when returning users arrive.
@@ -21,6 +22,13 @@ import {
  */
 function computeGreeting(): string | null {
   try {
+    // The return summary — real, local data only. On a genuine return, the
+    // honest "while you were away" line takes precedence over atmosphere.
+    const returnSummary = openReturnSession();
+    if (returnSummary.isReturn && returnSummary.lines.length > 0) {
+      return returnSummary.lines.join(" ");
+    }
+
     const state = getUniverseState();
     const depth = getUniverseDepth(state);
 

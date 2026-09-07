@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode
 } from "react";
-import { authService, getStoredSession } from "@/lib/auth/service";
+import { authService, fetchCurrentSession } from "@/lib/auth/service";
 import type { AuthSession, AuthUser, SignInInput, SignUpInput } from "@/lib/auth/types";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
@@ -40,16 +40,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SessionStatus>("loading");
   const [session, setSession] = useState<AuthSession | null>(null);
 
-  // Restore the persisted session exactly once, after hydration. Deferred into
-  // an animation frame (async) so the set-state-in-effect rule stays satisfied
-  // while remaining hydration-safe — identical SSR HTML on both passes.
+  // Restore the real session from the server exactly once, after hydration.
+  // Deferred into an animation frame + async fetch so the set-state-in-effect
+  // rule stays satisfied while remaining hydration-safe — identical SSR HTML
+  // on both passes, identity resolves from the httpOnly session cookie.
   useEffect(() => {
+    let cancelled = false;
     const frame = requestAnimationFrame(() => {
-      const stored = getStoredSession();
-      setSession(stored);
-      setStatus(stored ? "authenticated" : "unauthenticated");
+      void fetchCurrentSession().then((stored) => {
+        if (cancelled) return;
+        setSession(stored);
+        setStatus(stored ? "authenticated" : "unauthenticated");
+      });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   const applySession = useCallback((next: AuthSession | null) => {

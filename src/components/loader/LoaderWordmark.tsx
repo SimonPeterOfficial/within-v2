@@ -29,7 +29,7 @@ export default function LoaderWordmark({ showLetters = false, creditStage = 0, r
         className="flex"
         style={{
           letterSpacing: showLetters ? "0.02em" : "0.08em",
-          transition: "letter-spacing 1.8s cubic-bezier(0.16, 1, 0.3, 1)",
+          transition: "letter-spacing 1.4s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {LETTERS.map((letter, index) => (
@@ -52,7 +52,7 @@ export default function LoaderWordmark({ showLetters = false, creditStage = 0, r
               initial={{ opacity: 0, y: reduced ? 0 : 8, filter: reduced ? "blur(0px)" : "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, filter: "blur(6px)" }}
-              transition={{ duration: reduced ? 0.2 : 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: reduced ? 0.2 : 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="text-[10px] font-medium uppercase tracking-[0.55em] text-white/50 md:text-[11px]"
             >
               A WithIn Original
@@ -67,7 +67,7 @@ export default function LoaderWordmark({ showLetters = false, creditStage = 0, r
               initial={{ opacity: 0, y: reduced ? 0 : 8, filter: reduced ? "blur(0px)" : "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, filter: "blur(6px)" }}
-              transition={{ delay: reduced ? 0.1 : 0.9, duration: reduced ? 0.2 : 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: reduced ? 0.1 : 0.35, duration: reduced ? 0.2 : 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="text-[10px] font-medium uppercase tracking-[0.55em] text-white/30"
             >
               From Cymon Studios

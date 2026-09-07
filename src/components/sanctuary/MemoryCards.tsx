@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -9,56 +9,42 @@ import GlassCard from "@/components/ui/GlassCard";
 import GlowBorder from "@/components/ui/GlowBorder";
 import Reveal from "@/components/ui/Reveal";
 import TiltCard from "@/components/ui/TiltCard";
-import MemoryCardSkeleton from "@/components/dashboard/MemoryCardSkeleton";
+import { CardGridSkeleton, SkeletonRegion } from "@/components/ui/skeletons";
 import EmptyState from "@/components/ui/states/EmptyState";
+import { getShelf } from "@/lib/library";
+import { UNIVERSE } from "@/lib/search";
 
-const memories = [
-  {
-    id: "lighthouse",
-    title: "The Lighthouse Keeper",
-    tag: "Saved story",
-    meta: "Kept 2 days ago · 8 min",
-    emoji: "🌊",
-    gradient: "from-purple-600 to-indigo-600",
-    glow: "rgba(139, 92, 246, 0.35)",
-    synopsis:
-      "On the edge of a black sea, a lonely keeper tends a light that only shines for ships that no longer exist — until one night, a letter arrives from the water."
-  },
-  {
-    id: "horizon",
-    title: "Horizon",
-    tag: "Original",
-    meta: "Now streaming · Film",
-    emoji: "🌅",
-    gradient: "from-amber-500 to-orange-600",
-    glow: "rgba(245, 158, 11, 0.35)",
-    synopsis:
-      "Two strangers cross a desert toward a horizon that keeps moving. An original film about leaving everything to find anyone."
-  },
-  {
-    id: "letters",
-    title: "Letters to the Moon",
-    tag: "Saved story",
-    meta: "Kept last week · 6 min",
-    emoji: "💌",
-    gradient: "from-pink-600 to-rose-500",
-    glow: "rgba(236, 72, 153, 0.35)",
-    synopsis:
-      "Every night, a girl writes a letter to the moon and leaves it on the windowsill. Tonight, the moon writes back."
-  }
-];
+/** Resolves saved ids back to universe entries for display. */
+function resolveEntries(ids: string[]) {
+  return ids
+    .map((itemId) => UNIVERSE.find((entry) => entry.id === itemId))
+    .filter((entry): entry is (typeof UNIVERSE)[number] => Boolean(entry))
+    .slice(0, 6);
+}
 
-/** Story portals — tilt cards that open into an immersive dialog overlay. */
+/**
+ * Memories, kept safe — the user's real saved shelf.
+ *
+ * Reads the actual "saved" library shelf from this browser. While it
+ * resolves, skeletons hold the grid's shape; when it's empty, Auri explains
+ * why and offers the way forward. Nothing is invented.
+ */
 export default function MemoryCards() {
   const [loading, setLoading] = useState(true);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
-  const dialogRef = useRef<HTMLDivElement | null>(null);
-  const active = memories.find((memory) => memory.id === openId) ?? null;
 
+  // Hydration-safe: the shelf resolves after mount (it lives in this browser).
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 900);
-    return () => clearTimeout(timer);
+    const frame = requestAnimationFrame(() => {
+      setSavedIds(getShelf("saved"));
+      setLoading(false);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
+
+  const entries = useMemo(() => resolveEntries(savedIds), [savedIds]);
+  const active = entries.find((memory) => memory.id === openId) ?? null;
 
   const restoreFocus = (id: string | null) => {
     if (!id) return;
@@ -80,7 +66,7 @@ export default function MemoryCards() {
         return;
       }
       if (event.key === "Tab") {
-        const dialog = dialogRef.current;
+        const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-modal="true"]');
         if (!dialog) return;
         const focusables = dialog.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -115,26 +101,24 @@ export default function MemoryCards() {
       />
 
       {loading ? (
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {[0, 1, 2].map((index) => (
-            <MemoryCardSkeleton key={index} />
-          ))}
-        </div>
-      ) : memories.length === 0 ? (
+        <SkeletonRegion label="Loading your saved memories" className="mt-12">
+          <CardGridSkeleton count={3} />
+        </SkeletonRegion>
+      ) : entries.length === 0 ? (
         <EmptyState
           className="mt-12"
-          icon="sparkles"
-          title="No memories yet"
-          description="Stories you save will gather here, kept safe for when you need them."
+          icon="bookmark"
+          title="Nothing kept yet"
+          description="Save a film, story, or album while you wander — it will wait for you here."
           action={
-            <Button href="#originals" variant="outline" size="md">
-              Discover originals
+            <Button href="/discover" variant="outline" size="md">
+              Find something to keep
             </Button>
           }
         />
       ) : (
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {memories.map((memory, index) => (
+          {entries.map((memory, index) => (
             <Reveal key={memory.id} delay={index * 0.1} className="group h-full">
               <TiltCard
                 className="h-full"
@@ -151,7 +135,7 @@ export default function MemoryCards() {
                     <span
                       aria-hidden
                       className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
-                      style={{ background: memory.glow }}
+                      style={{ background: "rgba(var(--mood-rgb), 0.35)" }}
                     />
 
                     {/* Cover */}
@@ -168,7 +152,7 @@ export default function MemoryCards() {
                         className="absolute inset-0"
                       >
                         <span className="absolute left-4 top-4 rounded-full bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-                          {memory.tag}
+                          {memory.category}
                         </span>
                         <span className="absolute bottom-4 right-4 text-2xl" aria-hidden>
                           {memory.emoji}
@@ -220,14 +204,11 @@ export default function MemoryCards() {
             />
 
             <motion.div
-              ref={(element) => {
-                dialogRef.current = element;
-                element?.focus();
-              }}
               role="dialog"
               aria-modal="true"
               aria-label={active.title}
               tabIndex={-1}
+              ref={(element) => element?.focus()}
               className="relative w-full max-w-lg overflow-hidden rounded-modal border border-white/10 bg-[#0a0a0c] shadow-2xl outline-none"
               initial={{ scale: 0.92, y: 24 }}
               animate={{ scale: 1, y: 0 }}
@@ -240,7 +221,7 @@ export default function MemoryCards() {
                   className="absolute inset-0"
                 >
                   <span className="absolute left-4 top-4 rounded-full bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-                    {active.tag}
+                    {active.category}
                   </span>
                   <span className="absolute bottom-4 right-4 text-4xl" aria-hidden>
                     {active.emoji}
@@ -254,10 +235,10 @@ export default function MemoryCards() {
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-500">
                   {active.meta}
                 </p>
-                <p className="mt-4 text-sm leading-relaxed text-gray-400">{active.synopsis}</p>
+                <p className="mt-4 text-sm leading-relaxed text-gray-400">{active.description}</p>
                 <div className="mt-7 flex items-center gap-3">
-                  <Button variant="primary" size="md" className="shadow-mood">
-                    Begin story
+                  <Button href={active.href} variant="primary" size="md" className="shadow-mood">
+                    Open it
                   </Button>
                   <Button variant="outline" size="md" onClick={closePortal}>
                     Close

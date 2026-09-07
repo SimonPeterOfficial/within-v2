@@ -16,6 +16,7 @@
  */
 
 import { cookies } from "next/headers";
+import { createSignedToken, verifySignedToken } from "@/lib/auth/session-token";
 
 /* ── Configuration ───────────────────────────────────────────────────── */
 
@@ -52,30 +53,6 @@ function timingSafeEqual(a: string, b: string): boolean {
   return result === 0;
 }
 
-/* ── Simple HMAC-like signing (demo — production uses real JWTs) ──────── */
-
-function signToken(payload: string, secret: string): string {
-  // Simple hash for demo — NOT cryptographic security
-  let hash = 0;
-  const combined = `${secret}:${payload}`;
-  for (let i = 0; i < combined.length; i++) {
-    hash = (hash * 31 + combined.charCodeAt(i)) | 0;
-  }
-  return `${payload}.${(hash >>> 0).toString(36)}`;
-}
-
-function verifyToken(token: string, secret: string): string | null {
-  const dotIndex = token.lastIndexOf(".");
-  if (dotIndex === -1) return null;
-
-  const payload = token.slice(0, dotIndex);
-
-  const expected = signToken(payload, secret);
-  if (!timingSafeEqual(token, expected)) return null;
-
-  return payload;
-}
-
 /* ── Session management ──────────────────────────────────────────────── */
 
 export type AdminSession = {
@@ -98,12 +75,11 @@ export function verifyAdminCredentials(password: string): boolean {
  */
 export async function createAdminSession(): Promise<void> {
   const cookieStore = await cookies();
-  const payload = JSON.stringify({
+  // HMAC-SHA256 signed via the shared session-token module (edge-safe).
+  const token = await createSignedToken({
     authenticated: true,
     loginTime: Date.now(),
   });
-  const secret = getAdminPassword();
-  const token = signToken(payload, secret);
 
   cookieStore.set(COOKIE_NAME, `${TOKEN_PREFIX}${token}`, {
     httpOnly: true,
@@ -117,25 +93,18 @@ export async function createAdminSession(): Promise<void> {
 /**
  * Verify the admin session from a cookie value.
  * Used by middleware for server-side route protection.
+ * Now signed with the shared HMAC-SHA256 token util (was a weak custom hash).
  */
-export function verifyAdminSession(cookieValue: string): AdminSession | null {
+export async function verifyAdminSession(cookieValue: string): Promise<AdminSession | null> {
   if (!cookieValue.startsWith(TOKEN_PREFIX)) return null;
 
   const token = cookieValue.slice(TOKEN_PREFIX.length);
-  const secret = getAdminPassword();
-  const payloadStr = verifyToken(token, secret);
+  const payload = await verifySignedToken<AdminSession>(token);
 
-  if (!payloadStr) return null;
-
-  try {
-    const payload = JSON.parse(payloadStr) as AdminSession;
-    if (!payload.authenticated) return null;
-    // Session expires after COOKIE_MAX_AGE
-    if (Date.now() - payload.loginTime > COOKIE_MAX_AGE * 1000) return null;
-    return payload;
-  } catch {
-    return null;
-  }
+  if (!payload?.authenticated) return null;
+  // Session expires after COOKIE_MAX_AGE
+  if (Date.now() - payload.loginTime > COOKIE_MAX_AGE * 1000) return null;
+  return payload;
 }
 
 /**

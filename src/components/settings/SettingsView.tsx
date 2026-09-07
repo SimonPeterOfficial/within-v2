@@ -15,6 +15,13 @@ import {
   saveAuriPreferences,
   type AuriPreferences
 } from "@/lib/auri";
+import {
+  DEFAULT_SOUND_PREFERENCES,
+  getSoundPreferences,
+  saveSoundPreferences,
+  playInterfaceTick,
+  type SoundPreferences
+} from "@/lib/within-sound";
 import { copy } from "@/lib/navigation";
 
 /** Language options — the UI is prepared but not translated yet. */
@@ -39,6 +46,15 @@ const AURI_PREFERENCES: { id: keyof AuriPreferences; label: string; detail: stri
 ];
 
 const LANG_KEY = "language";
+
+/** Sound controls — the sonic identity, entirely in the user's hands. */
+const SOUND_PREFERENCES: { id: keyof SoundPreferences; label: string; detail: string }[] = [
+  { id: "master", label: "Sound", detail: "The master switch — WithIn stays silent until you invite it." },
+  { id: "cinematic", label: "Cinematic sounds", detail: "The ident and the world's opening moments." },
+  { id: "interface", label: "Interface sounds", detail: "Small confirmations — a tick when something lands." },
+  { id: "music", label: "Music", detail: "Reserved for the music rooms as they grow." },
+  { id: "auriVoice", label: "Auri's voice", detail: "A place held for her voice — nothing speaks yet." }
+];
 
 function SettingRow({
   label,
@@ -67,12 +83,14 @@ function SettingRow({
 export default function SettingsView() {
   const { moodId, setMood } = useEnvironment();
   const [prefs, setPrefs] = useState<AuriPreferences>(DEFAULT_AURI_PREFERENCES);
+  const [sound, setSound] = useState<SoundPreferences>(DEFAULT_SOUND_PREFERENCES);
   const [language, setLanguage] = useState("en");
 
   // Hydration-safe: preferences resolve after mount.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setPrefs(getAuriPreferences());
+      setSound(getSoundPreferences());
       setLanguage(memory.get<string>("preferences", LANG_KEY) ?? "en");
     });
     return () => cancelAnimationFrame(frame);
@@ -82,6 +100,14 @@ export default function SettingsView() {
     const next = { ...prefs, [id]: !prefs[id] };
     setPrefs(next);
     saveAuriPreferences(next);
+  };
+
+  const toggleSound = (id: keyof SoundPreferences) => {
+    const next = { ...sound, [id]: !sound[id] };
+    setSound(next);
+    saveSoundPreferences(next);
+    // Master turning on is the gesture browsers require — confirm it audibly.
+    if (id === "master" && next.master) playInterfaceTick();
   };
 
   const changeLanguage = (code: string) => {
@@ -182,6 +208,57 @@ export default function SettingsView() {
                         aria-checked={enabled}
                         aria-label={pref.label}
                         onClick={() => togglePref(pref.id)}
+                        className={`relative h-7 w-12 shrink-0 rounded-full border transition-colors duration-300 ${
+                          enabled
+                            ? "border-emerald-400/40 bg-emerald-400/20"
+                            : "border-white/10 bg-white/5"
+                        }`}
+                      >
+                        <motion.span
+                          aria-hidden
+                          animate={{ x: enabled ? 22 : 2 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                          className={`absolute top-1/2 h-5 w-5 -translate-y-1/2 rounded-full ${
+                            enabled ? "bg-emerald-300" : "bg-gray-400"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </GlassCard>
+
+            {/* Sound — the sonic identity, opt-in and honest */}
+            <GlassCard tone="strong" className="p-7">
+              <div className="flex items-center gap-4">
+                <span aria-hidden className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl">
+                  ◍
+                </span>
+                <div>
+                  <h2 className="font-display text-xl font-medium tracking-[-0.02em]">
+                    Sound
+                  </h2>
+                  <p className="mt-1 text-xs text-gray-500">
+                    WithIn has a voice made of light — it stays quiet until you ask for it.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 divide-y divide-white/5">
+                {SOUND_PREFERENCES.map((pref) => {
+                  const enabled = sound[pref.id];
+                  return (
+                    <div key={pref.id} className="flex items-center justify-between gap-4 py-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-200">{pref.label}</p>
+                        <p className="mt-0.5 text-xs text-gray-500">{pref.detail}</p>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={enabled}
+                        aria-label={pref.label}
+                        onClick={() => toggleSound(pref.id)}
                         className={`relative h-7 w-12 shrink-0 rounded-full border transition-colors duration-300 ${
                           enabled
                             ? "border-emerald-400/40 bg-emerald-400/20"

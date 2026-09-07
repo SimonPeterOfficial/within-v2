@@ -34,11 +34,11 @@ export default function LoaderWaterSurface({ visible = false, dissolving = false
                   }
           }
           transition={{
-            duration: reduced ? 0.5 : dissolving ? 1 : 4,
-            delay: reduced ? index * 0.1 : dissolving ? index * 0.08 : index * 0.8,
+            duration: reduced ? 0.4 : dissolving ? 0.8 : 2.4,
+            delay: reduced ? index * 0.08 : dissolving ? index * 0.06 : index * 0.42,
             ease: dissolving ? "easeOut" : [0.16, 1, 0.3, 1],
             repeat: reduced ? 0 : dissolving ? 0 : Infinity,
-            repeatDelay: 2,
+            repeatDelay: 1.2,
           }}
           className="absolute rounded-full border border-white/[0.06]"
           style={{

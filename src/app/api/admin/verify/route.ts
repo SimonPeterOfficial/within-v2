@@ -17,7 +17,7 @@ export async function GET() {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  const session = verifyAdminSession(sessionCookie.value);
+  const session = await verifyAdminSession(sessionCookie.value);
   if (!session) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }

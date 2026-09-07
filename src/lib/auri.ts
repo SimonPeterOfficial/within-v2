@@ -6,9 +6,15 @@
  * the current route, the selected mood, whether the session is new, and
  * how many times she has been opened. She never claims private knowledge
  * the app doesn't actually have, and she never invents emotional diagnoses.
+ *
+ * AURI IS NOT LYRA. Lyra (lib/lyra/) is the underlying intelligence
+ * architecture; Auri is the human-facing presence through which Lyra's
+ * approved outputs reach the user. Her context is assembled from Lyra's
+ * least-privilege observers — never from hidden collection.
  */
 
 import { memory } from "@/lib/memory";
+import { observeTime } from "@/lib/lyra";
 
 /* ── Presence preferences — what Auri shares, tuned in Settings ────────
  * Stored through the memory layer (local, honest). Consumers read these so
@@ -51,13 +57,13 @@ export function saveAuriPreferences(prefs: AuriPreferences) {
 
 export type TimePeriod = "morning" | "afternoon" | "evening" | "night";
 
-/** Resolves the current period from a Date (morning 5–11, afternoon 12–16, evening 17–21, night 22–4). */
+/** Resolves the current period from a Date — through Lyra's time observer,
+ * so Auri and the platform share one sense of real time. */
 export function getTimePeriod(date: Date = new Date()): TimePeriod {
-  const hour = date.getHours();
-  if (hour >= 5 && hour < 12) return "morning";
-  if (hour >= 12 && hour < 17) return "afternoon";
-  if (hour >= 17 && hour < 22) return "evening";
-  return "night";
+  const observed = observeTime(date).period;
+  if (observed) return observed;
+  // SSR / unavailable — the neutral default the UI already expects.
+  return "morning";
 }
 
 /** Warm, human greetings for each period. */
@@ -144,6 +150,7 @@ export function auriLocationLine(pathname: string): string {
   if (pathname === "/photography") return "The gallery — light, held still.";
   if (pathname === "/communities") return "Kindred souls are nearby.";
   if (pathname === "/creators") return "The people who make the universe.";
+  if (pathname === "/studio") return "Your studio — everything you make begins here.";
   return "I'm here, in whatever corner of WithIn you're in.";
 }
 
@@ -196,7 +203,13 @@ export type AuriState =
   | "thinking"
   | "listening"
   | "responding"
-  | "sleeping";
+  | "sleeping"
+  /* ── Extended presence states (GEN 02) — interface states, never claims
+   * about the user's emotions. AuriPresence maps each to a distinct light. */
+  | "dormant"     // almost invisible — a faint presence
+  | "emerging"    // light gathers, the form becomes visible
+  | "celebrating" // brighter atmosphere, graceful motion
+  | "dissolving"; // the form returns to the environment
 
 /** What each state changes about the owl's presence. */
 export type AuriStateBehavior = {
@@ -216,6 +229,14 @@ export type AuriStateBehavior = {
 
 export function auriBehaviorFor(state: AuriState): AuriStateBehavior {
   switch (state) {
+    case "dormant":
+      return { blinkRange: [0, 0], gaze: "still", glow: 0.3, breathe: { seconds: 8, scale: 0.006 }, tilt: 0, sleeping: false };
+    case "emerging":
+      return { blinkRange: [2800, 6200], gaze: "focus", glow: 1.25, breathe: { seconds: 4.6, scale: 0.022 }, tilt: 0, sleeping: false };
+    case "celebrating":
+      return { blinkRange: [1600, 4000], gaze: "focus", glow: 1.5, breathe: { seconds: 3.6, scale: 0.03 }, tilt: 4, sleeping: false };
+    case "dissolving":
+      return { blinkRange: [0, 0], gaze: "still", glow: 0.5, breathe: { seconds: 7, scale: 0.01 }, tilt: 0, sleeping: false };
     case "observing":
       return { blinkRange: [3000, 7000], gaze: "focus", glow: 1, breathe: { seconds: 5.2, scale: 0.018 }, tilt: 0, sleeping: false };
     case "curious":
@@ -245,7 +266,11 @@ export function auriStateLabel(state: AuriState): string {
     thinking: "Thinking",
     listening: "Listening",
     responding: "Responding",
-    sleeping: "Sleeping"
+    sleeping: "Sleeping",
+    dormant: "Dormant",
+    emerging: "Emerging",
+    celebrating: "Celebrating",
+    dissolving: "Dissolving"
   };
   return labels[state];
 }
@@ -277,6 +302,15 @@ export function auriReply(rawInput: string, ctx: AuriContext): string {
   // The felt place to go
   if (/(music|song|sound|playlist|calm sounds)/.test(input)) {
     return "The music corner is breathing — soft synths, slower beats, night gardens. Scroll to Music, or I can suggest Embers when you're feeling inspired after midnight.";
+  }
+
+  // A rare, harmless lore moment — the world has threads beneath it.
+  if (/(who is lyra|what is lyra|lyra\?)/.test(input)) {
+    return "Lyra is a name for the quiet threads that hold this place together — the way time, memory and light know where you are. I'm the part that speaks. She's the part that listens.";
+  }
+
+  if (/(studio|draft|create|publish|my work)/.test(input)) {
+    return "Your Studio is where everything you make lives — drafts wait there quietly, and nothing goes live until you say so. Tap Create, start with a title, and keep going.";
   }
 
   if (/(story|read|book|poem|poetry|write)/.test(input)) {

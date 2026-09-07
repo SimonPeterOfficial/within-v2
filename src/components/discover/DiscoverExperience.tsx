@@ -10,7 +10,7 @@ import AuriEmptyState from "@/components/ui/states/AuriEmptyState";
 import AuriSuggestion from "@/components/sanctuary/AuriSuggestion";
 import SearchField from "@/components/discover/SearchField";
 import FilterBar from "@/components/discover/FilterBar";
-import { searchUniverse, universeCounts, UNIVERSE, type UniverseFilter } from "@/lib/search";
+import { searchEntries, entryCounts, UNIVERSE, type UniverseEntry, type UniverseFilter } from "@/lib/search";
 import { staggerContainer, slideUp } from "@/lib/animations";
 
 /** Status chip tone per shelf label — keeps cards quiet but legible. */
@@ -26,23 +26,29 @@ const statusTone = (status?: string): "mood" | "emerald" | "warm" | "neutral" | 
  * Discover — the front door to the whole universe.
  *
  * One search field over every shelf, a segmented filter bar, and grids that
- * respond instantly (pure functions over the local index — no network, no
- * waiting). Auri appears in two places only: the suggestion moment at the
- * top (honest about its recommender) and the empty state when a search
- * finds nothing.
+ * respond instantly (pure functions over an entry collection — no network,
+ * no waiting).
+ *
+ * The collection is injected by the page: the server passes live published
+ * content (empty → honest empty states), and `entries` falls back to the
+ * static catalog when nothing is provided — one surface, two honest data
+ * sources, zero duplicated UI.
  */
-export default function DiscoverExperience() {
+export default function DiscoverExperience({ entries }: { entries?: UniverseEntry[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<UniverseFilter>("All");
-  const counts = useMemo(() => universeCounts(), []);
 
-  const results = useMemo(() => searchUniverse(query, filter), [query, filter]);
+  const collection = entries ?? UNIVERSE;
+  const serverDriven = entries !== undefined;
+  const counts = useMemo(() => entryCounts(collection), [collection]);
+
+  const results = useMemo(() => searchEntries(collection, query, filter), [collection, query, filter]);
   const searching = query.trim().length > 0;
   const browsing = !searching;
 
   // Editorial rails for the untouched browse state — Featured + New.
-  const featured = useMemo(() => UNIVERSE.filter((entry) => entry.statusLabel === "Featured"), []);
-  const fresh = useMemo(() => UNIVERSE.filter((entry) => entry.statusLabel === "New").slice(0, 8), []);
+  const featured = useMemo(() => collection.filter((entry) => entry.statusLabel === "Featured"), [collection]);
+  const fresh = useMemo(() => collection.filter((entry) => entry.statusLabel === "New").slice(0, 8), [collection]);
 
   return (
     <Container>
@@ -182,8 +188,16 @@ export default function DiscoverExperience() {
                 />
               ) : (
                 <AuriEmptyState
-                  message="This corner is still being shaped — it'll be ready soon."
-                  detail="Meanwhile, the rest of the universe is open."
+                  message={
+                    serverDriven
+                      ? "The universe is still being born — nothing has been published yet."
+                      : "This corner is still being shaped — it'll be ready soon."
+                  }
+                  detail={
+                    serverDriven
+                      ? "When creators publish their first work, it will gather here."
+                      : "Meanwhile, the rest of the universe is open."
+                  }
                   action={
                     <Button href="/discover" variant="outline" size="md">
                       <Icon name="refresh" size={14} className="mr-1.5" />
@@ -199,8 +213,8 @@ export default function DiscoverExperience() {
 
       {searching && results.length > 0 && (
         <p className="mt-8 text-center text-xs text-gray-600">
-          {results.length} {results.length === 1 ? "thing" : "things"} found — all kept in this
-          browser, nothing sent anywhere.
+          {results.length} {results.length === 1 ? "thing" : "things"} found
+          {serverDriven ? "." : " — all kept in this browser, nothing sent anywhere."}
         </p>
       )}
     </Container>

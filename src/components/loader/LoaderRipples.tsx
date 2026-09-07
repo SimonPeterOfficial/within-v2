@@ -33,11 +33,11 @@ export default function LoaderRipples({ visible = false, dissolving = false, red
                   }
           }
           transition={{
-            duration: reduced ? 0.5 : dissolving ? 0.8 : 3.5,
-            delay: reduced ? index * 0.15 : dissolving ? index * 0.1 : index * 0.6,
+            duration: reduced ? 0.4 : dissolving ? 0.7 : 2.2,
+            delay: reduced ? index * 0.12 : dissolving ? index * 0.08 : index * 0.38,
             ease: dissolving ? "easeOut" : [0.16, 1, 0.3, 1],
             repeat: reduced ? 0 : dissolving ? 0 : Infinity,
-            repeatDelay: 1.2,
+            repeatDelay: 0.9,
           }}
           className="absolute h-24 w-24 rounded-full border border-white/[0.08]"
           style={{

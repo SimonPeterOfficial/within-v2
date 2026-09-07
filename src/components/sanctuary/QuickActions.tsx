@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, Film, Moon, Sparkles } from "lucide-react";
+import { BookOpen, Film, Moon, Plus, Sparkles } from "lucide-react";
 import Hoverable from "@/components/ui/Hoverable";
 import { slideUp, staggerContainer } from "@/lib/animations";
 import { AURI_OPEN_EVENT } from "@/components/sanctuary/AuriOrb";
 
 const actions = [
+  { id: "create", label: "Create", icon: Plus, href: "/studio" },
   { id: "continue", label: "Continue story", icon: BookOpen, href: "#memories" },
   { id: "mood", label: "Shift mood", icon: Moon, href: "#mood" },
   { id: "auri", label: "Talk to Auri", icon: Sparkles, action: "auri" },

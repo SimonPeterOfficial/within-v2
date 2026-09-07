@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCinematicIntro } from "@/lib/useCinematicIntro";
+import { playWithinIdent } from "@/lib/within-sound";
 import LoaderParticles from "@/components/loader/LoaderParticles";
 import LoaderWordmark from "@/components/loader/LoaderWordmark";
 import LoaderRipples from "@/components/loader/LoaderRipples";
 import LoaderWaterSurface from "@/components/loader/LoaderWaterSurface";
+import AuriPresence from "@/components/auri/AuriPresence";
 
 type Phase = "hidden" | "spark" | "pulse" | "surface" | "gather" | "ripples" | "cosmic" | "letters" | "credit" | "out" | "done";
 
@@ -18,38 +20,52 @@ type Phase = "hidden" | "spark" | "pulse" | "surface" | "gather" | "ripples" | "
  *
  * For reduced-motion users: a beautiful static composition that fades in and out.
  *
- * Timeline (full animation): ~7 seconds, skippable at any moment.
- * Timeline (reduced motion): ~4 seconds, static composition with fade.
+ * Timeline (full animation): ~3.7 seconds — cinematic but never a wait.
+ * Skippable at any moment, and it only plays once per session.
+ * Timeline (reduced motion): ~2.2 seconds, static composition with fade.
  */
 const TIMELINE: Array<[Phase, number]> = [
-  ["spark", 100],
-  ["pulse", 600],
-  ["surface", 1200],
-  ["gather", 1800],
-  ["ripples", 2400],
-  ["cosmic", 3200],
-  ["letters", 4000],
-  ["credit", 5200],
-  ["out", 6200],
-  ["done", 7000],
+  ["spark", 80],
+  ["pulse", 420],
+  ["surface", 760],
+  ["gather", 1080],
+  ["ripples", 1400],
+  ["cosmic", 1800],
+  ["letters", 2100],
+  ["credit", 2600],
+  ["out", 3300],
+  ["done", 3700],
 ];
 
 /** Reduced motion timeline — much faster, skips animation phases */
 const REDUCED_TIMELINE: Array<[Phase, number]> = [
   ["spark", 50],
-  ["pulse", 200],
-  ["surface", 400],
-  ["gather", 600],
-  ["ripples", 800],
-  ["cosmic", 1000],
-  ["letters", 1200],
-  ["credit", 2000],
-  ["out", 2800],
-  ["done", 3200],
+  ["pulse", 160],
+  ["surface", 280],
+  ["gather", 400],
+  ["ripples", 520],
+  ["cosmic", 680],
+  ["letters", 820],
+  ["credit", 1200],
+  ["out", 1800],
+  ["done", 2200],
+];
+
+/**
+ * Returning-visitor timeline — the emergence condensed to ~1.6s.
+ * The light, the wordmark, the world: the full Genesis, remembered.
+ */
+const RETURNING_TIMELINE: Array<[Phase, number]> = [
+  ["spark", 40],
+  ["pulse", 160],
+  ["ripples", 320],
+  ["letters", 520],
+  ["out", 1150],
+  ["done", 1600],
 ];
 
 export default function CinematicLoader() {
-  const { play, reduced, markSeen } = useCinematicIntro();
+  const { play, reduced, returning, markSeen } = useCinematicIntro();
   const [phase, setPhase] = useState<Phase>("hidden");
   const skippedRef = useRef(false);
   const completedRef = useRef(false);
@@ -74,7 +90,13 @@ export default function CinematicLoader() {
   useEffect(() => {
     if (!play) return;
 
-    const timeline = reduced ? REDUCED_TIMELINE : TIMELINE;
+    // The ident only sounds when the user has opted in (Settings → Sound).
+    // It is synthesized, gesture-free, and silent for everyone else.
+    playWithinIdent({ reduced });
+
+    // Returning visitors get the condensed reveal; first visits, the full
+    // Genesis; reduced motion, the quiet static composition.
+    const timeline = reduced ? REDUCED_TIMELINE : returning ? RETURNING_TIMELINE : TIMELINE;
     const timers: number[] = [];
     const schedule = (fn: () => void, ms: number) => {
       const id = window.setTimeout(fn, ms);
@@ -185,6 +207,21 @@ export default function CinematicLoader() {
 
           {/* Ripples — concentric rings expanding from the core */}
           <LoaderRipples visible={showRipples} dissolving={dissolving} reduced={reduced} />
+
+          {/* Auri's emergence — the spark becomes a presence. She rises
+              above the water as the ripples open, then yields to the
+              wordmark: the presence becomes the world. */}
+          {(phase === "ripples" || phase === "cosmic") && !reduced && (
+            <motion.div
+              initial={{ opacity: 0, y: 26, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -14, scale: 0.92 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="pointer-events-none absolute bottom-[58%] left-1/2 -translate-x-1/2"
+            >
+              <AuriPresence size={120} state={"emerging"} particles={false} />
+            </motion.div>
+          )}
 
           {/* Wordmark + credits */}
           <div className="relative flex flex-col items-center">

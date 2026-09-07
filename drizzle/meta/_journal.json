@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788694783200,
+      "tag": "0000_puzzling_edwin_jarvis",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788782518409,
+      "tag": "0001_add_mirror_entries",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788784914152,
+      "tag": "0002_add_social_tables",
+      "breakpoints": true
+    }
+  ]
+}

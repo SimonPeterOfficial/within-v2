@@ -5,7 +5,8 @@
  * implementation never touches UI code.
  */
 
-export type UserRole = "user" | "admin";
+/** Platform roles — extensible permission model, enforced server-side. */
+export type UserRole = "user" | "creator" | "moderator" | "admin" | "super_admin";
 
 export type AuthUser = {
   id: string;

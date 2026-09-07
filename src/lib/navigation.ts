@@ -13,6 +13,7 @@ export const UNIVERSE_NAV: SidebarItem[] = [
   { label: "Music", href: "/music", icon: "music", route: true },
   { label: "Photography", href: "/photography", icon: "camera", route: true },
   { label: "Communities", href: "/communities", icon: "users", route: true },
+  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
   { label: "Creators", href: "/creators", icon: "sparkles", route: true },
   { label: "Profile", href: "/profile", icon: "profile", route: true },
   { label: "Settings", href: "/settings", icon: "settings", route: true }
@@ -33,6 +34,7 @@ export const copy = {
     music: "Music",
     photography: "Photography",
     communities: "Communities",
+    mirror: "Mirror",
     creators: "Creators",
     profile: "Profile",
     settings: "Settings"

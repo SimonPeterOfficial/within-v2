@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/lib/auth/session";
+import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/lib/theme";
 import { EnvironmentProvider } from "@/lib/environment";
 import CustomCursor from "@/components/effects/CustomCursor";
@@ -74,6 +75,7 @@ export default function RootLayout({
         <ThemeProvider>
           <EnvironmentProvider>
             <AuthProvider>
+              <ToastProvider>
               <a
                 href="#main"
                 className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
@@ -92,6 +94,7 @@ export default function RootLayout({
               <ScrollProgress />
               <PulseTrail />
               <SpeedInsights />
+              </ToastProvider>
             </AuthProvider>
           </EnvironmentProvider>
         </ThemeProvider>

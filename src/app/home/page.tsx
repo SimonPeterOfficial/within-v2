@@ -12,6 +12,9 @@ import MemoryCards from "@/components/sanctuary/MemoryCards";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
 import ReturningGreeting from "@/components/sanctuary/ReturningGreeting";
+import WhileYouWereAway from "@/components/sanctuary/WhileYouWereAway";
+import WorldPulse from "@/components/sanctuary/WorldPulse";
+import CrossedYourPath from "@/components/sanctuary/CrossedYourPath";
 
 // The feed shuffler — determines section order based on universe state
 const HomeFeed = dynamic(() => import("@/components/sanctuary/HomeFeed"));
@@ -25,6 +28,7 @@ export const metadata: Metadata = {
 const shellItems: SidebarItem[] = [
   /* ── Primary universe navigation ── */
   { label: "Home", href: "/home", icon: "home", route: true },
+  { label: "Studio", href: "/studio", icon: "dashboard", route: true },
   { label: "Explore", href: "/explore", icon: "discover", route: true },
   { label: "Within", href: "/within", icon: "sparkles", route: true },
   { label: "Journey", href: "/journey", icon: "heart", route: true },
@@ -38,6 +42,7 @@ const shellItems: SidebarItem[] = [
   { label: "Books", href: "/books", icon: "book", route: true },
   { label: "Photography", href: "/photography", icon: "camera", route: true },
   { label: "Communities", href: "/communities", icon: "users", route: true },
+  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
   { label: "Creators", href: "/creators", icon: "sparkles", route: true },
   { label: "Profile", href: "/profile", icon: "profile", route: true },
   { label: "Settings", href: "/settings", icon: "settings", route: true },
@@ -54,6 +59,12 @@ export default function HomePage() {
         <SanctuaryHero />
         <QuickActions />
 
+        {/* ── The world breathing: one honest line + today's real moment ── */}
+        <WorldPulse />
+
+        {/* ── Continuity: real return summary (only when something happened) ── */}
+        <WhileYouWereAway />
+
         {/* ── Sanctuary core: mood, continue, because-you-chose, recommended ── */}
         <MoodOrbit />
         <ContinueJourney />
@@ -61,6 +72,9 @@ export default function HomePage() {
 
         {/* ── Curated feed: the universe decides what you see next ── */}
         <HomeFeed />
+
+        {/* ── A small discovery — only when something genuinely qualifies ── */}
+        <CrossedYourPath />
 
         {/* ── Memory & recommendations (always present) ── */}
         <MemoryCards />
