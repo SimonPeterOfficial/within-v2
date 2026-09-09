@@ -1,4 +1,3 @@
-import DepthLayers from "@/components/effects/DepthLayers";
 import AppShell from "@/components/layout/AppShell";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 import { UNIVERSE_NAV } from "@/lib/navigation";
@@ -6,7 +5,7 @@ import type { MeshPreset } from "@/components/effects/MeshGradient";
 
 type UniverseShellProps = {
   children: React.ReactNode;
-  /** Room atmosphere — defaults to the quiet sanctuary light */
+  /** Preset kept for API compatibility — maps to the calm/cosmos atmosphere */
   preset?: MeshPreset;
   /** Override nav items (rarely needed — pages usually ride the universe nav) */
   nav?: typeof UNIVERSE_NAV;
@@ -15,17 +14,18 @@ type UniverseShellProps = {
 /**
  * The universe shell — the frame every corner of WithIn shares.
  *
- * One living atmosphere behind the page, the responsive sidebar navigation,
- * Auri resting in the corner, and the content. New pages (discover,
- * originals, books, music, photography, communities, creators, profile,
- * settings) render inside this shell so the whole universe feels like one
- * continuous place.
+ * ULTRA GEN 10: the old stacked DepthLayers are replaced by the single
+ * WithinEnvironment — one coherent atmospheric world that every page
+ * floats inside. The `preset` prop is preserved so existing pages keep
+ * compiling; sanctuary/photography presets calm the room.
  */
 export default function UniverseShell({ children, preset = "sanctuary", nav = UNIVERSE_NAV }: UniverseShellProps) {
+  const calm = preset === "sanctuary" || preset === "books";
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <DepthLayers preset={preset} particles={7} stars={16} fog={0.5} />
-      <AppShell items={nav}>{children}</AppShell>
+    <div className="relative min-h-screen overflow-hidden text-white">
+      <AppShell items={nav} atmosphere={calm ? "calm" : "world"}>
+        {children}
+      </AppShell>
       <AuriOrb />
     </div>
   );

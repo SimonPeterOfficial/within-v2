@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import DepthLayers from "@/components/effects/DepthLayers";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import MessagingExperience from "@/components/messaging/MessagingExperience";
 
@@ -21,9 +20,8 @@ const shellItems: SidebarItem[] = [
 
 export default function ConversationsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <DepthLayers preset="sanctuary" particles={4} stars={12} fog={0.55} />
-      <AppShell items={shellItems}>
+    <div className="relative min-h-screen overflow-hidden text-white">
+      <AppShell items={shellItems} atmosphere="world">
         {/* Suspense boundary — the messaging experience reads ?with= from the URL. */}
         <Suspense>
           <MessagingExperience />

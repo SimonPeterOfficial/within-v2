@@ -179,8 +179,8 @@ export default function MirrorExperience() {
         </p>
       </header>
 
-      {/* ── Composer ── */}
-      <GlassCard tone="soft" className="mt-8 p-5">
+      {/* ── Composer — a reflective crystal page you write on ── */}
+      <GlassCard tone="paper" className="crystal-elevated crystal-edge crystal-sheen depth-medium hairline mt-8 p-6 sm:p-8">
         {prompt && (
           <button
             type="button"
@@ -218,7 +218,7 @@ export default function MirrorExperience() {
         {state === "loading" && (
           <div className="space-y-4">
             {[0, 1, 2].map((index) => (
-              <div key={index} className="h-24 animate-pulse rounded-card bg-white/[0.04]" />
+              <div key={index} className="liquid-shimmer h-24 rounded-3xl bg-white/50" />
             ))}
           </div>
         )}
@@ -237,15 +237,16 @@ export default function MirrorExperience() {
         )}
 
         {state === "ready" && entries.length === 0 && (
-          <GlassCard tone="soft" className="p-10 text-center">
-            <p className="text-sm text-gray-300">Your Mirror is empty.</p>
-            <p className="mt-1.5 text-xs text-gray-600">
-              The first reflection is often the smallest one.
+          <div className="py-12 text-center">
+            <p className="font-display text-xl font-medium text-gray-300">
+              Your Mirror is empty.
             </p>
-          </GlassCard>
-        )}
-
-        {state === "ready" &&
+            <p className="mx-auto mt-2 max-w-xs text-xs leading-relaxed text-gray-500">
+              The first reflection is often the smallest one. Write the first
+              page above and it will rest here.
+            </p>
+          </div>
+        )}        {state === "ready" &&
           entries.map((entry) => (
             <AnimatePresence key={entry.id} initial={false}>
               <motion.article
@@ -255,11 +256,13 @@ export default function MirrorExperience() {
                 exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
                 transition={{ duration: prefersReducedMotion ? 0.1 : 0.25, ease: [0.16, 1, 0.3, 1] }}
               >
-                <GlassCard tone="soft" className="p-5">
+                {/* Each entry is a page of the journal — quiet paper, hairline
+                    opening, no card chrome. Reflections are not widgets. */}
+                <article className="hairline relative py-6">
                   {entry.prompt && (
                     <p className="text-[11px] italic text-gray-600">— {entry.prompt}</p>
                   )}
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-200">
+                  <p className="mt-2 whitespace-pre-wrap font-display text-[15px] leading-relaxed text-gray-200">
                     {entry.body}
                   </p>
                   <div className="mt-4 flex items-center justify-between">
@@ -276,7 +279,7 @@ export default function MirrorExperience() {
                       {deletingId === entry.id ? "Removing…" : "Remove"}
                     </button>
                   </div>
-                </GlassCard>
+                </article>
               </motion.article>
             </AnimatePresence>
           ))}

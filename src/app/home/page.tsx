@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import DepthLayers from "@/components/effects/DepthLayers";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
-import SanctuaryHero from "@/components/sanctuary/SanctuaryHero";
-import QuickActions from "@/components/sanctuary/QuickActions";
-import ContinueJourney from "@/components/sanctuary/ContinueJourney";
-import BecauseYouChose from "@/components/sanctuary/BecauseYouChose";
-import Recommended from "@/components/sanctuary/Recommended";
-import MoodOrbit from "@/components/sanctuary/MoodOrbit";
-import MemoryCards from "@/components/sanctuary/MemoryCards";
-import AuriOrb from "@/components/sanctuary/AuriOrb";
-import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
+import TopBar from "@/components/layout/TopBar";
+import HomeHero from "@/components/home/HomeHero";
+import HomeRail from "@/components/home/HomeRail";
+import WeatherPanel from "@/components/home/WeatherPanel";
+import MoodOrbs from "@/components/home/MoodOrbs";
+import UniverseDoors from "@/components/home/UniverseDoors";
+import FeedPanel from "@/components/home/FeedPanel";
+import MessagesPanel from "@/components/home/MessagesPanel";
+import SanctuaryPanel from "@/components/home/SanctuaryPanel";
 import ReturningGreeting from "@/components/sanctuary/ReturningGreeting";
-import WhileYouWereAway from "@/components/sanctuary/WhileYouWereAway";
-import WorldPulse from "@/components/sanctuary/WorldPulse";
-import CrossedYourPath from "@/components/sanctuary/CrossedYourPath";
-
-// The feed shuffler — determines section order based on universe state
-const HomeFeed = dynamic(() => import("@/components/sanctuary/HomeFeed"));
+import AuriOrb from "@/components/sanctuary/AuriOrb";
+import HomeDock from "@/components/home/HomeDock";
+import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
 
 export const metadata: Metadata = {
   title: "WithIn — A universe within you",
@@ -25,62 +20,58 @@ export const metadata: Metadata = {
     "A cinematic sanctuary where stories, emotions, and people connect.",
 };
 
+/**
+ * The illustrated home — reference composition, top to bottom:
+ *
+ *   TopBar        centered search + bell + weather chip + avatar
+ *   HomeHero      painted sky, floating isles, lake light, winged Auri
+ *   HomeRail      weather window + mood orbs + daily within + discover
+ *   Doors         eight painted world tiles (Originals → Discover)
+ *   Trio          For-You feed window + Messages window + Sanctuary
+ *   HomeDock      ambient line, center dock w/ Auri orb, now-playing
+ *
+ * The rail hugs the hero like the reference; the trio row follows.
+ */
 const shellItems: SidebarItem[] = [
-  /* ── Primary universe navigation ── */
   { label: "Home", href: "/home", icon: "home", route: true },
-  { label: "Studio", href: "/studio", icon: "dashboard", route: true },
   { label: "Explore", href: "/explore", icon: "discover", route: true },
-  { label: "Within", href: "/within", icon: "sparkles", route: true },
-  { label: "Journey", href: "/journey", icon: "heart", route: true },
-  /* ── Sanctuary sections ── */
-  { label: "Mood", href: "#mood", icon: "moon" },
-  { label: "Continue", href: "#continue", icon: "play" },
-  { label: "Recommended", href: "#recommended", icon: "sparkles" },
-  /* ── The universe — secondary routes ── */
   { label: "Originals", href: "/originals", icon: "originals", route: true },
+  { label: "Books", href: "/books", icon: "library", route: true },
   { label: "Music", href: "/music", icon: "music", route: true },
-  { label: "Books", href: "/books", icon: "book", route: true },
   { label: "Photography", href: "/photography", icon: "camera", route: true },
   { label: "Communities", href: "/communities", icon: "users", route: true },
+  { label: "Creators", href: "/creators", icon: "star", route: true },
+  { label: "Sanctuary", href: "/sanctuary", icon: "heart", route: true },
   { label: "Mirror", href: "/mirror", icon: "eye", route: true },
-  { label: "Creators", href: "/creators", icon: "sparkles", route: true },
-  { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true },
+  { label: "Within Time", href: "/atlas", icon: "clock", route: true },
+  { label: "Messages", href: "/conversations", icon: "message", route: true, badge: 3 },
+  { label: "Wallet", href: "/settings", icon: "wallet", route: true },
 ];
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* One living atmosphere — the sanctuary room */}
-      <DepthLayers preset="sanctuary" particles={7} stars={16} fog={0.5} />
-
+    <div className="crystal-world relative min-h-screen overflow-hidden text-[#232136]">
       <AppShell items={shellItems}>
-        {/* ── Fixed upper: always present regardless of feed mode ── */}
-        <SanctuaryHero />
-        <QuickActions />
+        <TopBar />
 
-        {/* ── The world breathing: one honest line + today's real moment ── */}
-        <WorldPulse />
+        {/* ── Hero + right rail — one hug like the reference ─────────── */}
+        <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-4 xl:px-6 lg:grid-cols-[1fr_300px]">
+          <div className="flex min-w-0 flex-col gap-4">
+            <HomeHero />
+            <UniverseDoors />
+          </div>
+          <HomeRail />
+        </div>
 
-        {/* ── Continuity: real return summary (only when something happened) ── */}
-        <WhileYouWereAway />
-
-        {/* ── Sanctuary core: mood, continue, because-you-chose, recommended ── */}
-        <MoodOrbit />
-        <ContinueJourney />
-        <BecauseYouChose />
-
-        {/* ── Curated feed: the universe decides what you see next ── */}
-        <HomeFeed />
-
-        {/* ── A small discovery — only when something genuinely qualifies ── */}
-        <CrossedYourPath />
-
-        {/* ── Memory & recommendations (always present) ── */}
-        <MemoryCards />
-        <Recommended />
+        {/* ── The trio row — feed · messages · sanctuary ─────────────── */}
+        <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 pb-6 xl:px-6 lg:grid-cols-[1.6fr_0.85fr_0.75fr] lg:pb-28">
+          <FeedPanel />
+          <MessagesPanel />
+          <SanctuaryPanel />
+        </div>
       </AppShell>
 
+      <HomeDock />
       <ReturningGreeting />
       <AuriOrb />
       <MicroDiscoveries />

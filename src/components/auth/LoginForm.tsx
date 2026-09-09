@@ -216,11 +216,15 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 w-full rounded-xl bg-gradient-to-r from-purple-600 to-emerald-500 py-3.5 text-[13px] font-semibold text-white transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
+        className="crystal-press crystal-focus relative mt-2 w-full overflow-hidden rounded-2xl py-3.5 text-[13px] font-semibold text-white"
+        style={{
+          background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.95), rgba(var(--mood-rgb),0.75))",
+          boxShadow: "0 8px 28px rgba(var(--mood-rgb),0.35), inset 0 1px 0 rgba(255,255,255,0.4)",
+        }}
       >
         {loading ? (
           <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white/60" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white/80" />
             Entering…
           </span>
         ) : (

@@ -74,8 +74,8 @@ export default function ProfileView() {
       />
 
       <Container className="pb-28">
-        {/* Identity card */}
-        <GlassCard tone="strong" className="p-7">
+        {/* Identity — a crystal surface with light-born edges */}
+        <GlassCard tone="strong" className="crystal-elevated crystal-edge depth-medium p-7">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-5">
               <span className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 text-2xl font-bold text-black shadow-orb">

@@ -16,17 +16,19 @@ type NavItem = {
 const PRIMARY_NAV: NavItem[] = [
   { label: "Home", href: "/home", icon: "home" },
   { label: "Discover", href: "/discover", icon: "discover" },
-  { label: "People", href: "/connections", icon: "users" },
   { label: "Within", href: "/within", icon: "sparkles" },
+  { label: "People", href: "/connections", icon: "users" },
   { label: "Profile", href: "/profile", icon: "profile" },
 ];
 
 /**
  * The mobile bottom navigation — WithIn's spatial dock.
  *
- * Not a generic iOS tab bar. A floating glass ribbon that responds to the
- * live mood, with an active indicator that illuminates rather than highlights.
- * Safe-area insets respected. Touch targets generous. Identity maintained.
+ * GEN 21: the dock is no longer a boxed ribbon — it is a layer of the
+ * atmosphere itself. No border, no card: just icons floating on the dark,
+ * a soft light-well rising from below, and a luminous orb that blooms
+ * under the place you are. The center (Within) is deliberately closest
+ * to the thumb — the door to Auri is always under the hand.
  */
 export default function BottomNav() {
   const pathname = usePathname();
@@ -37,24 +39,27 @@ export default function BottomNav() {
       aria-label="Primary navigation"
       className="fixed inset-x-0 bottom-0 z-50 lg:hidden"
     >
-      {/* The glass ribbon */}
-      <div className="relative mx-3 mb-3 overflow-hidden rounded-[1.25rem] border border-white/[0.08] bg-black/70 backdrop-blur-2xl shadow-dock"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      {/* The dock — a floating crystal surface rising from the light */}
+      <div
+        className="crystal-elevated crystal-edge depth-high relative mx-3 mb-3 rounded-[26px] pt-4"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.9rem)" }}
       >
-        {/* Subtle ambient glow behind active indicator */}
+        {/* The light-well — soft mood light blooming from below */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
           style={{
-            background: "radial-gradient(ellipse 60% 120% at 50% 0%, rgba(var(--mood-rgb), 0.4), transparent 70%)",
+            background:
+              "radial-gradient(ellipse 55% 100% at 50% 100%, rgba(var(--mood-rgb), 0.1), transparent 70%)",
           }}
         />
 
-        <div className="relative flex items-stretch">
-          {PRIMARY_NAV.map((item) => {
+        <div className="relative flex items-end justify-around px-4">
+          {PRIMARY_NAV.map((item, index) => {
             const isActive =
               pathname === item.href ||
               (item.href !== "/home" && pathname.startsWith(item.href));
+            const isCenter = index === Math.floor(PRIMARY_NAV.length / 2);
 
             return (
               <Link
@@ -62,39 +67,45 @@ export default function BottomNav() {
                 href={item.href}
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
-                className="relative flex flex-1 flex-col items-center gap-1 py-3 px-2"
+                className="relative flex flex-1 flex-col items-center gap-1.5 px-1 py-2"
               >
-                {/* Active indicator — subtle illumination, not a loud pill */}
+                {/* The bloom — light under the active place */}
                 {isActive && (
                   <motion.span
-                    layoutId="bottomnav-indicator"
-                    className="absolute -top-px left-1/2 -translate-x-1/2 h-[2px] w-8 rounded-full bg-[rgba(var(--mood-rgb),0.6)]"
+                    layoutId="bottomnav-bloom"
+                    aria-hidden
+                    className="absolute -bottom-1 left-1/2 h-10 w-10 -translate-x-1/2 rounded-full"
                     style={{
-                      boxShadow: "0 0 12px rgba(var(--mood-rgb), 0.4), 0 0 4px rgba(var(--mood-rgb), 0.2)",
+                      background:
+                        "radial-gradient(circle, rgba(var(--mood-rgb), 0.22), transparent 70%)",
                     }}
-                    transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 28 }}
+                    transition={
+                      prefersReducedMotion
+                        ? { duration: 0 }
+                        : { type: "spring", stiffness: 320, damping: 26 }
+                    }
                   />
                 )}
 
-                {/* Icon */}
+                {/* Icon — the center item rides slightly higher, like a key */}
                 <span
                   className={`relative transition-all duration-300 ${
-                    isActive ? "text-white" : "text-gray-500"
-                  }`}
+                    isActive ? "text-[#5b4bc4]" : "text-[#6f6e88]"
+                  } ${isCenter ? "-translate-y-1" : ""}`}
                   style={
                     isActive
-                      ? { filter: "drop-shadow(0 0 6px rgba(var(--mood-rgb), 0.3))" }
+                      ? { filter: "drop-shadow(0 0 8px rgba(var(--mood-rgb), 0.45))" }
                       : undefined
                   }
                 >
-                  <Icon name={item.icon} size={20} strokeWidth={isActive ? 2.2 : 1.6} />
+                  <Icon name={item.icon} size={isCenter ? 22 : 20} strokeWidth={isActive ? 2.2 : 1.6} />
                 </span>
 
-                {/* Label */}
+                {/* Label — quiet, only the active place speaks in ink */}
                 <span
-                  className={`text-[10px] font-medium transition-all duration-300 ${
-                    isActive ? "text-white/90" : "text-gray-500/70"
-                  }`}
+                  className={`text-[10px] font-medium tracking-wide transition-all duration-300 ${
+                    isCenter ? "-translate-y-0.5" : ""
+                  } ${isActive ? "text-[#3d3a5e]" : "text-[#8b8aa0]/80"}`}
                 >
                   {item.label}
                 </span>

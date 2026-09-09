@@ -6,8 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { useSession } from "@/lib/auth/session";
-import { COMMAND_PALETTE_EVENT } from "@/components/layout/CommandPalette";
-import NotificationsBell from "@/components/layout/NotificationsBell";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import Logo from "@/components/ui/Logo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -19,6 +17,10 @@ export type SidebarItem = {
   icon: IconName;
   /** True when href is a real route rather than an in-page anchor */
   route?: boolean;
+  /** Small numeric badge rendered beside the label */
+  badge?: number;
+  /** Group divider above this item */
+  divider?: boolean;
 };
 
 type SidebarProps = {
@@ -26,15 +28,13 @@ type SidebarProps = {
 };
 
 /**
- * The responsive sidebar — the navigation shell of the sanctuary.
+ * The labeled rail — the navigation shell of the authenticated universe.
  *
- * Desktop: a floating glass rail on the left that rests as a quiet icon pill
- * and blooms open on hover, with an animated active indicator that glides
- * between items (scroll-spy on section anchors, pathname on routes).
- * Mobile: a full glass drawer with overlay, Escape-to-close, focus move on
- * open, and body scroll lock.
- *
- * The footer carries the session — avatar chip, theme toggle, and sign out.
+ * Desktop: a fixed 60px labeled rail exactly like the reference — the
+ * "WithIn" serif wordmark on top, always-visible labels, a glowing pill on
+ * the active item, and a vertical "Scroll" spine at the bottom. It never
+ * collapses; the content column is offset to clear it.
+ * Mobile: a full glass drawer with overlay, Escape-to-close, and scroll lock.
  */
 export default function Sidebar({ items }: SidebarProps) {
   const pathname = usePathname();
@@ -44,7 +44,8 @@ export default function Sidebar({ items }: SidebarProps) {
   const panelRef = useRef<HTMLElement>(null);
 
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("#sanctuary");
+  const [userCardOpen, setUserCardOpen] = useState(false);
+  const [active, setActive] = useState(items[0]?.href ?? "");
 
   const close = () => setOpen(false);
   const isAuthenticated = status === "authenticated";
@@ -100,125 +101,163 @@ export default function Sidebar({ items }: SidebarProps) {
     router.push("/");
   };
 
-  const itemInner = (item: SidebarItem) => {
+  const railItem = (item: SidebarItem) => {
     const isActive = active === item.href;
     return (
-      <span className="relative flex w-full items-center gap-3 rounded-full px-3 py-2.5">
+      <span className="relative flex w-full items-center gap-3.5 px-4 py-2.5">
         {isActive && (
           <motion.span
             layoutId="sidebar-active"
-            className="absolute inset-0 rounded-full border border-white/10 bg-white/10 shadow-[0_0_18px_rgba(var(--mood-rgb),0.28)]"
             transition={spring}
-          />
+            className="absolute inset-x-2 inset-y-0.5 rounded-xl"
+            style={{
+              background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.18), rgba(var(--mood-rgb),0.09))",
+              boxShadow: "inset 0 0 0 1px rgba(var(--mood-rgb),0.32), inset 0 1px 0 rgba(255,255,255,0.6)",
+            }}
+          >
+            <span
+              aria-hidden
+              className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[rgba(var(--mood-rgb),1)]"
+              style={{ boxShadow: "0 0 8px rgba(var(--mood-rgb),0.55)" }}
+            />
+          </motion.span>
         )}
         <span
           aria-hidden
           className={`relative shrink-0 transition-colors ${
-            isActive ? "text-white" : "text-gray-400"
+            isActive ? "text-[#5b4bc4]" : "text-[#6f6e88] group-hover/item:text-[#232136]"
           }`}
         >
-          <Icon name={item.icon} size={18} />
+          <Icon name={item.icon} size={17} strokeWidth={1.9} />
         </span>
         <span
-          className={`relative hidden whitespace-nowrap text-sm font-medium transition-opacity duration-300 group-hover/rail:inline ${
-            isActive ? "text-white" : "text-gray-300"
+          className={`relative hidden whitespace-nowrap text-[13.5px] font-medium lg:inline ${
+            isActive ? "text-[#232136]" : "text-[#6f6e88] group-hover/item:text-[#232136]"
           }`}
         >
           {item.label}
         </span>
+        {typeof item.badge === "number" && item.badge > 0 && (
+          <span className="relative ml-auto hidden h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.92)] px-1 text-[10px] font-bold text-white lg:flex">
+            {item.badge}
+          </span>
+        )}
       </span>
     );
   };
 
-  const itemClasses = (item: SidebarItem) =>
-    `group/item block w-full transition-colors hover:text-white ${
-      active === item.href ? "" : "hover:bg-white/5"
-    }`;
+  const itemClasses = () =>
+    "group/item block w-full transition-colors";
 
   return (
     <>
-      {/* ── Desktop rail ─────────────────────────────────────────────── */}
+      {/* ── Desktop: the floating labeled crystal rail ────────── */}
       <nav
         aria-label="Primary"
-        className="fixed left-5 top-1/2 z-50 hidden -translate-y-1/2 lg:block"
-        onMouseEnter={() => {
-          const rail = document.querySelector('.group/rail');
-          if (rail) rail.classList.add('rail-expanded');
-        }}
-        onMouseLeave={() => {
-          const rail = document.querySelector('.group/rail');
-          if (rail) rail.classList.remove('rail-expanded');
-        }}
+        className="crystal-elevated crystal-edge depth-medium fixed inset-y-3 left-3 z-50 hidden w-[200px] flex-col rounded-[26px] lg:flex"
       >
-        <div className="group/rail max-h-[calc(100dvh-4rem)] w-16 overflow-y-auto overflow-x-hidden rounded-full border border-white/[0.07] bg-white/[0.03] p-3 shadow-dock backdrop-blur-xl transition-[width] duration-500 ease-out [scrollbar-width:none] hover:w-56 hover:border-white/[0.12] hover:bg-white/[0.06] [&::-webkit-scrollbar]:hidden">
-          <Link
-            href="/"
-            aria-label="WithIn home"
-            className="mb-1.5 flex w-full items-center justify-center rounded-full py-1 transition hover:bg-white/5"
-          >
-            <span
-              aria-hidden
-              className="h-2.5 w-2.5 rounded-full bg-linear-to-br from-purple-500 to-emerald-400 shadow-brand"
-            />
-          </Link>
+        {/* Wordmark */}
+        <Link
+          href="/home"
+          aria-label="WithIn home"
+          className="flex h-16 shrink-0 items-center pl-6"
+        >
+          <span className="font-display text-[21px] font-semibold tracking-[-0.01em] text-[#232136]">
+            With<span className="text-[#7c6ce0]">In</span>
+          </span>
+        </Link>
 
+        {/* Items */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => (
-            <span key={item.label} className="w-full">
+            <span
+              key={item.label}
+              className={`relative block w-full ${item.divider ? "before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-white/[0.06]" : ""}`}
+            >
               {item.route ? (
-                <Link href={item.href} className={itemClasses(item)}>
-                  {itemInner(item)}
+                <Link href={item.href} className={itemClasses()}>
+                  {railItem(item)}
                 </Link>
               ) : (
-                <a href={item.href} className={itemClasses(item)}>
-                  {itemInner(item)}
+                <a href={item.href} className={itemClasses()}>
+                  {railItem(item)}
                 </a>
               )}
             </span>
           ))}
         </div>
-      </nav>
 
-      {/* ── Desktop corner cluster: session + theme ─────────────────── */}
-      <div className="fixed bottom-6 left-6 z-50 hidden items-center gap-3 lg:flex">
-        <NotificationsBell />
-        <button
-          type="button"
-          onClick={() => window.dispatchEvent(new Event(COMMAND_PALETTE_EVENT))}
-          aria-label="Open command palette"
-          title="Search & navigate (⌘K)"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 shadow-dock backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10 hover:text-white"
-        >
-          <Icon name="search" size={16} />
-        </button>
-        {isAuthenticated && (
+        {/* User card — expands with the rail; opens the profile popover */}
+        <div className="group/usercard relative shrink-0 border-t border-white/40 p-2">
           <button
             type="button"
-            onClick={handleSignOut}
-            aria-label={`Sign out (${user?.name ?? "account"})`}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 shadow-dock backdrop-blur-sm transition hover:border-rose-400/40 hover:text-rose-300"
+            onClick={() => setUserCardOpen((openState) => !openState)}
+            aria-expanded={userCardOpen}
+            aria-label="Your account"
+            className="crystal-focus flex w-full items-center gap-3 rounded-2xl px-1.5 py-1.5 text-left transition hover:bg-white/50"
           >
-            <Icon name="logout" size={16} />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-amber-200 to-rose-400 text-[12px] font-bold text-[#232136] ring-2 ring-white/70">
+              {initial}
+            </span>
+            <span className="relative hidden min-w-0 flex-1 lg:block">
+              <span className="block truncate text-[12.5px] font-semibold text-[#2c2a48]">
+                {user?.name ?? "Explorer"}
+              </span>
+              <span className="block truncate text-[10.5px] text-[#8b8aa0]">Explorer</span>
+            </span>
+            <Icon
+              name="chevronRight"
+              size={12}
+              className={`hidden shrink-0 text-[#8b8aa0] transition-transform lg:block ${userCardOpen ? "rotate-90" : ""}`}
+            />
           </button>
-        )}
 
-        <Link
-          href={isAuthenticated ? "/home" : "/login"}
-          aria-label={isAuthenticated ? "Your profile" : "Log in"}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 text-xs font-bold text-black shadow-dock ring-2 ring-white/20 transition hover:ring-emerald-300/50"
-        >
-          {isAuthenticated ? initial : <Icon name="profile" size={16} />}
-        </Link>
+          {/* The popover — account doors, anchored above the card */}
+          <AnimatePresence>
+            {userCardOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="crystal-foreground crystal-edge depth-high absolute bottom-full left-0 z-10 mb-2 w-[208px] rounded-2xl p-2"
+              >
+                <Link
+                  href="/profile"
+                  onClick={() => setUserCardOpen(false)}
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-white/60 hover:text-[#232136]"
+                >
+                  <Icon name="profile" size={14} /> Your profile
+                </Link>
+                <Link
+                  href="/settings"
+                  onClick={() => setUserCardOpen(false)}
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-white/60 hover:text-[#232136]"
+                >
+                  <Icon name="settings" size={14} /> Settings
+                </Link>
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-rose-50 hover:text-rose-600"
+                  >
+                    <Icon name="logout" size={14} /> Sign out
+                  </button>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </nav>
 
-        <ThemeToggle />
-      </div>
-
-      {/* ── Mobile: floating menu trigger (secondary nav access) ──── */}
+      {/* ── Mobile: floating menu trigger ───────────────────────────── */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="fixed bottom-24 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/60 shadow-dock backdrop-blur-sm transition hover:bg-white/10 hover:text-white lg:hidden"
+        className="crystal-elevated crystal-edge depth-medium fixed bottom-24 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full text-[#5f5e74] transition hover:text-[#232136] lg:hidden"
       >
         <Icon name="menu" size={16} />
       </button>
@@ -274,14 +313,14 @@ export default function Sidebar({ items }: SidebarProps) {
                       : "text-gray-300 hover:bg-white/5 hover:text-white"
                   }`;
                   return item.route ? (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={close}
-                      className={classes}
-                    >
+                    <Link key={item.label} href={item.href} onClick={close} className={classes}>
                       <Icon name={item.icon} size={18} />
                       {item.label}
+                      {typeof item.badge === "number" && item.badge > 0 && (
+                        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.9)] px-1 text-[10px] font-bold text-black">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   ) : (
                     <a key={item.label} href={item.href} onClick={close} className={classes}>

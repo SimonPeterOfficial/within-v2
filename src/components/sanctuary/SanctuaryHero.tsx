@@ -1,13 +1,7 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform
-} from "framer-motion";
+import { useSyncExternalStore } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlowBackground from "@/components/effects/GlowBackground";
 import ParticleField from "@/components/effects/ParticleField";
@@ -25,23 +19,28 @@ const subscribe = () => () => {};
 const getClientGreeting = () => TIME_GREETINGS[getTimePeriod()];
 const getServerGreeting = () => "Welcome";
 
-const words = ["a sanctuary", "a universe", "a dreamspace", "a story"];
+/** Time-aware opening lines — the room answers the hour, not a script. */
+const TIME_OPENING: Record<string, string> = {
+  morning: "The light is new. So is today.",
+  afternoon: "The middle of the day — a good place to pause.",
+  evening: "The world is slowing. Yours can too.",
+  night: "The quiet hours. WithIn keeps the light on."
+};
+
+const getClientOpening = () =>
+  TIME_OPENING[getTimePeriod()] ?? "The world is slowing. Yours can too.";
+const getServerOpening = () => "The world is slowing. Yours can too.";
 
 /** Cinematic opening — layered nebula, living starfield, emotional welcome. */
 export default function SanctuaryHero() {
   const prefersReducedMotion = useReducedMotionSafe();
   const { user } = useSession();
   const greeting = useSyncExternalStore(subscribe, getClientGreeting, getServerGreeting);
-  const [wordIndex, setWordIndex] = useState(0);
+  // Time-aware opening — stable on the server, live on the client.
+  const opening = useSyncExternalStore(subscribe, getClientOpening, getServerOpening);
   // Personalization resolves after hydration — guests see the gentle default.
   const firstName = user?.name.trim().split(/\s+/)[0];
   const salutation = greeting + (firstName ? `, ${firstName}` : ", soul");
-
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-    const id = setInterval(() => setWordIndex((index) => (index + 1) % words.length), 2600);
-    return () => clearInterval(id);
-  }, [prefersReducedMotion]);
 
   // Mouse parallax — each layer drifts at its own depth.
   const mx = useMotionValue(0);
@@ -111,20 +110,17 @@ export default function SanctuaryHero() {
             </GradientText>
           </motion.h1>
 
-          {/* Rotating descriptor */}
+          {/* Time-aware opening — the room answers the hour */}
           <div className="relative mx-auto mt-6 min-h-[2.75rem] max-w-2xl md:min-h-[3rem]">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={wordIndex}
-                initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -14, filter: "blur(6px)" }}
-                transition={{ duration: 0.45 }}
-                className="text-lg text-gray-300 md:text-2xl"
-              >
-                {words[wordIndex]}
-              </motion.p>
-            </AnimatePresence>
+            <motion.p
+              key={opening}
+              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 14, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="text-lg text-gray-300 md:text-2xl"
+            >
+              {opening}
+            </motion.p>
           </div>
 
           <motion.p
@@ -132,22 +128,22 @@ export default function SanctuaryHero() {
             className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-gray-400 md:text-base"
           >
             Your sanctuary has been waiting — Auri shaped it around the way you&apos;ve been
-            feeling, and tonight it has a few quiet corners picked just for you.
+            feeling, and it has a few quiet corners picked just for you.
           </motion.p>
 
-          {/* Magnetic CTAs */}
+          {/* Magnetic CTAs — arrival, not advertisement */}
           <motion.div
             variants={blurUp}
             className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Magnetic>
               <Button href="#mood" variant="primary" size="xl">
-                Shape your universe
+                Begin here
               </Button>
             </Magnetic>
             <Magnetic>
               <Button href="#originals" variant="outline" size="xl">
-                Explore originals
+                Wander
               </Button>
             </Magnetic>
           </motion.div>

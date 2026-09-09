@@ -42,7 +42,8 @@ export default async function PublicProfileView({ username, viewerId }: PublicPr
   return (
     <Container className="pb-28">
       {/* Identity */}
-      <GlassCard tone="strong" className="p-7 sm:p-10">
+      {/* Identity — editorial crystal surface */}
+      <GlassCard tone="strong" className="crystal-elevated crystal-edge depth-medium p-7 sm:p-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-6">
             <span

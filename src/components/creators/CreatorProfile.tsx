@@ -12,6 +12,7 @@ import { useSession } from "@/lib/auth/session";
 import { useRouter } from "next/navigation";
 import { formatFollowers } from "@/lib/format";
 import type { Creator } from "@/lib/creators";
+import CreatorConstellation from "@/components/people/CreatorConstellation";
 
 type CreatorProfileProps = {
   creator: Creator;
@@ -166,6 +167,9 @@ export default function CreatorProfile({ creator }: CreatorProfileProps) {
           })}
         </div>
       </div>
+
+      {/* Gen 13 — the constellation around this creator */}
+      <CreatorConstellation creatorId={creator.id} creatorName={creator.name} />
 
       {/* Support panel — honest about what exists */}
       <GlassCard tone="clay" className="mt-16 px-8 py-10 text-center">

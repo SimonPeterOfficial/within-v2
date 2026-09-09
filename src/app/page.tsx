@@ -5,7 +5,9 @@ import DepthLayers from "@/components/effects/DepthLayers";
 import Hero from "@/components/home/Hero";
 import Footer from "@/components/layout/Footer";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
-import AuriSignatureMoment from "@/components/home/AuriSignatureMoment";
+import MoodPillBar from "@/components/landing/MoodPillBar";
+import UniverseStrip from "@/components/landing/UniverseStrip";
+import SanctuaryDuo from "@/components/landing/SanctuaryDuo";
 
 // The cinematic intro is code-split so the landing page stays lean — it only
 // loads (and plays) on a fresh session, once, then dissolves into the hero.
@@ -13,14 +15,9 @@ import AuriSignatureMoment from "@/components/home/AuriSignatureMoment";
 // `ssr: false` inside Client Components (see CinematicLoaderGate).
 import CinematicLoaderGate from "@/components/loader/CinematicLoaderGate";
 
-// Every section below the hero is code-split so the first paint stays lean —
-// the landing opens with darkness and light, then the universe unfolds.
-const EmotionalDiscovery = dynamic(() => import("@/components/landing/EmotionalDiscovery"));
+// Sections beyond the reference fold are code-split so the first paint stays
+// lean — the landing opens with darkness and light, then the universe unfolds.
 const OriginalsShowcase = dynamic(() => import("@/components/sanctuary/OriginalsShowcase"));
-const SanctuaryMoment = dynamic(() => import("@/components/landing/SanctuaryMoment"));
-const AuriMoment = dynamic(() => import("@/components/landing/AuriMoment"));
-const ContentUniverse = dynamic(() => import("@/components/landing/ContentUniverse"));
-const CreatorUniverse = dynamic(() => import("@/components/landing/CreatorUniverse"));
 const RecentDiscussions = dynamic(() => import("@/components/communities/RecentDiscussions"));
 const FinaleCTA = dynamic(() => import("@/components/sanctuary/FinaleCTA"));
 
@@ -40,35 +37,24 @@ export default function Home() {
       <CinematicLoaderGate />
 
       <main id="main" className="relative">
-        {/* 01 — ARRIVAL: The hero opens the universe */}
+        {/* 01 — ARRIVAL: The hero opens the universe (reference layout:
+            left-aligned wordmark + winged Auri in her ring of light) */}
         <Hero />
 
-        {/* 02 — RECOGNITION: The world answers how you feel */}
-        <Suspense fallback={null}>
-          <EmotionalDiscovery />
-        </Suspense>
+        {/* 02 — RECOGNITION: The mood pill bar, floating under the hero */}
+        <div className="relative z-20 -mt-10 pb-2">
+          <Suspense fallback={null}>
+            <MoodPillBar />
+          </Suspense>
+        </div>
 
-        {/* 03 — PRESENCE: Auri, the quiet listener */}
-        <Suspense fallback={null}>
-          <AuriMoment />
-        </Suspense>
+        {/* 03 — EXPLORATION: The eight doors into WithIn */}
+        <UniverseStrip />
 
-        {/* 04 — EXPLORATION: Six worlds, one light */}
-        <Suspense fallback={null}>
-          <ContentUniverse />
-        </Suspense>
+        {/* 04 — BELONGING: Your Sanctuary + Auri sees you (the closing duo) */}
+        <SanctuaryDuo />
 
-        {/* 05 — PEOPLE: The creators who make it */}
-        <Suspense fallback={null}>
-          <CreatorUniverse />
-        </Suspense>
-
-        {/* 06 — BELONGING: The sanctuary — a place to come back to */}
-        <Suspense fallback={null}>
-          <SanctuaryMoment />
-        </Suspense>
-
-        {/* 07 — POSSIBILITY: Originals + Community conversations */}
+        {/* 05 — POSSIBILITY: Originals + Community conversations */}
         <Suspense fallback={null}>
           <OriginalsShowcase trailerHref="/signup" />
         </Suspense>
@@ -76,7 +62,7 @@ export default function Home() {
           <RecentDiscussions id="community" />
         </Suspense>
 
-        {/* 08 — INVITATION: The final door */}
+        {/* 06 — INVITATION: The final door */}
         <Suspense fallback={null}>
           <FinaleCTA primaryHref="/signup" />
         </Suspense>
@@ -84,7 +70,6 @@ export default function Home() {
 
       <Footer />
       <AuriOrb />
-      <AuriSignatureMoment />
     </div>
   );
 }

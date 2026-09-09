@@ -22,8 +22,8 @@ export const moods: Mood[] = [
   {
     id: "inspired",
     label: "Inspired",
-    emoji: "🔥",
-    rgb: [251, 113, 133],
+    emoji: "✦",
+    rgb: [167, 139, 250],
     line: "Stories that light your next fire."
   },
   {
@@ -74,6 +74,20 @@ export const moods: Mood[] = [
     emoji: "🔭",
     rgb: [34, 211, 238],
     line: "New doors, softly opened."
+  },
+  {
+    id: "nostalgic",
+    label: "Nostalgic",
+    emoji: "📻",
+    rgb: [236, 72, 153],
+    line: "Old memories, kept warm."
+  },
+  {
+    id: "overwhelmed",
+    label: "Overwhelmed",
+    emoji: "🌊",
+    rgb: [99, 102, 241],
+    line: "Soft, quiet corners to land in."
   }
 ];
 

@@ -26,7 +26,6 @@ const MOOD_ATMOSPHERE: Record<string, { scale: number; meshBright: number; auror
   nostalgic: { scale: 0.99, meshBright: 0.92, auroraBright: 0.95 },
   overwhelmed: { scale: 0.97, meshBright: 0.9, auroraBright: 0.92 },
 };
-
 /**
  * Emotional discovery — "Meet yourself somewhere here."
  *

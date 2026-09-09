@@ -23,13 +23,15 @@ const PLACES: Command[] = [
   { id: "nav-home", label: "Home", hint: "Your sanctuary", icon: "home", href: "/home", group: "Places" },
   { id: "nav-studio", label: "Studio", hint: "Create, draft, publish", icon: "dashboard", href: "/studio", group: "Places" },
   { id: "nav-discover", label: "Discover", hint: "Search the universe", icon: "discover", href: "/discover", group: "Places" },
-  { id: "nav-journey", label: "Journey", hint: "Your constellation", icon: "heart", href: "/journey", group: "Places" },
+  { id: "nav-journey", label: "Journey", hint: "Your exploration atlas — threads & worlds", icon: "heart", href: "/journey", group: "Places" },
   { id: "nav-within", label: "Within", hint: "Talk to Auri", icon: "sparkles", href: "/within", group: "Places" },
   { id: "nav-profile", label: "Profile", hint: "Your corner", icon: "profile", href: "/profile", group: "Places" },
   { id: "nav-mirror", label: "Mirror", hint: "Your reflections, private by default", icon: "eye", href: "/mirror", group: "Places" },
   { id: "nav-connections", label: "Connections", hint: "Your people", icon: "users", href: "/connections", group: "Places" },
   { id: "nav-conversations", label: "Conversations", hint: "Quiet, direct messages", icon: "send", href: "/conversations", group: "Places" },
   { id: "nav-settings", label: "Settings", hint: "Tune the world", icon: "settings", href: "/settings", group: "Places" },
+  { id: "nav-atlas", label: "Atlas", hint: "The observatory — sky, aura, mystic", icon: "globe", href: "/atlas", group: "Places" },
+  { id: "nav-constellation", label: "The Human Constellation", hint: "The people of WithIn — creators, rooms, worlds", icon: "users", href: "/constellation", group: "Places" },
 ];
 
 const SHELVES: Command[] = [
@@ -201,11 +203,11 @@ export default function CommandPalette() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: prefersReducedMotion ? 0.1 : 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg overflow-hidden rounded-modal border border-white/10 bg-[#0b0912]/95 shadow-soft backdrop-blur-2xl"
+            className="crystal-foreground crystal-edge depth-high relative w-full max-w-lg overflow-hidden rounded-modal backdrop-blur-2xl"
           >
             {/* Input row */}
-            <div className="flex items-center gap-3 border-b border-white/[0.06] px-5 py-4">
-              <Icon name="search" size={16} className="shrink-0 text-gray-500" />
+            <div className="flex items-center gap-3 border-b border-[#232136]/10 px-5 py-4">
+              <Icon name="search" size={16} className="shrink-0 text-[#8b8aa0]" />
               <input
                 ref={inputRef}
                 type="text"
@@ -217,7 +219,7 @@ export default function CommandPalette() {
                 onKeyDown={onKeyDownList}
                 placeholder="Where to? Try “music”, “auri”, a title…"
                 aria-label="Search commands and the universe"
-                className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-600"
+                className="min-w-0 flex-1 bg-transparent text-sm text-[#232136] outline-none placeholder:text-[#8b8aa0]"
               />
               <kbd className="hidden shrink-0 rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 sm:block">
                 Esc

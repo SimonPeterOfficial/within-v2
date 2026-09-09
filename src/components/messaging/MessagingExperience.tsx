@@ -135,26 +135,32 @@ export default function MessagingExperience() {
 
   useEffect(() => {
     if (!authenticated || !withParam || state !== "ready" || opening) return;
-    setOpening(true);
-    void (async () => {
-      try {
-        const res = await fetch("/api/conversations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: withParam }),
-        });
-        const data = (await res.json()) as { ok: boolean; conversationId?: string; error?: string };
-        if (data.ok && data.conversationId) {
-          setActiveId(data.conversationId);
-          await loadThread(data.conversationId);
-          await loadConversations();
-        } else {
-          toast(data.error ?? "Couldn't open that conversation.", "error");
+    // Kick the async work off one tick later so the effect body itself never
+    // calls setState synchronously — React can settle `opening` first and the
+    // guard above keeps this from firing twice for the same ?with param.
+    const timer = setTimeout(() => {
+      setOpening(true);
+      void (async () => {
+        try {
+          const res = await fetch("/api/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: withParam }),
+          });
+          const data = (await res.json()) as { ok: boolean; conversationId?: string; error?: string };
+          if (data.ok && data.conversationId) {
+            setActiveId(data.conversationId);
+            await loadThread(data.conversationId);
+            await loadConversations();
+          } else {
+            toast(data.error ?? "Couldn't open that conversation.", "error");
+          }
+        } finally {
+          setOpening(false);
         }
-      } finally {
-        setOpening(false);
-      }
-    })();
+      })();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [authenticated, withParam, state, opening, loadConversations, loadThread, toast]);
 
   // Gentle polling while a thread is open — new messages arrive without a
@@ -224,9 +230,15 @@ export default function MessagingExperience() {
   if (!authenticated) {
     return (
       <section className="relative mx-auto w-full max-w-3xl px-6 pb-24 pt-28">
-        <GlassCard tone="soft" className="p-10 text-center">
-          <Icon name="send" size={28} className="mx-auto text-emerald-300/70" />
-          <Text as="h1" variant="sectionTitle" className="mt-4">
+        <div className="text-center">
+          <div className="relative mx-auto mb-7 flex h-20 w-20 items-center justify-center">
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(var(--mood-rgb),0.14),transparent_65%)]"
+            />
+            <Icon name="send" size={28} className="relative text-emerald-300/70" />
+          </div>
+          <Text as="h1" variant="sectionTitle">
             Conversations
           </Text>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-gray-400">
@@ -239,7 +251,7 @@ export default function MessagingExperience() {
             <Icon name="lock" size={14} />
             Sign in
           </Link>
-        </GlassCard>
+        </div>
       </section>
     );
   }
@@ -247,7 +259,7 @@ export default function MessagingExperience() {
   return (
     <section className="relative mx-auto w-full max-w-4xl px-4 pb-24 pt-24 sm:px-6">
       <header className="hidden sm:block">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-300/70">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[rgba(var(--mood-rgb),0.75)]">
           Conversations
         </p>
         <Text as="h1" variant="sectionTitle" className="mt-2">
@@ -256,9 +268,9 @@ export default function MessagingExperience() {
       </header>
 
       <div className="mt-6 grid gap-4 sm:mt-8 lg:grid-cols-[300px_minmax(0,1fr)]">
-        {/* ── Conversation list ── */}
-        <GlassCard tone="soft" className={`overflow-hidden ${activeId ? "hidden lg:block" : ""}`}>
-          <p className="border-b border-white/[0.06] px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-gray-500">
+        {/* ── Conversation list — a floating crystal rail ── */}
+        <GlassCard tone="soft" className={`crystal-elevated crystal-edge overflow-hidden ${activeId ? "hidden lg:block" : ""}`}>
+          <p className="border-b border-white/[0.06] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-gray-500">
             Conversations
           </p>
 
@@ -313,10 +325,17 @@ export default function MessagingExperience() {
                   setActiveId(conversation.id);
                   void loadThread(conversation.id);
                 }}
-                className={`flex w-full items-center gap-3 border-b border-white/[0.04] px-4 py-3 text-left transition last:border-b-0 hover:bg-white/[0.04] ${
-                  activeId === conversation.id ? "bg-white/[0.06]" : ""
+                className={`group relative flex w-full items-center gap-3 border-b border-white/[0.04] px-5 py-4 text-left transition last:border-b-0 hover:bg-white/[0.03] ${
+                  activeId === conversation.id ? "bg-white/[0.05]" : ""
                 }`}
               >
+                {/* The active conversation is a point of light on the list */}
+                {activeId === conversation.id && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-[rgba(var(--mood-rgb),0.8)] shadow-[0_0_12px_rgba(var(--mood-rgb),0.6)]"
+                  />
+                )}
                 <PartnerAvatar partner={conversation.partner} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
@@ -355,8 +374,8 @@ export default function MessagingExperience() {
             </div>
           ) : (
             <>
-              {/* Thread header */}
-              <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
+              {/* Thread header — a quiet hairline, not a chrome bar */}
+              <div className="hairline flex items-center gap-3 px-5 py-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -381,8 +400,8 @@ export default function MessagingExperience() {
                 )}
               </div>
 
-              {/* Messages */}
-              <div ref={scrollRef} className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
+              {/* Messages — a calm room: generous measure, soft spacing */}
+              <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-6">
                 {threadState === "loading" && (
                   <div className="space-y-3">
                     {[0, 1, 2].map((index) => (
@@ -399,16 +418,21 @@ export default function MessagingExperience() {
                   messages.map((message) => {
                     const mine = message.senderId === myId;
                     return (
-                      <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                        <div
+                      <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>                        <div
                           className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                            mine
-                              ? "bg-linear-to-br from-purple-500 to-emerald-400 text-black"
-                              : "border border-white/[0.06] bg-white/[0.05] text-gray-200"
+                            mine ? "text-white" : "crystal-soft crystal-edge text-[#232136]"
                           }`}
+                          style={
+                            mine
+                              ? {
+                                  background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.92), rgba(var(--mood-rgb),0.72))",
+                                  boxShadow: "0 4px 18px rgba(var(--mood-rgb),0.28), inset 0 1px 0 rgba(255,255,255,0.4)",
+                                }
+                              : { boxShadow: "var(--depth-low)" }
+                          }
                         >
                           <p className="whitespace-pre-wrap break-words">{message.body}</p>
-                          <p className={`mt-1 text-[10px] ${mine ? "text-black/50" : "text-gray-600"}`}>
+                          <p className={`mt-1 text-[10px] ${mine ? "text-white/70" : "text-[#8b8aa0]"}`}>
                             {timeAgo(message.createdAt)}
                           </p>
                         </div>
@@ -417,8 +441,8 @@ export default function MessagingExperience() {
                   })}
               </div>
 
-              {/* Composer */}
-              <div className="border-t border-white/[0.06] p-3">
+              {/* Composer — a listening surface, anchored to the room */}
+              <div className="px-5 pb-4 pt-2">
                 <form
                   onSubmit={(event) => {
                     event.preventDefault();
@@ -442,7 +466,8 @@ export default function MessagingExperience() {
                     rows={1}
                     maxLength={4000}
                     placeholder="Write something true…"
-                    className="max-h-32 flex-1 resize-none rounded-2xl border border-white/[0.08] bg-black/40 px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-600 outline-none transition focus:border-emerald-400/40 focus:ring-2 focus:ring-emerald-400/10"
+                    className="crystal-focus max-h-32 flex-1 resize-none rounded-2xl bg-white/[0.55] px-4 py-2.5 text-sm text-[#232136] placeholder:text-[#8b8aa0] outline-none backdrop-blur-md"
+                    style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9), var(--depth-low)" }}
                   />
                   <Button type="submit" size="sm" disabled={!draft.trim() || sending} ariaLabel="Send message">
                     <Icon name="send" size={14} />

@@ -17,7 +17,7 @@ import {
 } from "@/lib/explore";
 import { getThread, getAnotherDoor, type ThreadConnection } from "@/lib/explore/thread";
 import { fireRipple } from "@/lib/ripple";
-import DepthLayers from "@/components/effects/DepthLayers";
+import WorldEnvironment from "@/components/within/crystal/WorldEnvironment";
 import StarField from "@/components/sanctuary/StarField";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
@@ -59,7 +59,7 @@ function DiscoveryCard({
         onClick={(e) => { fireRipple(e); onSelect(item); }}
         className="w-full text-left"
       >
-        <GlowTrailCard className="rounded-card border border-white/[0.05] bg-white/[0.02] backdrop-blur-sm card-tactile p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.04] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.1)] active:scale-[0.99]">
+        <GlowTrailCard className="crystal-soft crystal-edge depth-medium crystal-press rounded-3xl p-5">
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent"
@@ -340,8 +340,8 @@ export default function ExploreExperience() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#02030a] text-white">
-      <DepthLayers preset="sanctuary" particles={6} stars={14} fog={0.4} />
+    <div className="crystal-world relative min-h-screen overflow-hidden text-[#232136]">
+      <WorldEnvironment variant="world" />
 
       <div
         aria-hidden

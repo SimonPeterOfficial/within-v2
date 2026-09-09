@@ -17,10 +17,9 @@ import {
 import { fireRipple } from "@/lib/ripple";
 import { recordExplorationDepth, markWithinVisited, recordDiscovery, getUniverseState } from "@/lib/universe/state";
 import { getAuriContextualMessage } from "@/lib/universe/events";
-import DepthLayers from "@/components/effects/DepthLayers";
-import StarField from "@/components/sanctuary/StarField";
 import AuriOwl from "@/components/sanctuary/AuriOwl";
 import Icon from "@/components/ui/Icon";
+import WorldEnvironment from "@/components/within/crystal/WorldEnvironment";
 import type { AuriState } from "@/lib/auri";
 
 /* ── Message types ───────────────────────────────────────────────────── */
@@ -141,7 +140,7 @@ function AmbientSuggestions({
           initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.8 + i * 0.1 }}
-          className="rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-[11px] font-medium text-gray-500/60 transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.15)] hover:bg-white/[0.04] hover:text-gray-300/80"
+          className="rounded-full border border-white/70 bg-white/45 px-4 py-2 text-[11px] font-medium text-[#6f6e88] transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.4)] hover:bg-white/75 hover:text-[#2c2a48]"
         >
           {s.text}
         </motion.button>
@@ -175,29 +174,29 @@ function DiscoveryDoor({ item }: { item: ExploreItem }) {
       initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6, filter: "blur(4px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="group mt-3 block overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.12)] hover:bg-white/[0.04]"
+      className="group mt-3 block overflow-hidden rounded-xl border border-white/60 bg-white/45 transition-all duration-500 hover:border-[rgba(var(--mood-rgb),0.35)] hover:bg-white/70"
     >
       {item.cover && (
         <div
-          className={`flex h-14 w-full items-center justify-center bg-gradient-to-br ${item.cover.gradient} text-2xl`}
-          style={{ opacity: 0.85 }}
+          className={`flex h-14 w-full items-center justify-center bg-linear-to-br ${item.cover.gradient} text-2xl`}
+          style={{ opacity: 0.9 }}
         >
           {item.cover.emoji}
         </div>
       )}
       <div className="p-3">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400/70">
+          <span className="rounded-full bg-white/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#5f5e74] ring-1 ring-white/80">
             {item.type}
           </span>
         </div>
-        <h4 className="mt-1.5 text-[13px] font-medium text-white/85 group-hover:text-white">
+        <h4 className="mt-1.5 text-[13px] font-medium text-[#2c2a48] group-hover:text-[#232136]">
           {item.title}
         </h4>
-        <p className="mt-1 text-[11px] text-gray-400/50 line-clamp-2">
+        <p className="mt-1 text-[11px] text-[#6f6e88] line-clamp-2">
           {item.description}
         </p>
-        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-400/40 group-hover:text-emerald-300/60 transition-colors">
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-[#5b4bc4] transition-colors">
           <span>Open this door</span>
           <Icon name="forward" size={8} />
         </div>
@@ -212,7 +211,7 @@ function NavDoor({ door }: { door: NonNullable<Message["door"]> }) {
   return (
     <a
       href={door.destination}
-      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-gray-400/60 transition-all duration-300 hover:border-[rgba(var(--mood-rgb),0.12)] hover:bg-white/[0.04] hover:text-gray-300/80"
+      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/45 px-3 py-1.5 text-[11px] font-medium text-[#5f5e74] transition-all duration-300 hover:border-[rgba(var(--mood-rgb),0.35)] hover:bg-white/70 hover:text-[#2c2a48]"
     >
       <span>{door.emoji}</span>
       <span>{door.label}</span>
@@ -239,17 +238,19 @@ function MessageBubble({ message, auriState }: { message: Message; auriState: Au
         {isAuri && (
           <div className="mb-2 flex items-center gap-2">
             <AuriOwl size={18} particles={false} state={auriState} />
-            <span className="text-[10px] font-medium tracking-wide text-emerald-400/35">Auri</span>
+            <span className="text-[10px] font-medium tracking-wide text-[#7c6ce0]">Auri</span>
           </div>
         )}
 
+        {/* The crystal room — Auri speaks as ink on light; the user's words
+            carry a soft mood aura so ownership reads at a glance. */}
         <div
-          className={`px-4 py-3 text-[13px] leading-relaxed ${
+          className={`text-[13px] leading-relaxed ${
             isUser
-              ? "ml-auto max-w-[85%] rounded-2xl rounded-tr-md border border-[rgba(var(--mood-rgb),0.06)] bg-[rgba(var(--mood-rgb),0.03)] px-5 py-3.5 text-white/85"
+              ? "ml-auto max-w-[85%] rounded-2xl bg-white/70 px-5 py-3.5 text-[#2c2a48] ring-1 ring-white/80 backdrop-blur"
               : isAuri
-              ? "max-w-[85%] rounded-2xl rounded-tl-md border border-white/[0.03] bg-white/[0.015] text-gray-300/75 px-5 py-3.5"
-              : "border border-white/[0.02] bg-white/[0.01] text-gray-500/50 text-center text-[12px] italic"
+              ? "max-w-[92%] font-display text-[15px] italic leading-relaxed text-[#3d3a5e]"
+              : "text-center text-[12px] italic text-[#8b8aa0]"
           }`}
         >
           {message.text}
@@ -297,7 +298,7 @@ function AmbientWhisper({ visible }: { visible: boolean }) {
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="pointer-events-none absolute bottom-28 left-0 right-0 text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.04] bg-white/[0.02] px-4 py-2 text-[11px] italic text-gray-500/40 backdrop-blur-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/55 px-4 py-2 text-[11px] italic text-[#6f6e88] backdrop-blur-sm">
             <AuriOwl size={12} particles={false} state="sleeping" />
             {whisper}
           </span>
@@ -621,20 +622,15 @@ export default function WithinExperience() {
   const showAmbientWhisper = idle && messages.length > 0 && !isTyping;
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#02030a] text-white">
-      {/* Living atmosphere — deeper, quieter than other rooms */}
-      <DepthLayers preset="sanctuary" particles={3} stars={12} fog={0.3} />
+    <div className="crystal-world relative flex min-h-screen flex-col overflow-hidden text-[#232136]">
+      {/* Living atmosphere — the luminous crystal world, softer in this room */}
+      <WorldEnvironment variant="calm" />
 
-      {/* Soft vignette — the room feels enclosed */}
+      {/* Soft light vignette — the room feels held, gently */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]"
+        className="pointer-events-none fixed inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(235,235,248,0.4)_100%)]"
       />
-
-      {/* Star field — the room has its own sky */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
-        <StarField count={16} seed={42} />
-      </div>
 
       {/* Portal ripple effect */}
       <PortalRipple active={portalActive} />
@@ -666,7 +662,7 @@ export default function WithinExperience() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.8 }}
-                  className="mt-6 text-center text-[13px] italic text-gray-500/40"
+                  className="mt-6 text-center text-[13px] italic text-[#8b8aa0]"
                 >
                   Auri is here.
                 </motion.p>
@@ -687,7 +683,7 @@ export default function WithinExperience() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex items-center gap-2 text-gray-500/40"
+                  className="flex items-center gap-2 text-[#8b8aa0]"
                 >
                   <AuriOwl size={16} particles={false} state="thinking" />
                   <span className="text-[11px] italic">thinking…</span>
@@ -715,26 +711,33 @@ export default function WithinExperience() {
         </div>
       )}
 
-      {/* Input — an invitation, not a form */}
-      <div className="relative z-10 border-t border-white/[0.03] bg-[#02030a]/60 px-6 py-4 backdrop-blur-xl">
-        <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl gap-3">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              resetIdle();
-            }}
-            onFocus={resetIdle}
-            placeholder={messages.length <= 1 ? "Tell Auri what you're feeling…" : "Whisper something…"}
-            className="flex-1 rounded-full border border-white/[0.05] bg-white/[0.02] px-5 py-3 text-[13px] text-white placeholder-gray-600/40 outline-none transition-all duration-500 focus:border-[rgba(var(--mood-rgb),0.12)] focus:bg-white/[0.03] focus:placeholder-gray-500/50"
-            aria-label="Message Auri"
-          />
+      {/* Input — a listening surface, not a form. No bar, no border across
+          the room: the field floats on the dark and warms when attended. */}
+      <div className="relative z-10 px-6 pb-8">
+        <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl items-center gap-3">
+          <div className="relative flex-1">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -inset-4 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(var(--mood-rgb),0.05),transparent_70%)] opacity-0 transition-opacity duration-700 focus-within:opacity-100"
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                resetIdle();
+              }}
+              onFocus={resetIdle}
+              placeholder={messages.length <= 1 ? "Tell Auri what you're feeling…" : "Whisper something…"}
+              className="relative w-full rounded-full border border-white/70 bg-white/60 px-5 py-3 text-[13px] text-[#2c2a48] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] placeholder-[#8b8aa0] outline-none backdrop-blur-md transition-all duration-500 focus:border-[rgba(var(--mood-rgb),0.45)] focus:bg-white/80 focus:placeholder-[#6f6e88]"
+              aria-label="Message Auri"
+            />
+          </div>
           <button
             type="submit"
             disabled={!inputValue.trim()}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-gray-400 transition-all duration-300 hover:border-[rgba(var(--mood-rgb),0.2)] hover:bg-[rgba(var(--mood-rgb),0.06)] hover:text-white disabled:opacity-20 disabled:hover:border-white/[0.06] disabled:hover:bg-white/[0.03]"
+            className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/60 text-[#5b4bc4] ring-1 ring-white/80 transition-all duration-300 hover:bg-white/90 disabled:opacity-30"
             aria-label="Send message"
           >
             <Icon name="forward" size={14} />

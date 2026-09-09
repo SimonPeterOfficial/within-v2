@@ -35,7 +35,7 @@ export default function AuthInput({
 
   return (
     <div className="text-left">
-      <label htmlFor={id} className="mb-2 block text-sm font-medium text-gray-300">
+      <label htmlFor={id} className="mb-2 block text-sm font-medium text-[#44435e]">
         {label}
       </label>
       <span className="relative block">
@@ -49,11 +49,12 @@ export default function AuthInput({
           required={required}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`w-full rounded-full border bg-white/5 px-5 py-3 pr-14 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition focus:bg-white/10 ${
+          className={`crystal-focus w-full rounded-full bg-white/[0.55] px-5 py-3 pr-14 text-sm text-[#232136] placeholder-[#8b8aa0] outline-none backdrop-blur transition focus:bg-white/[0.72] ${
             error
-              ? "border-rose-400/60 focus:border-rose-400/70"
-              : "border-white/10 focus:border-emerald-400/50"
+              ? "ring-1 ring-rose-400/70"
+              : "ring-1 ring-white/70 hover:ring-white/90"
           }`}
+          style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), var(--depth-low)" }}
         />
         {toggle && (
           <button
@@ -73,7 +74,7 @@ export default function AuthInput({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-2 px-3 text-xs text-rose-300"
+          className="mt-2 px-3 text-xs text-rose-500"
         >
           {error}
         </motion.p>

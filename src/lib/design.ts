@@ -81,7 +81,12 @@ export const moodColors = {
  * Headlines speak in the editorial display face (Fraunces) with generous
  * leading and tightened tracking; body copy stays in Geist. Every style in
  * the universe comes from here so headlines never drift between sections.
- * Consume via the <Text> primitive or directly. */
+ * Consume via the <Text> primitive or directly.
+ *
+ * GEN 21 — the scale now runs display → whisper with deliberate breathing
+ * room between levels: fewer weights, wider measure, quieter labels. The
+ * eyebrow is no longer always-loud emerald; it carries the mood light at
+ * low opacity so hierarchy comes from rhythm, not color saturation. */
 export const typography = {
   /** Largest statement — the landing hero */
   display: "font-display font-medium text-6xl leading-[0.98] tracking-[-0.03em] md:text-8xl",
@@ -99,8 +104,8 @@ export const typography = {
   caption: "text-sm text-gray-500",
   /** Micro text — metadata, timestamps */
   micro: "text-xs text-gray-500",
-  /** Uppercase kicker above titles — quiet, widely tracked */
-  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400",
+  /** Uppercase kicker above titles — the mood-lit spine marker */
+  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(var(--mood-rgb),0.75)]",
   /** Compact labels (chips, form labels) */
   label: "text-[11px] font-medium uppercase tracking-[0.2em]"
 } as const;

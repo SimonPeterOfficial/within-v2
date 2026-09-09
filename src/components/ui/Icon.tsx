@@ -43,6 +43,15 @@ import {
   Sun,
   User,
   Users,
+  Bell,
+  Globe,
+  Wallet,
+  Library,
+  MessageCircle,
+  MoreHorizontal,
+  Upload,
+  Scissors,
+  Gem,
   X
 } from "lucide-react";
 
@@ -100,7 +109,17 @@ export const icons = {
   analytics: BarChart3,
   /* ── Auri ── */
   mic: Mic,
-  send: Send
+  send: Send,
+  /* ── Shell ── */
+  bell: Bell,
+  globe: Globe,
+  wallet: Wallet,
+  library: Library,
+  message: MessageCircle,
+  dots: MoreHorizontal,
+  upload: Upload,
+  scissors: Scissors,
+  gem: Gem
 } as const;
 
 export type IconName = keyof typeof icons;

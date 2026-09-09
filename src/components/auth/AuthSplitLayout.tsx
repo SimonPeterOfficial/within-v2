@@ -39,24 +39,24 @@ export default function AuthSplitLayout({ children, meta }: AuthSplitLayoutProps
   return (
     <section
       id="main"
-      className="relative flex min-h-screen overflow-hidden bg-[#02030a] text-white"
+      className="crystal-world relative flex min-h-screen overflow-hidden text-[#232136]"
     >
       {/* ── Left side — Authentication ── */}
       <div className="relative flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2 lg:px-12">
-        {/* Atmospheric background — quieter than the right side */}
+        {/* Environmental light on the entrance — morning through glass */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(88,60,160,0.06),transparent_60%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_28%_0%,rgba(190,170,252,0.24),transparent_60%)]"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(52,211,153,0.03),transparent_50%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_72%_96%,rgba(170,215,245,0.2),transparent_55%)]"
         />
 
         {/* Back to home */}
         <Link
           href="/"
-          className="absolute left-6 top-6 z-10 flex items-center gap-2 text-[12px] font-medium text-gray-500 transition-colors hover:text-white/80"
+          className="absolute left-6 top-6 z-10 flex items-center gap-2 text-[12px] font-medium text-[#6f6e88] transition-colors hover:text-[#232136]"
           aria-label="Back to WithIn home"
         >
           <span aria-hidden className="text-lg leading-none">←</span>
@@ -75,9 +75,12 @@ export default function AuthSplitLayout({ children, meta }: AuthSplitLayoutProps
             <Logo />
           </motion.div>
 
-          {/* Form card — no heavy glass, just clean atmosphere */}
-          <motion.div variants={blurUp}>
-            {children}
+          {/* Form — a crystal-clear surface; the world shows through it */}
+          <motion.div
+            variants={blurUp}
+            className="crystal-elevated crystal-edge crystal-sheen depth-high rounded-modal p-7 md:p-8"
+          >
+            <div className="relative z-[2]">{children}</div>
           </motion.div>
 
           {/* Footer meta */}
