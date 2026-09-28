@@ -17,7 +17,7 @@ export function Skeleton({ className = "" }: SkeletonProps) {
   return (
     <div
       aria-hidden
-      className={clsx("animate-pulse rounded-full bg-white/[0.07]", className)}
+      className={clsx("animate-pulse rounded-full bg-ui-raised", className)}
     />
   );
 }
@@ -38,7 +38,7 @@ export function SkeletonRegion({
 /** Mirrors ContentCard (poster variant) — cover, kicker, title, meta line. */
 export function CardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-card border border-white/[0.06] bg-white/[0.03]">
+    <div className="overflow-hidden rounded-card border border-ui-line bg-ui-surface">
       <Skeleton className="h-40 w-full rounded-none" />
       <div className="space-y-3 p-6">
         <Skeleton className="h-2.5 w-20" />
@@ -67,7 +67,7 @@ export function RailSkeleton({ count = 5 }: { count?: number }) {
     <div className="flex gap-4 overflow-hidden">
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="w-64 shrink-0">
-          <div className="flex overflow-hidden rounded-card border border-white/[0.06] bg-white/[0.03]">
+          <div className="flex overflow-hidden rounded-card border border-ui-line bg-ui-surface">
             <Skeleton className="h-24 w-20 shrink-0 rounded-none" />
             <div className="flex-1 space-y-2.5 p-4">
               <Skeleton className="h-2.5 w-16" />
@@ -84,7 +84,7 @@ export function RailSkeleton({ count = 5 }: { count?: number }) {
 /** Mirrors the profile identity card — avatar, name, handle, bio, stats. */
 export function ProfileSkeleton() {
   return (
-    <div className="rounded-card border border-white/[0.12] bg-white/[0.07] p-7 sm:p-10">
+    <div className="rounded-card border border-ui-line bg-ui-raised p-7 sm:p-10">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
         <Skeleton className="h-24 w-24 shrink-0 rounded-full" />
         <div className="flex-1 space-y-3">

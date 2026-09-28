@@ -22,7 +22,7 @@ type UniverseShellProps = {
 export default function UniverseShell({ children, preset = "sanctuary", nav = UNIVERSE_NAV }: UniverseShellProps) {
   const calm = preset === "sanctuary" || preset === "books";
   return (
-    <div className="relative min-h-screen overflow-hidden text-white">
+    <div className="relative min-h-screen overflow-hidden">
       <AppShell items={nav} atmosphere={calm ? "calm" : "world"}>
         {children}
       </AppShell>

@@ -38,7 +38,7 @@ export default function StatePanel({
             <span className="relative">{icon}</span>
           </div>
           <div className="min-w-0">
-            <h3 className="font-display text-xl font-medium leading-snug tracking-[-0.01em] text-white">
+            <h3 className="font-display text-xl font-medium leading-snug tracking-[-0.01em] text-ui-ink">
               {title}
             </h3>
             {description && (
@@ -65,7 +65,7 @@ export default function StatePanel({
         />
         <span className="relative text-ink-muted">{icon}</span>
       </div>
-      <h3 className="font-display text-2xl font-medium leading-snug tracking-[-0.015em] text-white">
+      <h3 className="font-display text-2xl font-medium leading-snug tracking-[-0.015em] text-ui-ink">
         {title}
       </h3>
       {description && (

@@ -96,14 +96,14 @@ export const typography = {
   sectionTitle: "font-display font-semibold text-3xl leading-[1.08] tracking-[-0.02em] md:text-5xl",
   /** Sub-section headings */
   subsection: "font-display font-medium text-2xl leading-[1.12] tracking-[-0.01em] md:text-3xl",
-  /** Supportive subheadings */
-  subtitle: "text-lg leading-relaxed text-gray-400",
+  /** Supportive subheadings — follows the world's ink, dark or crystal */
+  subtitle: "text-lg leading-relaxed text-ui-soft",
   /** Default body copy */
   body: "text-base leading-relaxed",
   /** Small auxiliary text */
-  caption: "text-sm text-gray-500",
+  caption: "text-sm text-ui-faint",
   /** Micro text — metadata, timestamps */
-  micro: "text-xs text-gray-500",
+  micro: "text-xs text-ui-faint",
   /** Uppercase kicker above titles — the mood-lit spine marker */
   eyebrow: "text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(var(--mood-rgb),0.75)]",
   /** Compact labels (chips, form labels) */

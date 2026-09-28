@@ -45,6 +45,18 @@
   --color-line: var(--line);
   --color-ink: var(--foreground);
   --color-ink-muted: var(--ink-muted);
+
+  /* ── UI semantic tokens — the component ink & glass vocabulary ──────
+     Components speak in these instead of hard-coded white/gray classes,
+     so the same component renders correctly in the dark dreamscape AND
+     inside the Crystal World (the scope flips the values, see the
+     WORLD INK section at the end of this file). */
+  --color-ui-ink: var(--ui-ink);
+  --color-ui-soft: var(--ui-ink-soft);
+  --color-ui-faint: var(--ui-ink-faint);
+  --color-ui-surface: var(--ui-surface);
+  --color-ui-raised: var(--ui-raised);
+  --color-ui-line: var(--ui-line);
 }
 
 html {
@@ -1409,13 +1421,103 @@ html[data-breath="awake"] .aurora-root {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.35s ease;
 }
 .crystal-press:hover { transform: translateY(-1px); }
-.crystal-press:active { transform: translateY(0.5px) scale(0.99); }
-
-/* Crystal focus — soft luminous outline */
+.crystal-press:active { transform: translateY(0.5px) scale(0.99); }/* Crystal focus — soft luminous outline */
 .crystal-focus:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 2px rgba(139, 122, 236, 0.65),
     0 0 0 6px rgba(139, 122, 236, 0.14),
     var(--depth-medium);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   WORLD INK — one component ink vocabulary for the whole universe
+   ═══════════════════════════════════════════════════════════════════
+   Components must render correctly inside the dark dreamscape AND the
+   light Crystal World. Instead of hard-coded text-white/text-gray, they
+   speak in --ui-* tokens; the root declares the dark values and the
+   crystal scope flips them to crystal ink. This is the mechanism that
+   lets shared components (GlassCard, Button, StatePanel, PageHero…)
+   transform everywhere at once without duplicating markup.
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --ui-ink: #ededed;
+  --ui-ink-soft: #b9bcc8;
+  --ui-ink-faint: #8a8d9c;
+  --ui-surface: rgba(255, 255, 255, 0.04);
+  --ui-raised: rgba(255, 255, 255, 0.07);
+  --ui-line: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] {
+  --ui-ink: #232136;
+  --ui-ink-soft: #5f5e74;
+  --ui-ink-faint: #8b8aa0;
+  --ui-surface: rgba(255, 255, 255, 0.5);
+  --ui-raised: rgba(255, 255, 255, 0.68);
+  --ui-line: rgba(35, 33, 54, 0.12);
+}
+
+/* The Crystal World flips the ink — the interface reveals the world. */
+.crystal-world,
+.crystal-world-calm {
+  --ui-ink: #232136;
+  --ui-ink-soft: #5f5e74;
+  --ui-ink-faint: #8b8aa0;
+  --ui-surface: rgba(255, 255, 255, 0.45);
+  --ui-raised: rgba(255, 255, 255, 0.62);
+  --ui-line: rgba(255, 255, 255, 0.6);
+}
+
+/* World portal — looking through a crystal window into another place.
+   The scene sits behind glass; the light path reads as depth. */
+@utility crystal-portal {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 2px rgba(40, 38, 70, 0.08),
+    var(--depth-medium);
+}
+.crystal-portal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--crystal-edge);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 3;
+}
+/* The portal's glass breathes — light bends across it once, slowly. */
+.crystal-portal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.14) 45%,
+    rgba(255, 255, 255, 0.04) 52%,
+    transparent 66%
+  );
+  background-size: 220% 100%;
+  animation: portalGlint 14s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes portalGlint {
+  0%, 78%, 100% { background-position: 110% 0; }
+  92% { background-position: -110% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crystal-portal::after {
+    animation: none;
+  }
 }

@@ -25,9 +25,9 @@ export type GlassCardProps = {
 };
 
 const tones: Record<GlassTone, string> = {
-  soft: "border-white/[0.05] bg-white/[0.02] backdrop-blur-sm",
-  default: "border-white/[0.08] bg-white/[0.04] backdrop-blur-sm",
-  strong: "border-white/[0.12] bg-white/[0.07] backdrop-blur",
+  soft: "border-ui-line bg-ui-surface backdrop-blur-sm",
+  default: "border-ui-line bg-ui-surface backdrop-blur-sm",
+  strong: "border-ui-line bg-ui-raised backdrop-blur",
   aurora: "material-aurora-glass",
   tactile: "material-tactile-glass",
   clay: "material-soft-clay",
@@ -54,7 +54,7 @@ export default function GlassCard({
       style={style}
       className={`relative rounded-card border ${tones[tone]} ${
         hoverLift
-          ? "transition-all duration-300 ease-out hover:-translate-y-[2px] hover:border-white/[0.14] hover:bg-white/[0.05] hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.1),0_2px_8px_rgba(0,0,0,0.2)] active:scale-[0.995] active:translate-y-0"
+          ? "transition-all duration-300 ease-out hover:-translate-y-[2px] hover:border-ui-line hover:bg-ui-raised hover:shadow-[0_8px_32px_rgba(var(--mood-rgb),0.1),0_2px_8px_rgba(0,0,0,0.2)] active:scale-[0.995] active:translate-y-0"
           : ""
       } ${sheen ? "overflow-hidden" : ""} ${className}`}
     >

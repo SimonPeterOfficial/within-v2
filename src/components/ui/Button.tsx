@@ -29,13 +29,13 @@ const sizes: Record<ButtonSize, string> = {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "btn-tactile bg-[rgba(var(--mood-rgb),1)] text-black font-bold hover:shadow-[0_0_32px_rgba(var(--mood-rgb),0.35)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+    "btn-tactile bg-[rgba(var(--mood-rgb),1)] text-white font-bold hover:shadow-[0_0_32px_rgba(var(--mood-rgb),0.35)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   gradient:
-    "btn-tactile text-black font-bold hover:shadow-[0_0_36px_rgba(168,85,247,0.3)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+    "btn-tactile text-white font-bold hover:shadow-[0_0_36px_rgba(168,85,247,0.3)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   outline:
-    "btn-tactile border border-white/[0.12] bg-white/[0.03] text-white font-semibold backdrop-blur-sm hover:border-white/[0.2] hover:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
-  ghost: "text-gray-400 font-semibold hover:text-white hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
-  light: "btn-tactile bg-white text-black font-semibold hover:shadow-[0_4px_20px_rgba(255,255,255,0.12)] focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+    "btn-tactile border border-ui-line bg-ui-surface text-ui-ink font-semibold backdrop-blur-sm hover:border-ui-line hover:bg-ui-raised focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+  ghost: "text-ui-faint font-semibold hover:text-ui-ink hover:bg-ui-surface focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.3)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+  light: "btn-tactile bg-white text-[#232136] font-semibold hover:shadow-[0_4px_20px_rgba(255,255,255,0.12)] focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
 };
 
 /**
