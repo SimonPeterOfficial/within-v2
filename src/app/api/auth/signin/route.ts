@@ -7,6 +7,8 @@
  * endpoint never reveals which accounts exist.
  */
 
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, users, type User } from "@/lib/db";

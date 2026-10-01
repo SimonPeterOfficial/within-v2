@@ -28,12 +28,13 @@ type SidebarProps = {
 };
 
 /**
- * The labeled rail — the navigation shell of the authenticated universe.
+ * The crystal navigation rail — architectural glass.
  *
- * Desktop: a fixed 60px labeled rail exactly like the reference — the
- * "WithIn" serif wordmark on top, always-visible labels, a glowing pill on
- * the active item, and a vertical "Scroll" spine at the bottom. It never
- * collapses; the content column is offset to clear it.
+ * Desktop: a floating crystal rail that feels like part of the world's
+ * architecture. The WithIn wordmark on top, always-visible labels,
+ * a luminous pill on the active item, and a user card at the bottom.
+ * The rail is transparent — the world shows through it.
+ *
  * Mobile: a full glass drawer with overlay, Escape-to-close, and scroll lock.
  */
 export default function Sidebar({ items }: SidebarProps) {
@@ -151,10 +152,10 @@ export default function Sidebar({ items }: SidebarProps) {
 
   return (
     <>
-      {/* ── Desktop: the floating labeled crystal rail ────────── */}
+      {/* ── Desktop: the floating crystal rail ────────── */}
       <nav
         aria-label="Primary"
-        className="crystal-elevated crystal-edge depth-medium fixed inset-y-3 left-3 z-50 hidden w-[200px] flex-col rounded-[26px] lg:flex"
+        className="crystal-rail glass-veil fixed inset-y-3 left-3 z-navigation hidden w-[200px] flex-col rounded-[26px] lg:flex"
       >
         {/* Wordmark */}
         <Link
@@ -274,7 +275,7 @@ export default function Sidebar({ items }: SidebarProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[45] cursor-default bg-black/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[45] cursor-default bg-[#2c2a48]/25 backdrop-blur-sm lg:hidden"
             />
             <motion.aside
               ref={panelRef}
@@ -288,17 +289,19 @@ export default function Sidebar({ items }: SidebarProps) {
                 duration: prefersReducedMotion ? 0 : 0.35,
                 ease: [0.16, 1, 0.3, 1]
               }}
-              className="fixed inset-y-0 left-0 z-[55] flex w-72 flex-col border-r border-white/10 bg-black/85 p-6 backdrop-blur-xl outline-none lg:hidden"
+              className="crystal-foreground crystal-edge depth-high fixed inset-y-0 left-0 z-[55] flex w-72 flex-col rounded-r-[26px] p-6 outline-none lg:hidden"
             >
               <div className="flex items-center justify-between">
-                <Link href="/" onClick={close}>
-                  <Logo />
+                <Link href="/home" onClick={close} aria-label="WithIn home">
+                  <span className="font-display text-[21px] font-semibold tracking-[-0.01em] text-[#232136]">
+                    With<span className="text-[#7c6ce0]">In</span>
+                  </span>
                 </Link>
                 <button
                   type="button"
                   onClick={close}
                   aria-label="Close menu"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 transition hover:text-white"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/50 text-[#5f5e74] transition hover:bg-white/75 hover:text-[#232136]"
                 >
                   <Icon name="close" size={18} />
                 </button>
@@ -309,15 +312,15 @@ export default function Sidebar({ items }: SidebarProps) {
                   const isActive = active === item.href;
                   const classes = `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
                     isActive
-                      ? "bg-white/10 text-white"
-                      : "text-gray-300 hover:bg-white/5 hover:text-white"
+                      ? "bg-white/75 text-[#232136] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.8)]"
+                      : "text-[#5f5e74] hover:bg-white/45 hover:text-[#232136]"
                   }`;
                   return item.route ? (
                     <Link key={item.label} href={item.href} onClick={close} className={classes}>
                       <Icon name={item.icon} size={18} />
                       {item.label}
                       {typeof item.badge === "number" && item.badge > 0 && (
-                        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.9)] px-1 text-[10px] font-bold text-black">
+                        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.92)] px-1 text-[10px] font-bold text-white">
                           {item.badge}
                         </span>
                       )}
@@ -331,23 +334,23 @@ export default function Sidebar({ items }: SidebarProps) {
                 })}
               </nav>
 
-              <div className="mt-6 border-t border-white/10 pt-5">
+              <div className="mt-6 border-t border-white/50 pt-5">
                 {isAuthenticated ? (
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-emerald-400 text-xs font-bold text-black">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-amber-200 to-rose-400 text-xs font-bold text-[#232136] ring-2 ring-white/70">
                         {initial}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">{user?.name}</p>
-                        <p className="truncate text-xs text-gray-500">{user?.email}</p>
+                        <p className="truncate text-sm font-semibold text-[#232136]">{user?.name}</p>
+                        <p className="truncate text-xs text-[#8b8aa0]">{user?.email}</p>
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={handleSignOut}
                       aria-label="Sign out"
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 transition hover:border-rose-400/40 hover:text-rose-300"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/60 bg-white/50 text-[#5f5e74] transition hover:border-rose-300 hover:text-rose-500"
                     >
                       <Icon name="logout" size={16} />
                     </button>
@@ -356,7 +359,7 @@ export default function Sidebar({ items }: SidebarProps) {
                   <Link
                     href="/login"
                     onClick={close}
-                    className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                    className="flex items-center justify-center gap-2 rounded-full border border-white/70 bg-white/55 px-4 py-3 text-sm font-semibold text-[#232136] transition hover:bg-white/80"
                   >
                     <Icon name="profile" size={16} />
                     Log in

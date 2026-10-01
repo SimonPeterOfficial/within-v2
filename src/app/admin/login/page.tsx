@@ -53,6 +53,16 @@ export default function AdminLoginPage() {
 
         <AdminLoginForm />
 
+        {/* Forgot password link */}
+        <div className="mt-4 text-center">
+          <a
+            href="/admin/reset/request"
+            className="text-[10px] font-medium text-white/20 transition hover:text-white/40"
+          >
+            Forgot your passcode?
+          </a>
+        </div>
+
         {/* Security indicator */}
         <div className="mt-8 flex items-center justify-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/40" />

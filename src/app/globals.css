@@ -1521,3 +1521,1002 @@ html[data-breath="awake"] .aurora-root {
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FINAL VISION — ENVIRONMENTAL DEPTH LAYER SYSTEM
+   The world behind the interface. Thirteen conceptual layers that
+   compose into a living digital environment. Each layer is a CSS
+   class that can be stacked to create spatial depth.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Layer 01: Distant Sky — the atmospheric ceiling ─────────────── */
+.env-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(180, 200, 240, 0.35) 0%,
+    rgba(200, 190, 230, 0.2) 30%,
+    rgba(240, 230, 220, 0.15) 60%,
+    rgba(220, 210, 230, 0.1) 100%
+  );
+}
+
+/* ── Layer 02: Atmospheric Gradient — the color of the air ────────── */
+.env-atmosphere {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 30% 20%, rgba(168, 150, 250, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 70% 80%, rgba(100, 180, 220, 0.06) 0%, transparent 55%);
+}
+
+/* ── Layer 03: Distant Clouds — slow-moving atmospheric depth ────── */
+.env-clouds {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.4;
+}
+.env-clouds::before,
+.env-clouds::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse 15% 8% at 20% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 12% 6% at 60% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 18% 9% at 80% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 10% 5% at 40% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  animation: cloudDrift 120s linear infinite;
+}
+.env-clouds::after {
+  animation-duration: 180s;
+  animation-direction: reverse;
+  opacity: 0.5;
+}
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── Layer 04: Distant Architecture — far-off structures ──────────── */
+.env-architecture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(140, 130, 180, 0.3) 15%, transparent 30%),
+    linear-gradient(90deg, transparent 55%, rgba(120, 140, 180, 0.25) 70%, transparent 85%),
+    linear-gradient(90deg, transparent 30%, rgba(160, 150, 200, 0.2) 45%, transparent 60%);
+  mask-image: linear-gradient(180deg, transparent 0%, black 40%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 40%, black 80%, transparent 100%);
+}
+
+/* ── Layer 05: Floating Islands — the world's landmasses ──────────── */
+.env-islands {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.env-isle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(1px);
+}
+.env-isle-1 {
+  width: 180px;
+  height: 60px;
+  left: 10%;
+  top: 25%;
+  background: radial-gradient(ellipse, rgba(140, 160, 200, 0.2) 0%, rgba(120, 140, 180, 0.1) 60%, transparent 80%);
+  animation: isleFloat 20s ease-in-out infinite;
+}
+.env-isle-2 {
+  width: 120px;
+  height: 40px;
+  right: 15%;
+  top: 35%;
+  background: radial-gradient(ellipse, rgba(160, 150, 200, 0.15) 0%, transparent 70%);
+  animation: isleFloat 25s ease-in-out infinite reverse;
+}
+.env-isle-3 {
+  width: 200px;
+  height: 70px;
+  left: 40%;
+  top: 15%;
+  background: radial-gradient(ellipse, rgba(180, 170, 220, 0.12) 0%, transparent 70%);
+  animation: isleFloat 30s ease-in-out infinite;
+  animation-delay: 5s;
+}
+@keyframes isleFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(0.5deg); }
+}
+
+/* ── Layer 06: Towers & Structures — vertical elements ────────────── */
+.env-towers {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(140, 130, 180, 0.5) 20%, rgba(140, 130, 180, 0.3) 80%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 10%, transparent 20%, transparent 40%, black 50%, transparent 60%, transparent 80%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 10%, transparent 20%, transparent 40%, black 50%, transparent 60%, transparent 80%, black 90%, transparent 100%);
+}
+
+/* ── Layer 07: Waterfalls — vertical light streams ────────────────── */
+.env-waterfalls {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.1;
+}
+.env-waterfall {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(180deg, transparent 0%, rgba(200, 220, 255, 0.6) 30%, rgba(180, 200, 240, 0.3) 70%, transparent 100%);
+  border-radius: 2px;
+  animation: waterfallFlow 8s ease-in-out infinite;
+}
+.env-waterfall-1 { left: 25%; top: 20%; height: 120px; animation-delay: 0s; }
+.env-waterfall-2 { left: 65%; top: 15%; height: 100px; animation-delay: 2s; }
+.env-waterfall-3 { left: 80%; top: 30%; height: 80px; animation-delay: 4s; }
+@keyframes waterfallFlow {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.95); }
+  50% { opacity: 0.7; transform: scaleY(1.05); }
+}
+
+/* ── Layer 08: Middle-Ground Landscape — the horizon ──────────────── */
+.env-landscape {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 25% at 20% 70%, rgba(140, 160, 200, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 20% at 75% 75%, rgba(160, 150, 200, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 15% at 50% 80%, rgba(120, 140, 180, 0.08) 0%, transparent 70%);
+}
+
+/* ── Layer 09: Gardens & Vegetation — living foreground ──────────── */
+.env-gardens {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.12;
+}
+.env-garden {
+  position: absolute;
+  border-radius: 50%;
+}
+.env-garden-1 {
+  width: 150px;
+  height: 80px;
+  left: 5%;
+  bottom: 10%;
+  background: radial-gradient(ellipse, rgba(100, 160, 120, 0.4) 0%, transparent 70%);
+}
+.env-garden-2 {
+  width: 100px;
+  height: 60px;
+  right: 10%;
+  bottom: 15%;
+  background: radial-gradient(ellipse, rgba(120, 180, 140, 0.3) 0%, transparent 70%);
+}
+.env-garden-3 {
+  width: 200px;
+  height: 100px;
+  left: 35%;
+  bottom: 5%;
+  background: radial-gradient(ellipse, rgba(140, 170, 150, 0.25) 0%, transparent 70%);
+}
+
+/* ── Layer 10: Foreground Surfaces — the immediate environment ────── */
+.env-foreground {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 30% 20% at 10% 90%, rgba(255, 255, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 25% 15% at 90% 85%, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+}
+
+/* ── Layer 11: Reflective Water — the world's mirror ─────────────── */
+.env-water {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.env-water::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 15% at 30% 85%, rgba(200, 220, 255, 0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 12% at 70% 90%, rgba(180, 200, 240, 0.12) 0%, transparent 70%);
+}
+.env-water::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 255, 255, 0.02) 3px,
+    rgba(255, 255, 255, 0.02) 4px
+  );
+  animation: waterShimmer 6s ease-in-out infinite;
+}
+@keyframes waterShimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* ── Layer 12: Glass UI — the interface material ──────────────────── */
+.env-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+}
+
+/* ── Layer 13: Auri / Contextual Presence — the intelligence ──────── */
+.env-auri {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.env-auri-halo {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 150, 250, 0.08) 0%, transparent 70%);
+  animation: auriHalo 12s ease-in-out infinite;
+}
+@keyframes auriHalo {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+
+/* ── World Personalities — each world has its own atmosphere ──────── */
+.world-sanctuary {
+  --world-primary: rgba(139, 92, 246, 0.12);
+  --world-secondary: rgba(96, 130, 200, 0.1);
+  --world-accent: rgba(190, 200, 225, 0.08);
+}
+.world-mirror {
+  --world-primary: rgba(99, 102, 241, 0.1);
+  --world-secondary: rgba(120, 140, 200, 0.08);
+  --world-accent: rgba(200, 210, 240, 0.06);
+}
+.world-connections {
+  --world-primary: rgba(52, 211, 153, 0.12);
+  --world-secondary: rgba(139, 92, 246, 0.1);
+  --world-accent: rgba(255, 200, 150, 0.08);
+}
+.world-studio {
+  --world-primary: rgba(245, 158, 11, 0.1);
+  --world-secondary: rgba(236, 72, 153, 0.08);
+  --world-accent: rgba(255, 220, 180, 0.06);
+}
+.world-stage {
+  --world-primary: rgba(109, 40, 217, 0.14);
+  --world-secondary: rgba(37, 99, 235, 0.1);
+  --world-accent: rgba(255, 180, 200, 0.08);
+}
+.world-within-time {
+  --world-primary: rgba(139, 92, 246, 0.1);
+  --world-secondary: rgba(34, 211, 238, 0.08);
+  --world-accent: rgba(200, 220, 255, 0.06);
+}
+.world-originals {
+  --world-primary: rgba(109, 40, 217, 0.16);
+  --world-secondary: rgba(37, 99, 235, 0.12);
+  --world-accent: rgba(255, 200, 150, 0.08);
+}
+.world-worlds {
+  --world-primary: rgba(168, 150, 250, 0.14);
+  --world-secondary: rgba(100, 180, 220, 0.1);
+  --world-accent: rgba(255, 220, 180, 0.08);
+}
+
+/* ── Editorial Typography Scale — the voice of the world ──────────── */
+@utility text-editorial {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+@utility text-editorial-italic {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+@utility text-world-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+@utility text-world-subtitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+@utility text-whisper {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+
+/* ── Spatial Composition Utilities ────────────────────────────────── */
+@utility spatial-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+@utility spatial-depth-1 {
+  transform: translateZ(-100px) scale(1.1);
+}
+@utility spatial-depth-2 {
+  transform: translateZ(-50px) scale(1.05);
+}
+@utility spatial-depth-3 {
+  transform: translateZ(0);
+}
+@utility spatial-depth-4 {
+  transform: translateZ(50px) scale(0.95);
+}
+
+/* ── World Entrance — the transition into a new world ─────────────── */
+@utility world-entrance {
+  position: relative;
+  overflow: hidden;
+}
+.world-entrance::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, var(--world-primary, rgba(168, 150, 250, 0.1)) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+.world-entrance:hover::before {
+  opacity: 1;
+}
+
+/* ── Crystal Navigation Rail — architectural glass ────────────────── */
+@utility crystal-rail {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 4px 24px rgba(40, 38, 70, 0.08),
+    0 1px 3px rgba(40, 38, 70, 0.04);
+}
+
+/* ── Ambient Light — the world's illumination ─────────────────────── */
+@utility ambient-light {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+.ambient-light-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 240, 200, 0.15) 0%, transparent 70%);
+  top: -10%;
+  right: -5%;
+}
+.ambient-light-2 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(200, 220, 255, 0.12) 0%, transparent 70%);
+  bottom: -5%;
+  left: -5%;
+}
+.ambient-light-3 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(168, 150, 250, 0.1) 0%, transparent 70%);
+  top: 40%;
+  left: 30%;
+}
+
+/* ── Reduced Motion — preserve the design without movement ────────── */
+@media (prefers-reduced-motion: reduce) {
+  .env-clouds::before,
+  .env-clouds::after,
+  .env-isle,
+  .env-waterfall,
+  .env-water::after,
+  .env-auri-halo {
+    animation: none !important;
+  }
+  .world-entrance::before {
+    transition: none;
+    opacity: 0.5;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLASS WEIGHT SYSTEM — five levels of material density
+   Air → Veil → Crystal → Sheet → Sanctuary
+   Each level communicates thickness, transparency, light, and depth.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Level 0: AIR — almost invisible ────────────────────────────────
+   Used for: floating labels, minimal controls, environmental nav hints */
+@utility glass-air {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 1px 2px rgba(40, 38, 70, 0.03);
+}
+
+/* ── Level 1: VEIL — very light translucent surface ─────────────────
+   Used for: navigation, small rails, context controls */
+@utility glass-veil {
+  background: rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 2px 8px rgba(40, 38, 70, 0.05);
+}
+
+/* ── Level 2: CRYSTAL — moderate translucency ───────────────────────
+   Used for: content panels, world portals, cards that need containment */
+@utility glass-crystal {
+  background: rgba(255, 255, 255, 0.48);
+  backdrop-filter: blur(24px) saturate(1.45);
+  -webkit-backdrop-filter: blur(24px) saturate(1.45);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 4px 16px rgba(40, 38, 70, 0.07),
+    0 1px 3px rgba(40, 38, 70, 0.04);
+}
+
+/* ── Level 3: SHEET — more solid ───────────────────────────────────
+   Used for: drawers, sheets, larger forms, complex content */
+@utility glass-sheet {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(32px) saturate(1.55);
+  -webkit-backdrop-filter: blur(32px) saturate(1.55);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 8px 28px rgba(40, 38, 70, 0.09),
+    0 2px 6px rgba(40, 38, 70, 0.05);
+}
+
+/* ── Level 4: SANCTUARY — high clarity / high privacy ───────────────
+   Used for: sensitive experiences, modals, private surfaces */
+@utility glass-sanctuary {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(40px) saturate(1.65);
+  -webkit-backdrop-filter: blur(40px) saturate(1.65);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 12px 40px rgba(40, 38, 70, 0.12),
+    0 4px 10px rgba(40, 38, 70, 0.06);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Z-INDEX / SPATIAL SYSTEM — predictable visual layering
+   World → Atmosphere → Structures → Middle → Foreground → Nav →
+   Content → Overlays → Modals → Auri
+   ═══════════════════════════════════════════════════════════════════ */
+@utility z-world { z-index: 0; }
+@utility z-atmosphere { z-index: 1; }
+@utility z-structures { z-index: 2; }
+@utility z-middle { z-index: 3; }
+@utility z-foreground { z-index: 4; }
+@utility z-navigation { z-index: 50; }
+@utility z-content { z-index: 10; }
+@utility z-overlay { z-index: 40; }
+@utility z-modal { z-index: 55; }
+@utility z-auri { z-index: 60; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOTION TOKENS — consistent animation timing
+   Fast → Medium → Slow → Very Slow
+   ═══════════════════════════════════════════════════════════════════ */
+@utility motion-fast {
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@utility motion-medium {
+  transition-duration: 280ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility motion-slow {
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility motion-cinematic {
+  transition-duration: 1200ms;
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   WORLD PORTAL STATES — RESTING, HOVER, FOCUS, TOUCH, ACTIVE,
+   ENTERING, DISABLED
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── RESTING — nearly still ───────────────────────────────────────── */
+.portal-resting {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.35s ease;
+}
+
+/* ── HOVER — subtle elevation, light shift, depth movement ───────── */
+.portal-hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 8px 28px rgba(40, 38, 70, 0.12),
+    0 2px 6px rgba(40, 38, 70, 0.06);
+}
+
+/* ── FOCUS — strong accessible outline ────────────────────────────── */
+.portal-focus:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(139, 122, 236, 0.65),
+    0 0 0 6px rgba(139, 122, 236, 0.14),
+    0 8px 28px rgba(40, 38, 70, 0.12);
+}
+
+/* ── TOUCH — clear tactile response ───────────────────────────────── */
+.portal-touch:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+/* ── ACTIVE — the portal is currently selected ────────────────────── */
+.portal-active {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(139, 122, 236, 0.5),
+    0 4px 16px rgba(40, 38, 70, 0.08);
+}
+
+/* ── ENTERING — brief transition into the world ───────────────────── */
+.portal-entering {
+  animation: portalEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes portalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ── DISABLED — the portal is not available ───────────────────────── */
+.portal-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACCESSIBILITY — inclusive by default
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Focus Visible — clear, consistent focus indicator ────────────── */
+@utility focus-ring {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(139, 122, 236, 0.65),
+    0 0 0 6px rgba(139, 122, 236, 0.14);
+}
+
+/* ── Screen Reader Only — visually hidden but accessible ──────────── */
+@utility sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Skip Link — keyboard navigation aid ──────────────────────────── */
+@utility skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #232136;
+  font-weight: 600;
+  z-index: 100;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── Reduced Motion — preserve design without movement ────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .portal-resting,
+  .portal-hover,
+  .portal-touch,
+  .portal-entering {
+    transition: none !important;
+    animation: none !important;
+  }
+  .portal-hover {
+    transform: none;
+  }
+  .portal-touch:active {
+    transform: none;
+  }
+}
+
+/* ── High Contrast Mode ───────────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  .glass-air,
+  .glass-veil,
+  .glass-crystal,
+  .glass-sheet,
+  .glass-sanctuary {
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ── Print Styles ─────────────────────────────────────────────────── */
+@media print {
+  .glass-air,
+  .glass-veil,
+  .glass-crystal,
+  .glass-sheet,
+  .glass-sanctuary {
+    background: white !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PERFORMANCE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── GPU Acceleration — compositor-friendly transforms ───────────── */
+@utility gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ── Contain — isolate rendering layers ──────────────────────────── */
+@utility contain-layout {
+  contain: layout;
+}
+@utility contain-paint {
+  contain: paint;
+}
+@utility contain-strict {
+  contain: strict;
+}
+
+/* ── Content Visibility — skip rendering off-screen content ──────── */
+@utility content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+
+/* ── Will Change — hint for animated properties ──────────────────── */
+@utility will-transform {
+  will-change: transform;
+}
+@utility will-opacity {
+  will-change: opacity;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ENVIRONMENTAL SOPHISTICATION
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Horizon Line — the world's edge ──────────────────────────────── */
+@utility horizon-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 80%,
+    transparent 100%
+  );
+}
+
+/* ── Mist Layer — atmospheric depth ──────────────────────────────── */
+@utility mist-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(200, 210, 230, 0.08) 30%,
+    rgba(200, 210, 230, 0.12) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Light Shaft — volumetric light ──────────────────────────────── */
+@utility light-shaft {
+  position: absolute;
+  width: 200px;
+  height: 600px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 100%
+  );
+  transform: rotate(15deg);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+/* ── Reflection — water mirror effect ────────────────────────────── */
+@utility reflection {
+  position: relative;
+}
+.reflection::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 50%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Parallax Container — depth through movement ─────────────────── */
+@utility parallax-container {
+  position: relative;
+  overflow: hidden;
+  perspective: 1000px;
+}
+@utility parallax-layer {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FINAL REFINEMENT — polish and coherence
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Smooth Scroll — but respect reduced motion ──────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── Selection — the world's selection color ──────────────────────── */
+::selection {
+  background: rgba(139, 122, 236, 0.25);
+  color: inherit;
+}
+
+/* ── Scrollbar — quiet, part of the world ────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 122, 236, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 122, 236, 0.35);
+}
+
+/* ── Focus Visible — consistent across all elements ──────────────── */
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(139, 122, 236, 0.65),
+    0 0 0 6px rgba(139, 122, 236, 0.14);
+}
+
+/* ── Reduced Motion — comprehensive ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE EXPERIENCE — the phone as a doorway into the world
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Mobile Hero — immersive, intimate, cinematic ──────────────────── */
+@media (max-width: 1023px) {
+  .crystal-world {
+    /* The world is visible on mobile — the environment doesn't disappear */
+    background-attachment: fixed;
+  }
+
+  /* World portals become a horizontal rail on mobile */
+  .world-portals-mobile {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    scrollbar-width: none;
+  }
+  .world-portals-mobile::-webkit-scrollbar {
+    display: none;
+  }
+  .world-portals-mobile > * {
+    flex: 0 0 160px;
+    scroll-snap-align: start;
+  }
+
+  /* The hero is more compact on mobile */
+  .hero-mobile {
+    min-height: [420px] !important;
+  }
+
+  /* Touch targets are generous */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area handling for notched phones */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* ── Tablet Composition — between mobile and desktop ───────────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .crystal-world {
+    /* The world breathes on tablet — more environmental space */
+  }
+
+  /* World portals are a 2-column grid on tablet */
+  .world-portals-tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* ── Large Desktop — expansive, cinematic ──────────────────────────── */
+@media (min-width: 1440px) {
+  .crystal-world {
+    /* The world extends beyond the viewport on large screens */
+  }
+
+  /* World portals are a 4-column grid on large desktop */
+  .world-portals-large {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* ── Dynamic Viewport Height — handles mobile browser chrome ──────── */
+@supports (height: 100dvh) {
+  .crystal-world {
+    min-height: 100dvh;
+  }
+}
+
+/* ── Orientation Handling ─────────────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+  .crystal-world {
+    /* Landscape phones — the world adapts */
+  }
+}
+
+/* ── Touch Interaction ────────────────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch devices — no hover states, but tap states are clear */
+  .crystal-press:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ── Keyboard Navigation ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* Smooth scrolling for keyboard users */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── High Contrast Mode ───────────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  .crystal-world {
+    /* Ensure readability in high contrast mode */
+    --environment-text: #000000;
+    --environment-text-muted: #333333;
+  }
+}
+
+/* ── Print Styles ─────────────────────────────────────────────────── */
+@media print {
+  .crystal-world {
+    background: white !important;
+    color: black !important;
+  }
+  .env-sky,
+  .env-atmosphere,
+  .env-clouds,
+  .env-architecture,
+  .env-islands,
+  .env-towers,
+  .env-waterfalls,
+  .env-landscape,
+  .env-gardens,
+  .env-foreground,
+  .env-water,
+  .env-glass,
+  .env-auri {
+    display: none !important;
+  }
+}

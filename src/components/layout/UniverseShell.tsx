@@ -9,6 +9,8 @@ type UniverseShellProps = {
   preset?: MeshPreset;
   /** Override nav items (rarely needed — pages usually ride the universe nav) */
   nav?: typeof UNIVERSE_NAV;
+  /** World personality class — gives each world its own atmosphere */
+  worldClass?: string;
 };
 
 /**
@@ -18,11 +20,15 @@ type UniverseShellProps = {
  * WithinEnvironment — one coherent atmospheric world that every page
  * floats inside. The `preset` prop is preserved so existing pages keep
  * compiling; sanctuary/photography presets calm the room.
+ *
+ * FINAL VISION: each world has its own personality class that subtly
+ * shifts the atmosphere. The world is visible behind the interface —
+ * the interface exists INSIDE it, not on top of it.
  */
-export default function UniverseShell({ children, preset = "sanctuary", nav = UNIVERSE_NAV }: UniverseShellProps) {
+export default function UniverseShell({ children, preset = "sanctuary", nav = UNIVERSE_NAV, worldClass = "" }: UniverseShellProps) {
   const calm = preset === "sanctuary" || preset === "books";
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className={`relative min-h-screen overflow-hidden ${worldClass}`}>
       <AppShell items={nav} atmosphere={calm ? "calm" : "world"}>
         {children}
       </AppShell>

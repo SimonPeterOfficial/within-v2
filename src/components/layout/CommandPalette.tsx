@@ -204,8 +204,7 @@ export default function CommandPalette() {
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: prefersReducedMotion ? 0.1 : 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="crystal-foreground crystal-edge depth-high relative w-full max-w-lg overflow-hidden rounded-modal backdrop-blur-2xl"
-          >
-            {/* Input row */}
+          >            {/* Input row */}
             <div className="flex items-center gap-3 border-b border-[#232136]/10 px-5 py-4">
               <Icon name="search" size={16} className="shrink-0 text-[#8b8aa0]" />
               <input
@@ -221,7 +220,7 @@ export default function CommandPalette() {
                 aria-label="Search commands and the universe"
                 className="min-w-0 flex-1 bg-transparent text-sm text-[#232136] outline-none placeholder:text-[#8b8aa0]"
               />
-              <kbd className="hidden shrink-0 rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 sm:block">
+              <kbd className="hidden shrink-0 rounded-md border border-[#232136]/15 bg-white/50 px-1.5 py-0.5 text-[10px] font-medium text-[#8b8aa0] sm:block">
                 Esc
               </kbd>
             </div>
@@ -230,8 +229,8 @@ export default function CommandPalette() {
             <div ref={listRef} role="listbox" aria-label="Results" className="max-h-[46vh] overflow-y-auto p-2">
               {flat.length === 0 ? (
                 <div className="px-4 py-10 text-center">
-                  <p className="text-sm text-gray-400">Nothing answers to that.</p>
-                  <p className="mt-1.5 text-xs text-gray-600">
+                  <p className="text-sm text-[#5f5e74]">Nothing answers to that.</p>
+                  <p className="mt-1.5 text-xs text-[#8b8aa0]">
                     Try a mood, a place, or a fragment of a title.
                   </p>
                 </div>
@@ -243,7 +242,7 @@ export default function CommandPalette() {
                   return (
                     <div key={command.id}>
                       {showGroup && (
-                        <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-600">
+                        <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#8b8aa0]">
                           {command.group}
                         </p>
                       )}
@@ -255,23 +254,24 @@ export default function CommandPalette() {
                         onMouseMove={() => setActiveIndex(index)}
                         onClick={() => go(command)}
                         className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
-                          isActive ? "bg-white/[0.07] text-white" : "text-gray-300"
-                        }`}
-                      >
+                          isActive
+                            ? "bg-white/70 text-[#232136] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.85)]"
+                            : "text-[#44435e] hover:bg-white/45"
+                        }`}>
                         <span
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
                             isActive
-                              ? "border-[rgba(var(--mood-rgb),0.4)] bg-[rgba(var(--mood-rgb),0.12)]"
-                              : "border-white/[0.08] bg-white/[0.04]"
+                              ? "border-[rgba(var(--mood-rgb),0.45)] bg-[rgba(var(--mood-rgb),0.14)]"
+                              : "border-white/70 bg-white/45"
                           }`}
                         >
-                          <Icon name={command.icon} size={14} />
+                          <Icon name={command.icon} size={14} className="text-[#5b4bc4]" />
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-medium">{command.label}</span>
-                          <span className="block truncate text-[11px] text-gray-500">{command.hint}</span>
+                          <span className="block truncate text-[11px] text-[#8b8aa0]">{command.hint}</span>
                         </span>
-                        {isActive && <Icon name="forward" size={12} className="shrink-0 text-gray-500" />}
+                        {isActive && <Icon name="forward" size={12} className="shrink-0 text-[#8b8aa0]" />}
                       </button>
                     </div>
                   );
@@ -280,13 +280,13 @@ export default function CommandPalette() {
             </div>
 
             {/* Footer hints */}
-            <div className="flex items-center gap-4 border-t border-white/[0.06] px-5 py-2.5 text-[10px] text-gray-600">
+            <div className="flex items-center gap-4 border-t border-white/60 px-5 py-2.5 text-[10px] text-[#8b8aa0]">
               <span className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5">↑↓</kbd>
+                <kbd className="rounded border border-[#232136]/15 bg-white/50 px-1 py-0.5">↑↓</kbd>
                 navigate
               </span>
               <span className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5">↵</kbd>
+                <kbd className="rounded border border-[#232136]/15 bg-white/50 px-1 py-0.5">↵</kbd>
                 open
               </span>
               <span className="ml-auto hidden sm:block">WithIn, one keystroke away</span>

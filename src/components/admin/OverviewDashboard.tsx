@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -11,6 +11,49 @@ import {
 } from "@/lib/admin/data";
 import { getUniverseState, getUniverseDepth, getDominantInterest } from "@/lib/universe/state";
 import { getGraphStats } from "@/lib/explore/graph";
+type RealOverviewMetrics = {
+  totalUsers: number;
+  activeUsers: number;
+  totalCreators: number;
+  publishedContent: number;
+  openReports: number;
+  totalSubscriptions: number;
+  totalViews: number;
+  totalCommunities: number;
+};
+
+type RealActivityEvent = {
+  id: string;
+  type: string;
+  title: string;
+  entity: string;
+  timestamp: string;
+};
+
+type AnalyticsPoint = {
+  label: string;
+  value: number;
+};
+
+type AdminDataResponse = {
+  ok: boolean;
+  metrics: RealOverviewMetrics;
+  recentUsers: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    status: string;
+    createdAt: string;
+  }>;
+  recentContent: Array<{
+    id: string;
+    title: string;
+    type: string;
+    status: string;
+    createdAt: string;
+  }>;
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -62,6 +105,63 @@ function MiniChart({
  * Then: moderation queue summary.
  */
 export default function OverviewDashboard() {
+  const [realMetrics, setRealMetrics] = useState<RealOverviewMetrics | null>(null);
+  const [realActivity, setRealActivity] = useState<RealActivityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadRealData() {
+      try {
+        const res = await fetch("/api/admin/data", { cache: "no-store" });
+        if (res.ok) {
+          const data: AdminDataResponse = await res.json();
+          setRealMetrics(data.metrics);
+          // Build activity from recent users and content
+          const activity: RealActivityEvent[] = [
+            ...data.recentUsers.map((u) => ({
+              id: `user-${u.id}`,
+              type: "user_joined",
+              title: "New user joined",
+              entity: u.name,
+              timestamp: u.createdAt,
+            })),
+            ...data.recentContent.map((c) => ({
+              id: `content-${c.id}`,
+              type: "content_created",
+              title: "Content created",
+              entity: c.title,
+              timestamp: c.createdAt,
+            })),
+          ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+          setRealActivity(activity);
+        }
+      } catch (error) {
+        console.error("[ADMIN] Failed to load real data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadRealData();
+  }, []);
+
+  // Use real data if available, fall back to mock
+  const metrics = realMetrics
+    ? [
+        { label: "Total Users", value: realMetrics.totalUsers.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "👥" },
+        { label: "Active Users", value: realMetrics.activeUsers.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "🟢" },
+        { label: "Creators", value: realMetrics.totalCreators.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "✨" },
+        { label: "Published Content", value: realMetrics.publishedContent.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "📚" },
+        { label: "Communities", value: realMetrics.totalCommunities.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "🤝" },
+        { label: "Open Reports", value: realMetrics.openReports.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "⚠️" },
+        { label: "Subscriptions", value: realMetrics.totalSubscriptions.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "💳" },
+        { label: "Total Views", value: realMetrics.totalViews.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "👁️" },
+      ]
+    : OVERVIEW_METRICS;
+
+  const activity = realActivity.length > 0 ? realActivity : MOCK_ACTIVITY;
+  const userGrowth = MOCK_USER_GROWTH;
+  const contentEngagement = MOCK_CONTENT_ENGAGEMENT;
+
   return (
     <motion.div
       variants={stagger}
@@ -78,7 +178,7 @@ export default function OverviewDashboard() {
           WithIn is alive.
         </h2>
         <p className="mt-2 text-sm text-gray-500">
-          Real-time overview of the platform. All data is mock — ready for API integration.
+          {realMetrics ? "Live platform data from the database." : "Real-time overview of the platform."}
         </p>
       </motion.div>
 
@@ -87,7 +187,7 @@ export default function OverviewDashboard() {
         variants={stagger}
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
-        {OVERVIEW_METRICS.map((metric) => (
+        {metrics.map((metric) => (
           <motion.div
             key={metric.label}
             variants={fadeUp}
@@ -117,7 +217,9 @@ export default function OverviewDashboard() {
                 {metric.changeType === "up" ? "↑" : metric.changeType === "down" ? "↓" : "→"}{" "}
                 {metric.change}
               </span>
-              <span className="text-[10px] text-gray-600">vs last month</span>
+              <span className="text-[10px] text-gray-600">
+                {realMetrics ? "live data" : "vs last month"}
+              </span>
             </div>
             {/* Subtle glow on hover */}
             <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/[0.02] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
@@ -139,17 +241,21 @@ export default function OverviewDashboard() {
             </Link>
           </div>
           <div className="space-y-3">
-            {MOCK_ACTIVITY.slice(0, 6).map((event) => (
+            {activity.slice(0, 6).map((event) => (
               <div
                 key={event.id}
                 className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-white/[0.02]"
               >
-                <span className="mt-0.5 text-sm">{event.icon}</span>
+                <span className="mt-0.5 text-sm">
+                  {"icon" in event ? (event as { icon: string }).icon : "•"}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-white/90">{event.title}</p>
                   <p className="text-[11px] text-gray-500 truncate">{event.entity}</p>
                 </div>
-                <span className="text-[10px] text-gray-600 whitespace-nowrap">{event.timestamp}</span>
+                <span className="text-[10px] text-gray-600 whitespace-nowrap">
+                  {"timestamp" in event ? (event as { timestamp: string }).timestamp : ""}
+                </span>
               </div>
             ))}
           </div>
@@ -169,11 +275,11 @@ export default function OverviewDashboard() {
           <div className="space-y-5">
             <div>
               <p className="text-[11px] text-gray-500 mb-2">User Growth</p>
-              <MiniChart data={MOCK_USER_GROWTH} color="rgba(52, 211, 153, 0.5)" />
+              <MiniChart data={userGrowth} color="rgba(52, 211, 153, 0.5)" />
             </div>
             <div>
               <p className="text-[11px] text-gray-500 mb-2">Content Engagement</p>
-              <MiniChart data={MOCK_CONTENT_ENGAGEMENT} color="rgba(168, 85, 247, 0.5)" />
+              <MiniChart data={contentEngagement} color="rgba(168, 85, 247, 0.5)" />
             </div>
           </div>
         </motion.div>

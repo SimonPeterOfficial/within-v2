@@ -4,6 +4,8 @@
  *   DELETE — leave
  */
 
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, communities } from "@/lib/db";

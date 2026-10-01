@@ -16,8 +16,19 @@ import {
   verifyAdminCredentials,
   createAdminSession,
 } from "@/lib/admin/auth";
+import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
+  // Rate limit: 5 attempts per 15 minutes per IP
+  const clientKey = clientKeyFrom(request);
+  const rateResult = rateLimit(`admin-login:${clientKey}`, 5, 15 * 60 * 1000);
+  if (!rateResult.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Too many attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { password } = body as { password?: string };

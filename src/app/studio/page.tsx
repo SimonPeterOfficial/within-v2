@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import DepthLayers from "@/components/effects/DepthLayers";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import StudioWorkspace from "@/components/studio/StudioWorkspace";
+import WorldHero from "@/components/home/WorldHero";
+import ContextualRail from "@/components/home/ContextualRail";
 import { getSessionUser, touchUserActivity } from "@/lib/auth/server";
 import { processDuePublications } from "@/lib/studio";
+import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
   title: "Studio — WithIn",
@@ -35,10 +37,27 @@ export default async function StudioPage() {
   await touchUserActivity(user.id);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <DepthLayers preset="sanctuary" particles={5} stars={14} fog={0.5} />
+    <div className="crystal-world relative min-h-screen overflow-hidden text-[#232136]">
       <AppShell items={shellItems}>
-        <StudioWorkspace creatorName={user.name} />
+        <WorldHero
+          eyebrow="Studio"
+          title="Your creative workspace"
+          subtitle="Drafts, publishing, and honest numbers — a quiet, focused place to create."
+          worldClass="world-studio"
+        />
+        <div className="relative z-10 px-4 pb-28 md:px-6">
+          <StudioWorkspace creatorName={user.name} />
+          <div className="mt-6">
+            <ContextualRail
+              title="Your creative universe"
+              destinations={[
+                { label: "Creators", href: "/creators", icon: "star", line: "Real people. Real stories." },
+                { label: "Originals", href: "/originals", icon: "originals", line: "Films, series & more" },
+                { label: "Communities", href: "/communities", icon: "users", line: "Find your people" },
+              ]}
+            />
+          </div>
+        </div>
       </AppShell>
     </div>
   );

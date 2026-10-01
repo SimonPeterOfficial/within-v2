@@ -90,5 +90,30 @@ export const copy = {
     eyebrow: "Settings",
     title: "Make it yours",
     subtitle: "The world answers how you feel — tune the details here."
+  },
+  mirror: {
+    eyebrow: "Mirror",
+    title: "Quiet reflection",
+    subtitle: "A clear, spacious place to see yourself — no noise, no judgment."
+  },
+  atlas: {
+    eyebrow: "Within Time",
+    title: "Moments, layered",
+    subtitle: "Time made spatial — past, present, and the journey between."
+  },
+  connections: {
+    eyebrow: "Connections",
+    title: "Your people",
+    subtitle: "The ones who feel in the same language — find them here."
+  },
+  messages: {
+    eyebrow: "Messages",
+    title: "Conversations",
+    subtitle: "Communication inside the WithIn world — human, warm, alive."
+  },
+  within: {
+    eyebrow: "Within",
+    title: "The heart of WithIn",
+    subtitle: "Where the world comes alive — Auri, Lyra, and the universe within you."
   }
 } as const;

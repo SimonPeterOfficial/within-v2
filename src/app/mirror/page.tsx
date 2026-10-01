@@ -1,26 +1,33 @@
 import type { Metadata } from "next";
-import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
-import MirrorExperience from "@/components/mirror/MirrorExperience";
+import UniverseShell from "@/components/layout/UniverseShell";
+import WorldHero from "@/components/home/WorldHero";
+import ContextualRail from "@/components/home/ContextualRail";
+import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
-  title: "WithIn — Mirror",
-  description: "A quiet room for your own reflections. Private by default.",
+  title: "Mirror — WithIn",
+  description: "Quiet reflection — the WithIn mirror.",
 };
-
-const shellItems: SidebarItem[] = [
-  { label: "Home", href: "/home", icon: "home", route: true },
-  { label: "Discover", href: "/discover", icon: "discover", route: true },
-  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
-  { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true },
-];
 
 export default function MirrorPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden text-white">
-      <AppShell items={shellItems} atmosphere="calm">
-        <MirrorExperience />
-      </AppShell>
-    </div>
+    <UniverseShell preset="sanctuary" worldClass="world-mirror">
+      <WorldHero
+        eyebrow={copy.mirror.eyebrow}
+        title={copy.mirror.title}
+        subtitle={copy.mirror.subtitle}
+        worldClass="world-mirror"
+      />
+      <div className="relative z-10 px-4 pb-28 md:px-6">
+        <ContextualRail
+          title="Nearby in the universe"
+          destinations={[
+            { label: "Sanctuary", href: "/sanctuary", icon: "heart", line: "A calmer you" },
+            { label: "Within Time", href: "/atlas", icon: "clock", line: "Moments, layered" },
+            { label: "Journey", href: "/journey", icon: "globe", line: "Your constellation" },
+          ]}
+        />
+      </div>
+    </UniverseShell>
   );
 }

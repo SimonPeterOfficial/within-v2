@@ -1,28 +1,41 @@
 import type { Metadata } from "next";
 import UniverseShell from "@/components/layout/UniverseShell";
-import PageHero from "@/components/ui/PageHero";
 import LiveCommunities from "@/components/communities/LiveCommunities";
-import HumanDiscovery from "@/components/people/HumanDiscovery";
+import WorldHero from "@/components/home/WorldHero";
 import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
   title: "Communities — WithIn",
-  description: "Quiet rooms full of kindred souls — communities on WithIn.",
+  description: "Find your people — the WithIn communities.",
 };
 
+export const dynamic = "force-dynamic";
+
+/**
+ * Communities — gathering places inside the WithIn world.
+ *
+ * The LiveCommunities component is fully functional:
+ * - Real community listing from /api/communities
+ * - Search with debounce
+ * - Create community with real API
+ * - Join/Leave with optimistic state
+ * - Member counts
+ * - Empty states
+ *
+ * The visual language is WithIn's crystal material system.
+ */
 export default function CommunitiesPage() {
   return (
-    <UniverseShell preset="communities">
-      <PageHero
+    <UniverseShell preset="sanctuary" worldClass="world-connections">
+      <WorldHero
         eyebrow={copy.communities.eyebrow}
         title={copy.communities.title}
         subtitle={copy.communities.subtitle}
+        worldClass="world-connections"
       />
-      {/* Gen 13 — who is here with you, honestly explained */}
-      <div className="mx-auto max-w-3xl pb-4">
-        <HumanDiscovery />
+      <div className="relative z-10 px-4 pb-28 md:px-6">
+        <LiveCommunities />
       </div>
-      <LiveCommunities />
     </UniverseShell>
   );
 }
