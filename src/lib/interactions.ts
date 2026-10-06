@@ -10,10 +10,9 @@
  */
 
 import "server-only";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db, content, profiles, reports, saves, users, type SaveShelf } from "@/lib/db";
-import type { Content, NewReport } from "@/lib/db";
-import { createNotification } from "@/lib/auth/server";
+import type { NewReport } from "@/lib/db";
 
 export type SaveResult = { ok: true; saved: boolean } | { ok: false; error: string };
 

@@ -8,7 +8,7 @@
  */
 
 import "server-only";
-import { and, count, eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db, content, follows, profiles, users, type Profile } from "@/lib/db";
 import { validateBio, validateName } from "@/lib/auth/validation";
 

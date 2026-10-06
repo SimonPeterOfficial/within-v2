@@ -85,14 +85,7 @@ export default function FeedPanel() {
             );
           })}
         </div>
-        <div className="flex items-center gap-1 pb-2 text-[#8b8aa0]">
-          <button type="button" aria-label="Grid view" className="crystal-focus rounded-lg p-1.5 transition hover:bg-white/50">
-            <Icon name="dashboard" size={14} />
-          </button>
-          <button type="button" aria-label="List view" className="crystal-focus rounded-lg p-1.5 transition hover:bg-white/50">
-            <Icon name="menu" size={14} />
-          </button>
-        </div>
+
       </div>
 
       <div className="grid gap-4 p-4 lg:grid-cols-[1.35fr_1fr]">
@@ -146,35 +139,7 @@ export default function FeedPanel() {
                 Open
                 <Icon name="forward" size={11} />
               </Link>
-              <button
-                type="button"
-                aria-label="Like"
-                className="crystal-focus rounded-full bg-white/18 p-2 text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/32"
-              >
-                <Icon name="heart" size={13} />
-              </button>
-              <button
-                type="button"
-                aria-label="Comment"
-                className="crystal-focus rounded-full bg-white/18 p-2 text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/32"
-              >
-                <Icon name="message" size={13} />
-              </button>
-              <button
-                type="button"
-                aria-label="Save"
-                className="crystal-focus rounded-full bg-white/18 p-2 text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/32"
-              >
-                <Icon name="book" size={13} />
-              </button>
-              <span className="ml-auto flex items-center gap-2.5 text-[11px] font-medium text-white/75">
-                <span className="flex items-center gap-1">
-                  <Icon name="heart" size={11} /> 4.8k
-                </span>
-                <span className="flex items-center gap-1">
-                  <Icon name="message" size={11} /> 321
-                </span>
-              </span>
+
             </div>
           </div>
         </motion.article>

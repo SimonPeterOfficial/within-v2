@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#02030a] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
       {/* One living atmosphere behind the entire world: glow → fog → mesh →
           aurora → light rays → particles → stars, all drifting in slow motion */}
       <DepthLayers preset="home" />

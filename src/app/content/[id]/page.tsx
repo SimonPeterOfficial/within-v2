@@ -80,7 +80,7 @@ export default async function ContentPage({ params }: Props) {
   const related = creatorWorks
     .filter((row) => row.id !== id)
     .slice(0, 3)
-    .map((row) => toUniverseEntry(row, resolvedCreatorName, username));
+    .map((row) => toUniverseEntry(row, resolvedCreatorName));
 
   const gradient = content.coverGradient ?? "from-purple-600 via-indigo-600 to-blue-600";
 

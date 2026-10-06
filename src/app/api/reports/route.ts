@@ -9,7 +9,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth/server";
 import { fileReport } from "@/lib/interactions";
-import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
+import { rateLimit } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
   const user = await requireUser();

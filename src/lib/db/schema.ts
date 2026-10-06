@@ -606,3 +606,101 @@ export const auditLogs = pgTable(
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
+
+/* ── Worlds — places people make ──────────────────────────────────────
+ * A World is a curated place inside WithIn: owned, versioned by a simple
+ * lifecycle (draft → published → archived), and privacy-bound
+ * (private/unlisted/public). Content is referenced later via embedding;
+ * this table is the identity and permission anchor. */
+
+export type WorldStatus = "draft" | "published" | "archived";
+export type WorldVisibility = "private" | "unlisted" | "public";
+
+export const worlds = pgTable(
+  "worlds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    /** URL-safe unique slug — /worlds/[slug]. */
+    slug: text("slug").notNull(),
+    description: text("description"),
+    coverGradient: text("cover_gradient"),
+    coverEmoji: text("cover_emoji"),
+    status: text("status").$type<WorldStatus>().notNull().default("draft"),
+    visibility: text("visibility").$type<WorldVisibility>().notNull().default("private"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("worlds_slug_unique").on(table.slug),
+    index("worlds_owner_idx").on(table.ownerId),
+    index("worlds_status_idx").on(table.status, table.visibility),
+  ],
+);
+
+export type World = typeof worlds.$inferSelect;
+export type NewWorld = typeof worlds.$inferInsert;
+
+/* ── Journeys — paths through the universe ─────────────────────────────
+ * A Journey references existing content rather than duplicating it: each
+ * item is (journeyId, position, sourceType, sourceId, note?). Ordering is
+ * explicit so a Journey's path is authored, not algorithmic. */
+
+export type JourneyStatus = "draft" | "published" | "archived";
+export type JourneyItemSource = "content" | "world" | "mirror" | "creation" | "other";
+
+export const journeys = pgTable(
+  "journeys",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    coverEmoji: text("cover_emoji"),
+    coverGradient: text("cover_gradient"),
+    status: text("status").$type<JourneyStatus>().notNull().default("draft"),
+    visibility: text("visibility").$type<ContentVisibility>().notNull().default("private"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("journeys_slug_unique").on(table.slug),
+    index("journeys_owner_idx").on(table.ownerId),
+  ],
+);
+
+export type Journey = typeof journeys.$inferSelect;
+export type NewJourney = typeof journeys.$inferInsert;
+
+export const journeyItems = pgTable(
+  "journey_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    journeyId: uuid("journey_id")
+      .notNull()
+      .references(() => journeys.id, { onDelete: "cascade" }),
+    /** Explicit, gap-free ordering authored by the Journey's owner. */
+    position: integer("position").notNull(),
+    sourceType: text("source_type").$type<JourneyItemSource>().notNull(),
+    /** ID of the referenced row in its own table — ownership lives there. */
+    sourceId: uuid("source_id").notNull(),
+    /** Optional creator-written context for this step of the path. */
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("journey_items_position_unique").on(table.journeyId, table.position),
+    index("journey_items_journey_idx").on(table.journeyId),
+  ],
+);
+
+export type JourneyItem = typeof journeyItems.$inferSelect;
+export type NewJourneyItem = typeof journeyItems.$inferInsert;

@@ -20,7 +20,7 @@ const ROUTES = [
   { path: "/", markers: ["You.", "Enter WithIn", "Explore the universe"] },
   { path: "/home", markers: ["Welcome", "sanctuary", "Discover"] },
   { path: "/login", markers: ["Welcome", "Log in", "Forgot password?"] },
-  { path: "/signup", markers: ["make you, you", "Enter WithIn"] },
+  { path: "/signup", markers: ["Come a little further", "Enter WithIn"] },
   { path: "/forgot-password", markers: ["Find your way", "Send reset link"] },
   { path: "/onboarding", markers: ["Entering your sanctuary"] },
   { path: "/discover", markers: ["A universe, waiting", "Search"] },
@@ -29,12 +29,12 @@ const ROUTES = [
   { path: "/books", markers: ["The library", "Stories that sit with you"] },
   { path: "/music", markers: ["The music room", "Soundscapes for the way you feel"] },
   { path: "/photography", markers: ["Stillness, captured", "Let the frames breathe"] },
-  { path: "/communities", markers: ["Quiet rooms, kindred souls", "Browse by kind"] },
+  { path: "/communities", markers: ["Quiet rooms, kindred souls"] },
   { path: "/creators", markers: ["The people who make it", "Creator"] },
   { path: "/creators/mira-okoye", markers: ["Mira Okoye", "Filmmaker of quiet skies"] },
   { path: "/sanctuary", markers: ["<html", "WithIn"] },
-  { path: "/profile", markers: ["Entering your sanctuary"] },
-  { path: "/settings", markers: ["Entering your sanctuary"] },
+  { path: "/profile", markers: ["Welcome", "Enter WithIn"] },
+  { path: "/settings", markers: ["Welcome", "Enter WithIn"] },
   { path: "/icon.svg", markers: ["<svg"] }
 ];
 

@@ -213,6 +213,37 @@ export default function MirrorExperience() {
         </div>
       </GlassCard>
 
+      {/* ── Looking back — the Mirror's quiet juxtaposition ──
+          The oldest and newest entries, side by side. No analysis, no
+          conclusion — the user is the interpreter. Shown only when there
+          are at least two real entries. */}
+      {state === "ready" && entries.length >= 2 && (
+        <section aria-label="Looking back" className="mt-12 border-t border-white/[0.06] pt-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-300/60">
+            Looking back
+          </p>
+          <div className="mt-5 grid gap-6 sm:grid-cols-2">
+            {[entries[entries.length - 1], entries[0]].map((entry, index) => (
+              <figure key={entry.id} className="hairline rounded-2xl bg-white/[0.02] p-5">
+                <figcaption className="text-[10px] uppercase tracking-[0.25em] text-gray-600">
+                  {index === 0 ? "Your first page" : "Your most recent page"}
+                </figcaption>
+                <blockquote className="mt-3 font-display text-sm leading-relaxed text-gray-300">
+                  {entry.body.length > 140 ? `${entry.body.slice(0, 140)}…` : entry.body}
+                </blockquote>
+                <time dateTime={entry.createdAt} className="mt-3 block text-[11px] text-gray-600">
+                  {formatDate(entry.createdAt)}
+                </time>
+              </figure>
+            ))}
+          </div>
+          <p className="mt-4 text-[11px] leading-relaxed text-gray-600">
+            Two entries, one thread — what has changed, and what has stayed.
+            Mirror doesn&apos;t draw the conclusion; you do.
+          </p>
+        </section>
+      )}
+
       {/* ── Entries ── */}
       <div className="mt-10 space-y-4">
         {state === "loading" && (

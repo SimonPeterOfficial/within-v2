@@ -26,15 +26,6 @@ export type PersonCard = {
   bio: string | null;
 };
 
-type PersonRow = {
-  userId: string;
-  username: string;
-  displayName: string | null;
-  avatar: string | null;
-  gradient: string | null;
-  bio: string | null;
-};
-
 const personColumns = {
   userId: profiles.userId,
   username: profiles.username,

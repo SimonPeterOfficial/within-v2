@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { useEnvironment } from "@/lib/environment";
-import { applyMood, getMood, moods, rgbString } from "@/lib/mood";
+import { applyMood, moods, rgbString } from "@/lib/mood";
 import { fireRipple } from "@/lib/ripple";
 
 /**

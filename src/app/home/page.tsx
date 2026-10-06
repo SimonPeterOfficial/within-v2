@@ -3,8 +3,6 @@ import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import TopBar from "@/components/layout/TopBar";
 import HomeHero from "@/components/home/HomeHero";
 import HomeRail from "@/components/home/HomeRail";
-import WeatherPanel from "@/components/home/WeatherPanel";
-import MoodOrbs from "@/components/home/MoodOrbs";
 import UniverseDoors from "@/components/home/UniverseDoors";
 import FeedPanel from "@/components/home/FeedPanel";
 import MessagesPanel from "@/components/home/MessagesPanel";
@@ -44,7 +42,7 @@ const shellItems: SidebarItem[] = [
   { label: "Sanctuary", href: "/sanctuary", icon: "heart", route: true },
   { label: "Mirror", href: "/mirror", icon: "eye", route: true },
   { label: "Within Time", href: "/atlas", icon: "clock", route: true },
-  { label: "Messages", href: "/conversations", icon: "message", route: true, badge: 3 },
+  { label: "Messages", href: "/conversations", icon: "message", route: true },
   { label: "Wallet", href: "/settings", icon: "wallet", route: true },
 ];
 

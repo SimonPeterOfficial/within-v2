@@ -8,8 +8,8 @@
  */
 
 import "server-only";
-import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { db, communities, communityMembers, profiles, users } from "@/lib/db";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { db, communities, communityMembers, profiles } from "@/lib/db";
 
 export type CommunityCard = {
   id: string;

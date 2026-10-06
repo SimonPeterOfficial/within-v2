@@ -59,3 +59,5 @@ export type { Message, NewMessage } from "./schema";
 export type { Community, NewCommunity, CommunityVisibility, CommunityRole } from "./schema";
 export type { CommunityMember, NewCommunityMember } from "./schema";
 export type { AuditLog, NewAuditLog, AuditTargetType } from "./schema";
+export type { World, NewWorld, WorldStatus, WorldVisibility } from "./schema";
+export type { Journey, NewJourney, JourneyStatus, JourneyItemSource, JourneyItem, NewJourneyItem } from "./schema";

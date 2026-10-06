@@ -121,7 +121,7 @@ export default async function PublicProfileView({ username, viewerId }: PublicPr
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {published.map((item, index) => {
-              const entry = toUniverseEntry(item, profile.displayName, profile.username);
+              const entry = toUniverseEntry(item, profile.displayName);
               return (
                 <ContentCard
                   key={item.id}

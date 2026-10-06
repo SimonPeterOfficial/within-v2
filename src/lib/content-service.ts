@@ -23,9 +23,8 @@ import {
   type Content,
   type ContentStatus,
   type ContentType,
-  type NewContent,
 } from "@/lib/db";
-import { can, hasRole } from "@/lib/auth/authorization";
+import { hasRole } from "@/lib/auth/authorization";
 import { createNotification, logAdminAction } from "@/lib/auth/server";
 import { validateDescription, validateTags, validateTitle } from "@/lib/auth/validation";
 import type { UniverseEntry } from "@/lib/search";
@@ -273,7 +272,7 @@ const CONTENT_TYPE_LABEL: Record<ContentType, string> = {
 };
 
 /** Maps a published content row + creator profile to the shared card shape. */
-export function toUniverseEntry(row: Content, creatorName: string, username: string): UniverseEntry {
+export function toUniverseEntry(row: Content, creatorName: string): UniverseEntry {
   return {
     id: row.id,
     title: row.title,
@@ -325,8 +324,8 @@ export async function listPublishedContent(filters: DiscoveryFilters = {}): Prom
     .limit(limit)
     .offset(offset);
 
-  return rows.map(({ row, creatorName, username }) =>
-    toUniverseEntry(row, creatorName ?? row.attribution ?? "A WithIn creator", username),
+  return rows.map(({ row, creatorName }) =>
+    toUniverseEntry(row, creatorName ?? row.attribution ?? "A WithIn creator"),
   );
 }
 

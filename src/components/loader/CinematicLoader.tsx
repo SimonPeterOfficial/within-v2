@@ -142,7 +142,7 @@ export default function CinematicLoader() {
           exit={{ opacity: 0 }}
           transition={{ duration: reduced ? 0.3 : 0.8, ease: "easeInOut" }}
           onClick={skip}
-          className="fixed inset-0 z-[90] flex cursor-pointer items-center justify-center overflow-hidden bg-black"
+          className="fixed inset-0 z-[90] flex cursor-pointer items-center justify-center overflow-hidden bg-[#050505]"
           role="status"
           aria-live="polite"
           aria-label="WithIn is opening"
