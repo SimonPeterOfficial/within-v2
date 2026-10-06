@@ -11,6 +11,7 @@ import "server-only";
 import { and, count, eq } from "drizzle-orm";
 import { db, follows, users } from "@/lib/db";
 import { createNotification } from "@/lib/auth/server";
+import { isBlockedEitherWay } from "@/lib/social";
 
 export type FollowResult = { ok: true; following: boolean } | { ok: false; error: string };
 
@@ -48,6 +49,14 @@ export async function toggleFollow(followerId: string, followeeId: string): Prom
   const target = await db.select({ id: users.id, name: users.name }).from(users).where(eq(users.id, followeeId)).limit(1);
   if (target.length === 0 || target[0].id !== followeeId) {
     return { ok: false, error: "This account doesn't exist." };
+  }
+
+  // A block is absolute in both directions — a blocked user can never
+  // silently follow back, and must never trigger a new_follower
+  // notification. The client hides the button only as a courtesy; this is
+  // the server-side boundary.
+  if (await isBlockedEitherWay(followerId, followeeId)) {
+    return { ok: false, error: "This action isn't available." };
   }
 
   const existing = await db
