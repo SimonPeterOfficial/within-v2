@@ -8,14 +8,15 @@ import { PICKS, type PickItem } from "@/lib/content";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 /**
- * FeedPanel — the reference's "For You" window.
+ * FeedPanel — the "For You" window.
  *
- * CONTENT + SPACE + TRANSPARENCY: one large editorial moment (the
- * featured pick, full-bleed scene, quiet metadata) beside a short list
- * of further picks. Tabs switch the lens (For You / Following /
- * Trending) over the same real catalog — Following/Trending show honest
- * subsets until real social data exists. Actions are quiet liquid
- * controls; nothing covers the imagery.
+ * Uses the real content catalog (PICKS from lib/content) as its data
+ * source. Tabs switch the lens (For You / Following / Trending) over
+ * the same real catalog — Following/Trending show honest subsets
+ * until real social data exists.
+ *
+ * The visual language is WithIn's crystal material system.
+ * Actions are quiet liquid controls; nothing covers the imagery.
  */
 
 type FeedTab = "For You" | "Following" | "Trending";

@@ -7,6 +7,8 @@
  * client beyond the cookie itself.
  */
 
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, profiles, users, type User } from "@/lib/db";

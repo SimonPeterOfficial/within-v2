@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import TopBar from "@/components/layout/TopBar";
-import HomeHero from "@/components/home/HomeHero";
+import HomeHeroV2 from "@/components/home/HomeHeroV2";
 import HomeRail from "@/components/home/HomeRail";
+<<<<<<< HEAD
 import UniverseDoors from "@/components/home/UniverseDoors";
+=======
+import WorldPortals from "@/components/home/WorldPortals";
+>>>>>>> f1f6ae1e2a5d0ae4df447fafa57c254c6a78a24c
 import FeedPanel from "@/components/home/FeedPanel";
 import MessagesPanel from "@/components/home/MessagesPanel";
 import SanctuaryPanel from "@/components/home/SanctuaryPanel";
@@ -11,6 +15,9 @@ import ReturningGreeting from "@/components/sanctuary/ReturningGreeting";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 import HomeDock from "@/components/home/HomeDock";
 import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
+import EnvironmentLayers from "@/components/effects/EnvironmentLayers";
+import AmbientLight from "@/components/effects/AmbientLight";
+import ContextualRail from "@/components/home/ContextualRail";
 
 export const metadata: Metadata = {
   title: "WithIn — A universe within you",
@@ -19,16 +26,20 @@ export const metadata: Metadata = {
 };
 
 /**
- * The illustrated home — reference composition, top to bottom:
+ * The transformed home — a spatial composition, not a card grid.
  *
- *   TopBar        centered search + bell + weather chip + avatar
- *   HomeHero      painted sky, floating isles, lake light, winged Auri
- *   HomeRail      weather window + mood orbs + daily within + discover
- *   Doors         eight painted world tiles (Originals → Discover)
- *   Trio          For-You feed window + Messages window + Sanctuary
- *   HomeDock      ambient line, center dock w/ Auri orb, now-playing
+ *   Environment    the living world behind everything (13 layers)
+ *   AmbientLight   the world's illumination (3 light sources)
+ *   TopBar         compact glass header
+ *   HomeHeroV2     cinematic editorial greeting with Auri integrated
+ *   WorldPortals   crystal windows into destinations
+ *   HomeRail       weather + mood + daily within + discover
+ *   ContextualRail related destinations (the WITHIN THREAD)
+ *   Trio           feed · messages · sanctuary
+ *   HomeDock       ambient line + center dock with Auri orb
  *
- * The rail hugs the hero like the reference; the trio row follows.
+ * The environment is visible immediately. The interface exists INSIDE
+ * the world, not on top of it. Negative space lets the world breathe.
  */
 const shellItems: SidebarItem[] = [
   { label: "Home", href: "/home", icon: "home", route: true },
@@ -49,19 +60,33 @@ const shellItems: SidebarItem[] = [
 export default function HomePage() {
   return (
     <div className="crystal-world relative min-h-screen overflow-hidden text-[#232136]">
+      {/* ═══ The living environment ═══ */}
+      <EnvironmentLayers />
+      <AmbientLight />
+
       <AppShell items={shellItems}>
         <TopBar />
 
-        {/* ── Hero + right rail — one hug like the reference ─────────── */}
+        {/* ═══ Hero + right rail — spatial composition ═══ */}
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-4 xl:px-6 lg:grid-cols-[1fr_300px]">
           <div className="flex min-w-0 flex-col gap-4">
-            <HomeHero />
-            <UniverseDoors />
+            <HomeHeroV2 />
+            <WorldPortals />
           </div>
-          <HomeRail />
+          <div className="flex flex-col gap-4">
+            <HomeRail />
+            <ContextualRail
+              title="Continue exploring"
+              destinations={[
+                { label: "Explore", href: "/explore", icon: "discover", line: "The endless universe" },
+                { label: "Within", href: "/within", icon: "sparkles", line: "The heart of WithIn" },
+                { label: "Journey", href: "/journey", icon: "globe", line: "Your constellation" },
+              ]}
+            />
+          </div>
         </div>
 
-        {/* ── The trio row — feed · messages · sanctuary ─────────────── */}
+        {/* ═══ The trio row — feed · messages · sanctuary ═══ */}
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 pb-6 xl:px-6 lg:grid-cols-[1.6fr_0.85fr_0.75fr] lg:pb-28">
           <FeedPanel />
           <MessagesPanel />

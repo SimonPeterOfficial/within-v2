@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import UniverseShell from "@/components/layout/UniverseShell";
-import PageHero from "@/components/ui/PageHero";
+import WorldHero from "@/components/home/WorldHero";
 import DiscoverExperience from "@/components/discover/DiscoverExperience";
 import { listPublishedContent } from "@/lib/content-service";
 import { copy } from "@/lib/navigation";
@@ -21,8 +21,13 @@ export default async function DiscoverPage() {
   const entries = await listPublishedContent({ limit: 60 });
 
   return (
-    <UniverseShell preset="sanctuary">
-      <PageHero eyebrow={copy.discover.eyebrow} title={copy.discover.title} subtitle={copy.discover.subtitle} />
+    <UniverseShell preset="sanctuary" worldClass="world-worlds">
+      <WorldHero
+        eyebrow={copy.discover.eyebrow}
+        title={copy.discover.title}
+        subtitle={copy.discover.subtitle}
+        worldClass="world-worlds"
+      />
       <div className="pb-28">
         <DiscoverExperience entries={entries} />
       </div>

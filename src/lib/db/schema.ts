@@ -704,3 +704,23 @@ export const journeyItems = pgTable(
 
 export type JourneyItem = typeof journeyItems.$inferSelect;
 export type NewJourneyItem = typeof journeyItems.$inferInsert;
+=======
+/* ── Admin password reset tokens — one-time use, expiring ─────────────
+ * A reset token is a random 32-byte hex string stored with an expiry.
+ * Once used, the row is deleted — tokens cannot be reused. The token is
+ * only ever sent to the admin's email (or displayed in development). */
+
+export const adminResetTokens = pgTable(
+  "admin_reset_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    token: text("token").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("admin_reset_tokens_token_unique").on(table.token)],
+);
+
+export type AdminResetToken = typeof adminResetTokens.$inferSelect;
+export type NewAdminResetToken = typeof adminResetTokens.$inferInsert;
+>>>>>>> f1f6ae1e2a5d0ae4df447fafa57c254c6a78a24c

@@ -1,32 +1,41 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
+import UniverseShell from "@/components/layout/UniverseShell";
 import MessagingExperience from "@/components/messaging/MessagingExperience";
+import WorldHero from "@/components/home/WorldHero";
+import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
-  title: "WithIn — Conversations",
-  description: "Quiet, direct conversations with your people.",
+  title: "Messages — WithIn",
+  description: "Communication inside the WithIn world.",
 };
 
-const shellItems: SidebarItem[] = [
-  { label: "Home", href: "/home", icon: "home", route: true },
-  { label: "Discover", href: "/discover", icon: "discover", route: true },
-  { label: "Connections", href: "/connections", icon: "users", route: true },
-  { label: "Conversations", href: "/conversations", icon: "send", route: true },
-  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
-  { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true },
-];
+export const dynamic = "force-dynamic";
 
+/**
+ * Messages — communication inside the WithIn world.
+ *
+ * The MessagingExperience component is fully functional:
+ * - Real conversation list from /api/conversations
+ * - Real message sending via /api/conversations/[id]
+ * - Gentle polling for new messages
+ * - Optimistic send with rollback
+ * - Unread badges
+ * - Deep linking via ?with=<userId>
+ *
+ * The visual language is WithIn's crystal material system.
+ */
 export default function ConversationsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden text-white">
-      <AppShell items={shellItems} atmosphere="world">
-        {/* Suspense boundary — the messaging experience reads ?with= from the URL. */}
-        <Suspense>
-          <MessagingExperience />
-        </Suspense>
-      </AppShell>
-    </div>
+    <UniverseShell preset="sanctuary" worldClass="world-connections">
+      <WorldHero
+        eyebrow={copy.messages.eyebrow}
+        title={copy.messages.title}
+        subtitle={copy.messages.subtitle}
+        worldClass="world-connections"
+      />
+      <div className="relative z-10 px-4 pb-28 md:px-6">
+        <MessagingExperience />
+      </div>
+    </UniverseShell>
   );
 }

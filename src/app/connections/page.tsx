@@ -1,31 +1,100 @@
 import type { Metadata } from "next";
-import DepthLayers from "@/components/effects/DepthLayers";
-import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
-import ConnectionsExperience from "@/components/connections/ConnectionsExperience";
+import UniverseShell from "@/components/layout/UniverseShell";
+import WorldHero from "@/components/home/WorldHero";
+import ContextualRail from "@/components/home/ContextualRail";
+import { copy } from "@/lib/navigation";
+import { CREATORS } from "@/lib/creators";
+import { COMMUNITIES } from "@/lib/content";
+import CreatorCard from "@/components/ui/cards/CreatorCard";
+import CommunityCard from "@/components/ui/cards/CommunityCard";
+import { motion } from "framer-motion";
+import { staggerContainer, blurUp } from "@/lib/animations";
 
 export const metadata: Metadata = {
-  title: "WithIn — Connections",
-  description: "Your people — friends, requests, conversations, communities.",
+  title: "Connections — WithIn",
+  description: "Your people — the WithIn connections.",
 };
 
-const shellItems: SidebarItem[] = [
-  { label: "Home", href: "/home", icon: "home", route: true },
-  { label: "Discover", href: "/discover", icon: "discover", route: true },
-  { label: "Connections", href: "/connections", icon: "users", route: true },
-  { label: "Conversations", href: "/conversations", icon: "send", route: true },
-  { label: "Communities", href: "/communities", icon: "users", route: true },
-  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
-  { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true },
-];
-
+/**
+ * Connections — the people of WithIn.
+ *
+ * Shows creators and communities that the user can connect with.
+ * Uses real data from lib/creators and lib/content.
+ */
 export default function ConnectionsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <DepthLayers preset="sanctuary" particles={5} stars={14} fog={0.5} />
-      <AppShell items={shellItems}>
-        <ConnectionsExperience />
-      </AppShell>
-    </div>
+    <UniverseShell preset="sanctuary" worldClass="world-connections">
+      <WorldHero
+        eyebrow={copy.connections.eyebrow}
+        title={copy.connections.title}
+        subtitle={copy.connections.subtitle}
+        worldClass="world-connections"
+      />
+      <div className="relative z-10 px-4 pb-28 md:px-6">
+        {/* People — creators to discover */}
+        <div className="mb-12">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400">
+            People
+          </p>
+          <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">
+            Creators to discover
+          </h2>
+          <motion.div
+            variants={staggerContainer(0.05, 0.05)}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.1 }}
+            className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {CREATORS.slice(0, 3).map((creator, index) => (
+              <motion.div key={creator.id} variants={blurUp}>
+                <CreatorCard creator={creator} delay={index * 0.06} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Communities — spaces to join */}
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-400">
+            Communities
+          </p>
+          <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">
+            Spaces to belong
+          </h2>
+          <motion.div
+            variants={staggerContainer(0.05, 0.05)}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.1 }}
+            className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {COMMUNITIES.slice(0, 3).map((community, index) => (
+              <motion.div key={community.id} variants={blurUp}>
+                <CommunityCard
+                  name={community.name}
+                  tagline={community.tagline}
+                  avatars={community.avatars}
+                  gradient={community.gradient}
+                  members={community.members}
+                  delay={index * 0.06}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="mt-6">
+          <ContextualRail
+            title="Your universe"
+            destinations={[
+              { label: "Messages", href: "/conversations", icon: "message", line: "Conversations" },
+              { label: "Communities", href: "/communities", icon: "users", line: "Find your people" },
+              { label: "Creators", href: "/creators", icon: "star", line: "Real people. Real stories." },
+            ]}
+          />
+        </div>
+      </div>
+    </UniverseShell>
   );
 }
