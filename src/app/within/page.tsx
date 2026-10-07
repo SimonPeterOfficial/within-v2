@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import UniverseShell from "@/components/layout/UniverseShell";
 import WorldHero from "@/components/home/WorldHero";
 import ContextualRail from "@/components/home/ContextualRail";
@@ -11,17 +12,15 @@ import { useEnvironment } from "@/lib/environment";
 import { applyMood } from "@/lib/mood";
 import { getTimePeriod, type AuriContext } from "@/lib/auri";
 
-export const metadata: Metadata = {
-  title: "Within — WithIn",
-  description: "The heart of WithIn — where the world comes alive.",
-};
-
 /**
  * Within — the heart of WithIn.
  *
  * This is where Auri lives. The page opens with Auri's presence
  * and provides a direct connection to her. The environment is
  * calm and focused — this is a space for reflection and connection.
+ *
+ * This file is a Client Component because it reads the live session and
+ * environment; the route's metadata lives in ./layout.tsx.
  */
 export default function WithinPage() {
   const { user } = useSession();

@@ -721,5 +721,20 @@ export const adminResetTokens = pgTable(
   (table) => [uniqueIndex("admin_reset_tokens_token_unique").on(table.token)],
 );
 
+/* ── Admin credentials — database override for ADMIN_PASSWORD ───────────
+ * At most one row. When present, it supersedes the environment variable so
+ * an admin can rotate the password without a redeploy. Passwords are only
+ * ever stored as a salted scrypt hash. */
+
+export const adminCredentials = pgTable("admin_credentials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  passwordSalt: text("password_salt").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type AdminCredential = typeof adminCredentials.$inferSelect;
+export type NewAdminCredential = typeof adminCredentials.$inferInsert;
+
 export type AdminResetToken = typeof adminResetTokens.$inferSelect;
 export type NewAdminResetToken = typeof adminResetTokens.$inferInsert;

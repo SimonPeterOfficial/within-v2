@@ -5,8 +5,7 @@ import ContextualRail from "@/components/home/ContextualRail";
 import { copy } from "@/lib/navigation";
 import { BOOKS } from "@/lib/content";
 import ContentCard from "@/components/ui/cards/ContentCard";
-import { motion } from "framer-motion";
-import { staggerContainer, blurUp } from "@/lib/animations";
+import { MotionContainer, FadeItem } from "@/components/motion/MotionStagger";
 
 export const metadata: Metadata = {
   title: "Books — WithIn",
@@ -31,15 +30,11 @@ export default function BooksPage() {
       />
       <div className="relative z-10 px-4 pb-28 md:px-6">
         {/* Book catalog — real content from lib/content */}
-        <motion.div
-          variants={staggerContainer(0.05, 0.05)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.1 }}
+        <MotionContainer
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {BOOKS.map((book, index) => (
-            <motion.div key={book.id} variants={blurUp}>
+            <FadeItem key={book.id}>
               <ContentCard
                 title={book.title}
                 creator={book.creator}
@@ -50,9 +45,9 @@ export default function BooksPage() {
                 badges={book.status ? [{ label: book.status, tone: "mood" as const }] : undefined}
                 delay={index * 0.06}
               />
-            </motion.div>
+            </FadeItem>
           ))}
-        </motion.div>
+        </MotionContainer>
 
         <div className="mt-6">
           <ContextualRail

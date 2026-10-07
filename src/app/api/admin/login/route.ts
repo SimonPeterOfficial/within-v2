@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     // Verify against the environment variable — server-side only
-    if (!verifyAdminCredentials(password)) {
+    if (!(await verifyAdminCredentials(password))) {
       // Same error for wrong password and missing account — never leak which
       return NextResponse.json(
         { ok: false, error: "Invalid credentials." },

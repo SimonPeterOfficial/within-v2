@@ -6,7 +6,6 @@ import WorldHero from "@/components/home/WorldHero";
 import ContextualRail from "@/components/home/ContextualRail";
 import { getSessionUser, touchUserActivity } from "@/lib/auth/server";
 import { processDuePublications } from "@/lib/studio";
-import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
   title: "Studio — WithIn",

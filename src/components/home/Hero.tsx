@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlowBackground from "@/components/effects/GlowBackground";
@@ -51,6 +52,19 @@ export default function Hero() {
     >
       {/* ── Deep background ── */}
       <GlowBackground variant="hero" />
+
+      {/* The painted arrival — atmospheric backdrop, receding behind the copy */}
+      <div aria-hidden className="absolute inset-0">
+        <Image
+          src="/within-home.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-[0.65]"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,3,10,0.45)_0%,rgba(2,3,10,0.25)_45%,rgba(2,3,10,0.78)_100%)]" />
+      </div>
 
       {/* Nebula layers — deepest parallax */}
       <motion.div

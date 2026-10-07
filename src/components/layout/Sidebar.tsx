@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { useSession } from "@/lib/auth/session";
 import Icon, { type IconName } from "@/components/ui/Icon";
-import Logo from "@/components/ui/Logo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { spring } from "@/lib/animations";
 

@@ -5,8 +5,7 @@ import ContextualRail from "@/components/home/ContextualRail";
 import { copy } from "@/lib/navigation";
 import { CREATORS } from "@/lib/creators";
 import CreatorCard from "@/components/ui/cards/CreatorCard";
-import { motion } from "framer-motion";
-import { staggerContainer, blurUp } from "@/lib/animations";
+import { MotionContainer, FadeItem } from "@/components/motion/MotionStagger";
 
 export const metadata: Metadata = {
   title: "Creators — WithIn",
@@ -31,19 +30,15 @@ export default function CreatorsPage() {
       />
       <div className="relative z-10 px-4 pb-28 md:px-6">
         {/* Creator catalog — real content from lib/creators */}
-        <motion.div
-          variants={staggerContainer(0.05, 0.05)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.1 }}
+        <MotionContainer
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {CREATORS.map((creator, index) => (
-            <motion.div key={creator.id} variants={blurUp}>
+            <FadeItem key={creator.id}>
               <CreatorCard creator={creator} delay={index * 0.06} />
-            </motion.div>
+            </FadeItem>
           ))}
-        </motion.div>
+        </MotionContainer>
 
         <div className="mt-6">
           <ContextualRail

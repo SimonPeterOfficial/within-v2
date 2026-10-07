@@ -4,7 +4,6 @@ import JourneyExperience from "@/components/journey/JourneyExperience";
 import PersonalAtlas from "@/components/universe/PersonalAtlas";
 import WorldHero from "@/components/home/WorldHero";
 import ContextualRail from "@/components/home/ContextualRail";
-import { copy } from "@/lib/navigation";
 
 export const metadata: Metadata = {
   title: "Your Journey — WithIn",

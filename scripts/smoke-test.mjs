@@ -28,7 +28,7 @@ const ROUTES = [
   { path: "/originals/salt-stars", markers: ["Mira Okoye", "WithIn Original", "1h 42m"] },
   { path: "/books", markers: ["The library", "Stories that sit with you"] },
   { path: "/music", markers: ["The music room", "Soundscapes for the way you feel"] },
-  { path: "/photography", markers: ["Stillness, captured", "Let the frames breathe"] },
+  { path: "/photography", markers: ["Stillness, captured", "Frames from people"] },
   { path: "/communities", markers: ["Quiet rooms, kindred souls"] },
   { path: "/creators", markers: ["The people who make it", "Creator"] },
   { path: "/creators/mira-okoye", markers: ["Mira Okoye", "Filmmaker of quiet skies"] },

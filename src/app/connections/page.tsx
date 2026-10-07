@@ -7,8 +7,7 @@ import { CREATORS } from "@/lib/creators";
 import { COMMUNITIES } from "@/lib/content";
 import CreatorCard from "@/components/ui/cards/CreatorCard";
 import CommunityCard from "@/components/ui/cards/CommunityCard";
-import { motion } from "framer-motion";
-import { staggerContainer, blurUp } from "@/lib/animations";
+import { MotionContainer, FadeItem } from "@/components/motion/MotionStagger";
 
 export const metadata: Metadata = {
   title: "Connections — WithIn",
@@ -39,19 +38,13 @@ export default function ConnectionsPage() {
           <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">
             Creators to discover
           </h2>
-          <motion.div
-            variants={staggerContainer(0.05, 0.05)}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.1 }}
-            className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
+          <MotionContainer className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {CREATORS.slice(0, 3).map((creator, index) => (
-              <motion.div key={creator.id} variants={blurUp}>
+              <FadeItem key={creator.id}>
                 <CreatorCard creator={creator} delay={index * 0.06} />
-              </motion.div>
+              </FadeItem>
             ))}
-          </motion.div>
+          </MotionContainer>
         </div>
 
         {/* Communities — spaces to join */}
@@ -62,15 +55,9 @@ export default function ConnectionsPage() {
           <h2 className="mt-3 font-display text-2xl font-medium tracking-[-0.02em]">
             Spaces to belong
           </h2>
-          <motion.div
-            variants={staggerContainer(0.05, 0.05)}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.1 }}
-            className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
+          <MotionContainer className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {COMMUNITIES.slice(0, 3).map((community, index) => (
-              <motion.div key={community.id} variants={blurUp}>
+              <FadeItem key={community.id}>
                 <CommunityCard
                   name={community.name}
                   tagline={community.tagline}
@@ -79,9 +66,9 @@ export default function ConnectionsPage() {
                   members={community.members}
                   delay={index * 0.06}
                 />
-              </motion.div>
+              </FadeItem>
             ))}
-          </motion.div>
+          </MotionContainer>
         </div>
 
         <div className="mt-6">

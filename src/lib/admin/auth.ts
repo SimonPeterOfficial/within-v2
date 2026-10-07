@@ -17,6 +17,8 @@
 
 import { cookies } from "next/headers";
 import { createSignedToken, verifySignedToken } from "@/lib/auth/session-token";
+import { verifyPassword } from "@/lib/auth/password";
+import { getDbAdminCredential } from "@/lib/admin/credentials";
 
 /* ── Configuration ───────────────────────────────────────────────────── */
 
@@ -62,9 +64,14 @@ export type AdminSession = {
 
 /**
  * Verify admin credentials — server-side only.
- * Returns true if the password matches the environment variable.
+ * Prefers the database-backed override (set via change-password or
+ * reset-confirm); falls back to ADMIN_PASSWORD so first boot still works.
  */
-export function verifyAdminCredentials(password: string): boolean {
+export async function verifyAdminCredentials(password: string): Promise<boolean> {
+  const override = await getDbAdminCredential();
+  if (override) {
+    return verifyPassword(password, override.salt, override.hash);
+  }
   const adminPassword = getAdminPassword();
   return timingSafeEqual(password, adminPassword);
 }

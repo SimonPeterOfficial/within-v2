@@ -4,8 +4,7 @@ import WorldHero from "@/components/home/WorldHero";
 import ContextualRail from "@/components/home/ContextualRail";
 import { copy } from "@/lib/navigation";
 import AtlasExperience from "@/components/atlas/AtlasExperience";
-import { motion } from "framer-motion";
-import { staggerContainer, blurUp } from "@/lib/animations";
+import { MotionContainer, FadeItem } from "@/components/motion/MotionStagger";
 
 export const metadata: Metadata = {
   title: "Within Time — WithIn",
@@ -30,16 +29,11 @@ export default function AtlasPage() {
       />
       <div className="relative z-10 px-4 pb-28 md:px-6">
         {/* Atlas experience — the temporal layer */}
-        <motion.div
-          variants={staggerContainer(0.05, 0.05)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.1 }}
-        >
-          <motion.div variants={blurUp}>
+        <MotionContainer>
+          <FadeItem>
             <AtlasExperience />
-          </motion.div>
-        </motion.div>
+          </FadeItem>
+        </MotionContainer>
 
         <div className="mt-6">
           <ContextualRail

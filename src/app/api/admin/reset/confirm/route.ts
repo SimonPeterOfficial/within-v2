@@ -74,13 +74,18 @@ export async function POST(request: Request) {
     // Delete the token (single-use)
     await db.delete(adminResetTokens).where(eq(adminResetTokens.token, token));
 
-    // In a real implementation with a database-backed admin user,
-    // we would update the password hash here. Since the current system
-    // uses an environment variable, we return a success response
-    // indicating the password should be updated in the environment.
+    // Persist a real new admin password override — replaces the env
+    // fallback going forward. Token was single-use and deleted above.
+    try {
+      const { setDbAdminPassword } = await import("@/lib/admin/credentials");
+      await setDbAdminPassword(newPassword);
+    } catch {
+      return NextResponse.json(
+        { ok: false, error: "Could not update the admin password. Please try again." },
+        { status: 500 }
+      );
+    }
 
-    // For now, we log that a reset occurred (in production, this would
-    // update the database)
     console.log("[ADMIN RESET] Password reset completed successfully");
 
     return NextResponse.json({
