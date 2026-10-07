@@ -704,7 +704,7 @@ export const journeyItems = pgTable(
 
 export type JourneyItem = typeof journeyItems.$inferSelect;
 export type NewJourneyItem = typeof journeyItems.$inferInsert;
-=======
+
 /* ── Admin password reset tokens — one-time use, expiring ─────────────
  * A reset token is a random 32-byte hex string stored with an expiry.
  * Once used, the row is deleted — tokens cannot be reused. The token is
@@ -723,4 +723,3 @@ export const adminResetTokens = pgTable(
 
 export type AdminResetToken = typeof adminResetTokens.$inferSelect;
 export type NewAdminResetToken = typeof adminResetTokens.$inferInsert;
->>>>>>> f1f6ae1e2a5d0ae4df447fafa57c254c6a78a24c

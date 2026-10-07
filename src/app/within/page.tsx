@@ -25,7 +25,7 @@ export const metadata: Metadata = {
  */
 export default function WithinPage() {
   const { user } = useSession();
-  const { period, moodId } = useEnvironment();
+  const { moodId } = useEnvironment();
 
   const context: AuriContext = {
     period: getTimePeriod(),

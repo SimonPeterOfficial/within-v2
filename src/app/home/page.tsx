@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import AppShell, { type SidebarItem } from "@/components/layout/AppShell";
 import TopBar from "@/components/layout/TopBar";
-import HomeHeroV2 from "@/components/home/HomeHeroV2";
+import HomeHero from "@/components/home/HomeHero";
 import HomeRail from "@/components/home/HomeRail";
-<<<<<<< HEAD
-import UniverseDoors from "@/components/home/UniverseDoors";
-=======
 import WorldPortals from "@/components/home/WorldPortals";
->>>>>>> f1f6ae1e2a5d0ae4df447fafa57c254c6a78a24c
 import FeedPanel from "@/components/home/FeedPanel";
 import MessagesPanel from "@/components/home/MessagesPanel";
 import SanctuaryPanel from "@/components/home/SanctuaryPanel";
@@ -70,7 +66,7 @@ export default function HomePage() {
         {/* ═══ Hero + right rail — spatial composition ═══ */}
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-4 xl:px-6 lg:grid-cols-[1fr_300px]">
           <div className="flex min-w-0 flex-col gap-4">
-            <HomeHeroV2 />
+            <HomeHero />
             <WorldPortals />
           </div>
           <div className="flex flex-col gap-4">

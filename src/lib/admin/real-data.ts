@@ -12,7 +12,6 @@
 import { db } from "@/lib/db";
 import {
   users,
-  profiles,
   content,
   communities,
   communityMembers,
@@ -21,10 +20,7 @@ import {
   subscriptions,
   contentViews,
   follows,
-  saves,
-  notifications,
   messages,
-  conversations,
 } from "@/lib/db/schema";
 import { eq, desc, count, sql, and, gte } from "drizzle-orm";
 

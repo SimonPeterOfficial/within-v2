@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 /**
  * WorldHero — the cinematic page hero for secondary worlds.
@@ -30,8 +29,6 @@ export default function WorldHero({
   worldClass?: string;
   children?: React.ReactNode;
 }) {
-  const prefersReducedMotion = useReducedMotionSafe();
-
   return (
     <section aria-label={title} className={`relative z-10 ${worldClass}`}>
       <div className="crystal-elevated crystal-edge depth-medium crystal-sheen relative overflow-hidden rounded-[28px]">

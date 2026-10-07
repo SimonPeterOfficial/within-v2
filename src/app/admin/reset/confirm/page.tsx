@@ -17,7 +17,10 @@ function ResetConfirmForm() {
 
   useEffect(() => {
     if (!token) {
-      setError("Invalid reset link. Please request a new one.");
+      const frame = requestAnimationFrame(() =>
+        setError("Invalid reset link. Please request a new one."),
+      );
+      return () => cancelAnimationFrame(frame);
     }
   }, [token]);
 

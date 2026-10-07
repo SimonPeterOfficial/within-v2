@@ -30,11 +30,6 @@ type RealActivityEvent = {
   timestamp: string;
 };
 
-type AnalyticsPoint = {
-  label: string;
-  value: number;
-};
-
 type AdminDataResponse = {
   ok: boolean;
   metrics: RealOverviewMetrics;
@@ -107,7 +102,7 @@ function MiniChart({
 export default function OverviewDashboard() {
   const [realMetrics, setRealMetrics] = useState<RealOverviewMetrics | null>(null);
   const [realActivity, setRealActivity] = useState<RealActivityEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadRealData() {

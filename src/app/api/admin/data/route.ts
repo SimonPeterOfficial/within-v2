@@ -17,7 +17,7 @@ import {
   subscriptions,
   contentViews,
 } from "@/lib/db/schema";
-import { eq, desc, count, sql, and, gte } from "drizzle-orm";
+import { eq, desc, count, and, gte } from "drizzle-orm";
 
 export async function GET() {
   try {
