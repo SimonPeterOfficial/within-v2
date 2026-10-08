@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { MOCK_SETTINGS } from "@/lib/admin/data";
 
 const SECTIONS = ["Platform", "Content", "Moderation", "Community", "Auri", "Notifications", "Appearance"];
@@ -20,8 +20,6 @@ export default function SettingsPage() {
       <h2 className="font-display text-2xl font-medium tracking-[-0.02em] text-white mb-8">
         Platform Settings
       </h2>
-
-      <SecuritySection />
 
       <div className="space-y-8">
         {SECTIONS.map((section) => {
@@ -74,64 +72,3 @@ export default function SettingsPage() {
   );
 }
 
-function SecuritySection() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  async function changePassword(e: FormEvent) {
-    e.preventDefault();
-    setStatus(null);
-    if (newPassword.length < 8) { setStatus("New password must be at least 8 characters."); return; }
-    if (newPassword !== confirmPassword) { setStatus("New passwords do not match."); return; }
-    setBusy(true);
-    try {
-      const res = await fetch("/api/admin/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      });
-      const data = (await res.json()) as { ok: boolean; error?: string };
-      if (data.ok) {
-        setStatus("Admin password updated.");
-        setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
-      } else {
-        setStatus(data.error ?? "Could not update the password.");
-      }
-    } catch {
-      setStatus("Network error — please try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
-      <h3 className="text-sm font-semibold text-white mb-4">Security</h3>
-      <form onSubmit={changePassword} className="space-y-3 max-w-sm">
-        <label className="block text-sm text-gray-300">
-          Current password
-          <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required
-            className="mt-1 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white outline-none" />
-        </label>
-        <label className="block text-sm text-gray-300">
-          New password
-          <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8}
-            className="mt-1 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white outline-none" />
-        </label>
-        <label className="block text-sm text-gray-300">
-          Confirm new password
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
-            className="mt-1 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white outline-none" />
-        </label>
-        <button type="submit" disabled={busy}
-          className="rounded-lg bg-white/[0.08] px-4 py-2 text-sm font-medium text-white transition hover:bg-white/[0.14] disabled:opacity-50">
-          {busy ? "Updating…" : "Change admin password"}
-        </button>
-        {status && <p className="text-sm text-emerald-300">{status}</p>}
-      </form>
-    </div>
-  );
-}

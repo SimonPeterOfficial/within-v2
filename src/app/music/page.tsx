@@ -4,8 +4,6 @@ import WorldHero from "@/components/home/WorldHero";
 import ContextualRail from "@/components/home/ContextualRail";
 import { copy } from "@/lib/navigation";
 import { ALBUMS } from "@/lib/content";
-import ContentCard from "@/components/ui/cards/ContentCard";
-import { MotionContainer, FadeItem } from "@/components/motion/MotionStagger";
 
 export const metadata: Metadata = {
   title: "Music — WithIn",
@@ -29,25 +27,44 @@ export default function MusicPage() {
         worldClass="world-music"
       />
       <div className="relative z-10 px-4 pb-28 md:px-6">
-        {/* Music catalog — real content from lib/content */}
-        <MotionContainer
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {ALBUMS.map((album, index) => (
-            <FadeItem key={album.id}>
-              <ContentCard
-                title={album.title}
-                creator={album.creator}
-                description={album.description}
-                meta={album.meta}
-                href={`/content/${album.id}`}
-                cover={{ gradient: album.cover.gradient, emoji: album.cover.emoji }}
-                badges={album.status ? [{ label: album.status, tone: "mood" as const }] : undefined}
-                delay={index * 0.06}
-              />
-            </FadeItem>
+        {/* Featured atmosphere — the listening room's main surface */}
+        {ALBUMS[0] && (
+          <section aria-label={`Featured: ${ALBUMS[0].title}`} className="relative mb-10 overflow-hidden rounded-[36px] ring-1 ring-white/[0.06] bg-white/[0.03] backdrop-blur-sm min-h-[44vh] sm:min-h-[58vh] max-h-[70vh]">
+            <div
+              aria-hidden
+              className={`absolute inset-0 bg-gradient-to-br ${ALBUMS[0].cover.gradient} opacity-70`}
+            />
+            <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,5,10,0.6)_100%)]" />
+            <div className="absolute bottom-8 left-8 sm:bottom-12 sm:left-14">
+              <p className="text-[11px] uppercase tracking-[0.45em] text-emerald-300/70 mb-3">Now listening</p>
+              <h2 className="font-display text-4xl sm:text-6xl text-white tracking-[-0.02em]">{ALBUMS[0].title}</h2>
+              {ALBUMS[0].creator && <p className="mt-2 text-sm text-white/70">{ALBUMS[0].creator}</p>}
+            </div>
+            <a href={`/content/${ALBUMS[0].id}`} className="absolute inset-0" aria-label={`Open ${ALBUMS[0].title}`} />
+          </section>
+        )}
+
+        {/* Secondary listening surfaces — quiet, spatial */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {ALBUMS.slice(1).map((album) => (
+            <a
+              key={album.id}
+              href={`/content/${album.id}`}
+              className="group flex items-center gap-4 rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/[0.06] transition hover:bg-white/[0.08] hover:ring-white/[0.12]"
+            >
+              <span
+                aria-hidden
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${album.cover.gradient} text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]`}
+              >
+                {album.cover.emoji}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-[15px] font-semibold text-white">{album.title}</span>
+                <span className="mt-0.5 block truncate text-[12px] text-white/60">{album.creator ?? album.meta}</span>
+              </span>
+            </a>
           ))}
-        </MotionContainer>
+        </div>
 
         <div className="mt-6">
           <ContextualRail
