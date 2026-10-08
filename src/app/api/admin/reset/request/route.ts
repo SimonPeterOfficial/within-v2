@@ -18,6 +18,7 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { adminResetTokens } from "@/lib/db/schema";
+import { getDbAdminCredential } from "@/lib/admin/credentials";
 import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
@@ -32,9 +33,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Check if admin password is configured (i.e., admin exists)
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminPassword) {
+    // An admin exists if EITHER a database-backed credential has been set
+    // OR the legacy ADMIN_PASSWORD env credential is present. Never reveal
+    // which source matched.
+    const dbCredential = await getDbAdminCredential();
+    const envCredential = process.env.ADMIN_PASSWORD;
+    if (!dbCredential && !envCredential) {
       // Don't reveal whether admin exists — same response either way
       return NextResponse.json({
         ok: true,

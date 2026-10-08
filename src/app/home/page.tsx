@@ -38,19 +38,26 @@ export const metadata: Metadata = {
  * the world, not on top of it. Negative space lets the world breathe.
  */
 const shellItems: SidebarItem[] = [
-  { label: "Home", href: "/home", icon: "home", route: true },
-  { label: "Explore", href: "/explore", icon: "discover", route: true },
-  { label: "Originals", href: "/originals", icon: "originals", route: true },
-  { label: "Books", href: "/books", icon: "library", route: true },
-  { label: "Music", href: "/music", icon: "music", route: true },
-  { label: "Photography", href: "/photography", icon: "camera", route: true },
-  { label: "Communities", href: "/communities", icon: "users", route: true },
-  { label: "Creators", href: "/creators", icon: "star", route: true },
+  { label: "Home", href: "/home", icon: "home", route: true, group: "Core" },
   { label: "Sanctuary", href: "/sanctuary", icon: "heart", route: true },
   { label: "Mirror", href: "/mirror", icon: "eye", route: true },
+  { label: "Connections", href: "/connections", icon: "users", route: true },
+  { label: "Studio", href: "/studio", icon: "dashboard", route: true },
+  { label: "Worlds", href: "/worlds", icon: "globe", route: true },
+  { label: "Journey", href: "/journey", icon: "star", route: true },
+  { label: "Library", href: "/library", icon: "library", route: true },
   { label: "Within Time", href: "/atlas", icon: "clock", route: true },
+  { label: "Originals", href: "/originals", icon: "originals", route: true, group: "Discover" },
+  { label: "Books", href: "/books", icon: "book", route: true },
+  { label: "Music", href: "/music", icon: "music", route: true },
+  { label: "Photography", href: "/photography", icon: "camera", route: true },
+  { label: "Explore", href: "/explore", icon: "discover", route: true },
+  { label: "Serendipity", href: "/serendipity", icon: "sparkles", route: true },
+  { label: "Search", href: "/discover", icon: "search", route: true },
+  { label: "Identity", href: "/profile", icon: "profile", route: true, group: "You" },
+  { label: "Trace", href: "/trace", icon: "eye", route: true },
   { label: "Messages", href: "/conversations", icon: "message", route: true },
-  { label: "Wallet", href: "/settings", icon: "wallet", route: true },
+  { label: "Settings", href: "/settings", icon: "settings", route: true },
 ];
 
 export default function HomePage() {

@@ -22,7 +22,7 @@ export default function HomeHero() {
           height={997}
           priority
           sizes="(max-width: 1024px) 100vw, 80vw"
-          className="block h-auto w-full object-cover"
+          className="block w-full object-cover min-h-[56vh] max-h-[82vh]"
         />
       </div>
     </section>

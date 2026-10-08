@@ -81,7 +81,7 @@ function SecuritySection() {
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function changePassword(e: React.FormEvent) {
+  async function changePassword(e: FormEvent) {
     e.preventDefault();
     setStatus(null);
     if (newPassword.length < 8) { setStatus("New password must be at least 8 characters."); return; }

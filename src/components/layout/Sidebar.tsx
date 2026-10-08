@@ -20,6 +20,8 @@ export type SidebarItem = {
   badge?: number;
   /** Group divider above this item */
   divider?: boolean;
+  /** Section label; when it changes, a tiny divider label is rendered in the rail */
+  group?: string;
 };
 
 type SidebarProps = {
@@ -169,11 +171,16 @@ export default function Sidebar({ items }: SidebarProps) {
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <span
               key={item.label}
               className={`relative block w-full ${item.divider ? "before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-white/[0.06]" : ""}`}
             >
+              {item.group && items[index - 1]?.group !== item.group && (
+                <p className="px-4 text-[10px] font-semibold uppercase tracking-[0.35em] text-[#8b8aa0]/70 py-2">
+                  {item.group}
+                </p>
+              )}
               {item.route ? (
                 <Link href={item.href} className={itemClasses()}>
                   {railItem(item)}
