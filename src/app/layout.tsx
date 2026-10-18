@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { AuthProvider } from "@/lib/auth/session";
+import { AuthProvider, ClerkAuthWrapper } from "@/lib/auth/session";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/lib/theme";
 import { EnvironmentProvider } from "@/lib/environment";
@@ -124,9 +124,9 @@ export default function RootLayout({
           <EnvironmentProvider>
             {clerkConfigured ? (
               <ClerkProvider>
-                <AuthProvider>
+                <ClerkAuthWrapper>
                   <ToastProvider>{pageChildren({ children })}</ToastProvider>
-                </AuthProvider>
+                </ClerkAuthWrapper>
               </ClerkProvider>
             ) : (
               <AuthProvider>

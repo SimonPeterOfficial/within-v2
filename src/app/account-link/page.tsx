@@ -4,6 +4,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/session";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Account linking page — shown when a Clerk-authenticated user has no
  * local WITHIN mapping. The user verifies ownership of their existing

@@ -83,8 +83,6 @@ describe("Clerk identity mapping", async () => {
     db,
     users,
     profiles,
-    hashPassword,
-    resolveClerkUser,
     linkClerkToLocalUser,
     findLocalUserByEmail,
     createLocalUserFromClerk,
@@ -204,7 +202,6 @@ describe("Clerk identity mapping", async () => {
   });
 
   await test("7. links Clerk identity to existing local user via legacy password", async () => {
-    const { hashPassword } = await import("@/lib/auth/password");
     const localUser = await createLocalUser({
       email: `${TEST_PREFIX}link-existing@example.invalid`,
       name: "Link Existing",
