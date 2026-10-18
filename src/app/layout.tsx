@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AuthProvider } from "@/lib/auth/session";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -97,6 +98,7 @@ export default function RootLayout({
               <ScrollProgress />
               <PulseTrail />
               <SpeedInsights />
+              <Analytics />
                 </ToastProvider>
               </AuthProvider>
             </ClerkProvider>
