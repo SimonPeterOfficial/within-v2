@@ -18,19 +18,19 @@ import * as schema from "./schema";
 export * from "./schema";
 
 function getDatabaseUrl(): string {
-  // Prefer the unpooled (direct) connection so multi-step operations can
-  // use database transactions. The pooled DATABASE_URL (neon-http mode)
-  // does not support transactions, which breaks the outbox pattern used
-  // by submitContent(), publishContent(), and related workflows.
-  const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+  // DATABASE_URL (the pooled Neon connection) works with neon-serverless
+  // and supports database transactions, unlike the neon-http driver which
+  // does not. DATABASE_URL_UNPOOLED may be set for direct connections in
+  // production, but DATABASE_URL is the primary source.
+  const url = process.env.DATABASE_URL;
   if (!url) {
     if (process.env.NODE_ENV === "production") {
-      throw new Error("DATABASE_URL_UNPOOLED is required in production.");
+      throw new Error("DATABASE_URL is required in production.");
     }
     // Development without a database: every query fails loudly with a clear
     // message instead of silently pretending the platform persists.
     throw new Error(
-      "DATABASE_URL_UNPOOLED is not set. Add your Neon unpooled connection string to .env.local " +
+      "DATABASE_URL is not set. Add your Neon connection string to .env.local " +
         "(see https://neon.tech/docs/connect/connect-from-any-app).",
     );
   }

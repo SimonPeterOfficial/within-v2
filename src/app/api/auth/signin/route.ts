@@ -52,7 +52,10 @@ export async function POST(request: Request) {
   const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
   const user = rows[0];
 
-  const valid = user ? await verifyPassword(password, user.passwordSalt, user.passwordHash) : false;
+  const valid =
+    user && user.passwordSalt && user.passwordHash
+      ? await verifyPassword(password, user.passwordSalt, user.passwordHash)
+      : false;
   if (!user || !valid) {
     return NextResponse.json({ ok: false, error: "Incorrect email or password." }, { status: 401 });
   }

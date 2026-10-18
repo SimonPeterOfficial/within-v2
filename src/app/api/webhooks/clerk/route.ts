@@ -74,11 +74,11 @@ export async function POST(request: Request) {
 
   let evt: ClerkUserEvent;
   try {
-    evt = wh.verify(JSON.stringify(payload), {
+    evt = (wh.verify(JSON.stringify(payload), {
       "svix-id": svixId,
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
-    } as WebhookRequiredHeaders) as ClerkUserEvent;
+    } as WebhookRequiredHeaders) as unknown) as ClerkUserEvent;
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid webhook signature." }, { status: 401 });
   }
@@ -95,7 +95,6 @@ export async function POST(request: Request) {
           { status: 400 },
         );
       }
-      const name = [data.first_name, data.last_name].filter(Boolean).join(" ") || email.split("@")[0];
       try {
         await syncLocalUserFromClerk({
           clerkUserId: data.id,

@@ -45,29 +45,75 @@ export const metadata: Metadata = {
   openGraph: {
     title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
     description:
-      "A home for stories, emotions, creators and meaningful connections — a universe built around how you feel.",
+      "A home for stories, emotions, creators and meaningful connections.",
     type: "website",
     siteName: "WithIn",
-    locale: "en_US"
+    locale: "en_US",
   },
   twitter: {
     card: "summary",
     title: "WithIn — Feel Seen. Feel Heard. Feel WithIn.",
     description:
-      "A home for stories, emotions, creators and meaningful connections."
+      "A home for stories, emotions, creators and meaningful connections.",
   },
-  keywords: ["stories", "emotions", "creators", "sanctuary", "community", "originals", "music"]
+  keywords: [
+    "stories",
+    "emotions",
+    "creators",
+    "sanctuary",
+    "community",
+    "originals",
+    "music",
+  ],
 };
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#050505" }]
+  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#050505" }],
 };
 
+const pageChildren = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => (
+  <>
+    <a
+      href="#main"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
+    >
+      Skip to content
+    </a>
+    <PortalTransition>{children}</PortalTransition>
+    <GrainOverlay />
+    <PresenceField />
+    <PointerLight />
+    <CustomCursor />
+    <MemoryRipple />
+    <UniverseTracker />
+    <RouteAtmosphere />
+    <Breath />
+    <ScrollProgress />
+    <PulseTrail />
+    <SpeedInsights />
+  </>
+);
+
+/**
+ * Root layout with optional ClerkProvider.
+ *
+ * Clerk integration is conditional on NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY being
+ * configured. When keys are missing, the legacy authentication system
+ * continues to work unchanged — no Clerk dependency blocks the app.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clerkConfigured = Boolean(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  );
+
   return (
     <html
       lang="en"
@@ -76,30 +122,17 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-white">
         <ThemeProvider>
           <EnvironmentProvider>
-            <ClerkProvider>
+            {clerkConfigured ? (
+              <ClerkProvider>
+                <AuthProvider>
+                  <ToastProvider>{pageChildren({ children })}</ToastProvider>
+                </AuthProvider>
+              </ClerkProvider>
+            ) : (
               <AuthProvider>
-                <ToastProvider>
-              <a
-                href="#main"
-                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
-              >
-                Skip to content
-              </a>
-              <PortalTransition>{children}</PortalTransition>
-              <GrainOverlay />
-              <PresenceField />
-              <PointerLight />
-              <CustomCursor />
-              <MemoryRipple />
-              <UniverseTracker />
-              <RouteAtmosphere />
-              <Breath />
-              <ScrollProgress />
-              <PulseTrail />
-              <SpeedInsights />
-                </ToastProvider>
+                <ToastProvider>{pageChildren({ children })}</ToastProvider>
               </AuthProvider>
-            </ClerkProvider>
+            )}
           </EnvironmentProvider>
         </ThemeProvider>
       </body>

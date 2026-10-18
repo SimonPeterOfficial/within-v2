@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getSessionUser } from "@/lib/auth/server";
 import { resolveClerkUser } from "@/lib/auth/clerk";
 import type { AuthSession } from "@/lib/auth/types";
