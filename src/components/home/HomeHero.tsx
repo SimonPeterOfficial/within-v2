@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import CoverArt from "@/components/ui/cards/CoverArt";
@@ -10,20 +9,13 @@ import { useEnvironment } from "@/lib/environment";
 import { useAtlasTime } from "@/lib/atlas/useAtlasTime";
 
 /**
- * HomeHero — the painted welcome scene.
+ * HomeHero — a calm, application-ready welcome panel.
  *
- * The repository's canonical illustrated arrival: a golden-hour sky palace
- * above the clouds. When real published content exists, a featured editorial
- * moment overlays the hero with the first genuine piece; otherwise the
- * painting stands alone as an honest empty state.
- *
- * A time-aware welcome band sits above the scene — greeting and date come
- * from the shared environment clock, so every visitor sees the same honest
- * moment rather than fabricated personalization.
- *
- * The HTML chrome (nav, rail, panels) lives around this section rather
- * than over it, so the painting is never collaged over by UI.
+ * Replaces the large decorative image with a restrained, dark surface that
+ * keeps the hero useful: a time-aware welcome band and an optional featured
+ * cover art overlay when published content exists.
  */
+
 type HomeHeroProps = {
   featured?: UniverseEntry | null;
 };
@@ -48,16 +40,9 @@ export default function HomeHero({ featured }: HomeHeroProps) {
         <span className="text-[12px] text-[#8b8aa0]">{today}</span>
       </div>
 
-      <div className="relative overflow-hidden rounded-[30px] ring-1 ring-white/40 shadow-[var(--shadow-soft)] mt-2">
-        <Image
-          src="/within-home.png"
-          alt="Welcome to WithIn — a painted sky palace above clouds"
-          width={1610}
-          height={997}
-          priority
-          sizes="(max-width: 1024px) 100vw, 80vw"
-          className="block w-full object-cover min-h-[56vh] max-h-[82vh]"
-        />
+      {/* A restrained, dark surface replaces the large background painting. */}
+      <div className="relative overflow-hidden rounded-[30px] ring-1 ring-white/40 shadow-[var(--shadow-soft)] mt-2 bg-gradient-to-b from-[#06060a] to-[#07060b]">
+        <div className="block w-full min-h-[56vh] max-h-[82vh]" />
       </div>
 
       {featured && (
@@ -77,20 +62,13 @@ export default function HomeHero({ featured }: HomeHeroProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent" />
           <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end h-full">
-            {featured.category && (
-              <Badge tone="mood">{featured.category}</Badge>
-            )}
-            <Link
-              href={featured.href}
-              className="block mb-4"
-            >
+            {featured.category && <Badge tone="mood">{featured.category}</Badge>}
+            <Link href={featured.href} className="block mb-4">
               <h2 className="font-display text-[28px] font-medium leading-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
                 {featured.title}
               </h2>
             </Link>
-            <p className="mt-1 text-sm text-white/90 max-w-md">
-              {featured.description}
-            </p>
+            <p className="mt-1 text-sm text-white/90 max-w-md">{featured.description}</p>
           </div>
         </motion.div>
       )}
