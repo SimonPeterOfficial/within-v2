@@ -28,7 +28,7 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { verifyToken } from "@clerk/backend";
 import {
   SESSION_COOKIE,
   verifySessionToken,
@@ -51,17 +51,28 @@ async function verifyAdminSession(cookieValue: string): Promise<boolean> {
   return Date.now() - payload.loginTime <= ADMIN_MAX_AGE_MS;
 }
 
+const CLERK_SESSION_COOKIE = "__session";
+
 /**
- * Checks Clerk authentication status. Returns the Clerk userId when a valid
- * Clerk session exists, null otherwise. Never throws — if Clerk isn't
- * configured yet, falls back to null so legacy auth keeps working.
+ * Checks Clerk authentication status in the edge runtime. Manually verifies
+ * the Clerk session cookie (`__session`) using @clerk/backend's verifyToken,
+ * which is edge-safe. Returns the Clerk userId when a valid session exists,
+ * null otherwise. Never throws — if Clerk isn't configured or the token is
+ * invalid, falls back to null so legacy auth keeps working.
  */
 async function getClerkUserId(request: NextRequest): Promise<string | null> {
   try {
-    const { userId } = await auth(request);
-    return userId ?? null;
+    const secretKey = process.env.CLERK_SECRET_KEY;
+    if (!secretKey) return null;
+
+    const sessionCookie = request.cookies.get(CLERK_SESSION_COOKIE);
+    if (!sessionCookie?.value) return null;
+
+    const payload = await verifyToken(sessionCookie.value, { secretKey });
+    return payload?.sub ?? null;
   } catch {
-    // Clerk not configured or unavailable — legacy auth is the fallback.
+    // Clerk not configured, token invalid, or verification failed —
+    // legacy auth is the fallback.
     return null;
   }
 }
