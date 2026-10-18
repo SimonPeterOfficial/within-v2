@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AuthProvider, ClerkAuthWrapper } from "@/lib/auth/session";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -130,6 +131,27 @@ export default function RootLayout({
               </ClerkProvider>
             ) : (
               <AuthProvider>
+                <ToastProvider>
+              <a
+                href="#main"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
+              >
+                Skip to content
+              </a>
+              <PortalTransition>{children}</PortalTransition>
+              <GrainOverlay />
+              <PresenceField />
+              <PointerLight />
+              <CustomCursor />
+              <MemoryRipple />
+              <UniverseTracker />
+              <RouteAtmosphere />
+              <Breath />
+              <ScrollProgress />
+              <PulseTrail />
+              <SpeedInsights />
+              <Analytics />
+                </ToastProvider>
                 <ToastProvider>{pageChildren({ children })}</ToastProvider>
               </AuthProvider>
             )}
