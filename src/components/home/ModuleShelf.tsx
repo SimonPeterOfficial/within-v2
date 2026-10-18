@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
-import { UNIVERSE_NAV } from "@/lib/navigation";
-import type { SidebarItem } from "@/components/layout/Sidebar";
-import Icon from "@/components/ui/Icon";
+import { useState, useRef, useEffect, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { clsx } from "clsx";
+import Icon from "@/components/ui/Icon";
+import type { SidebarItem } from "@/components/layout/Sidebar";
 
 type ModuleShelfProps = {
   items: SidebarItem[];
@@ -13,7 +12,7 @@ type ModuleShelfProps = {
 };
 
 export default function ModuleShelf({ items, available = [] }: ModuleShelfProps) {
-  const tiles = items.filter((i) => i.route);
+  const tiles = items.filter((item) => item.route);
   const [focusIndex, setFocusIndex] = useState(0);
   const refs = useRef<Array<HTMLAnchorElement | null>>([]);
 
@@ -21,28 +20,29 @@ export default function ModuleShelf({ items, available = [] }: ModuleShelfProps)
     refs.current = refs.current.slice(0, tiles.length);
   }, [tiles.length]);
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      setFocusIndex((s) => Math.min(s + 1, tiles.length - 1));
-      refs.current[Math.min(focusIndex + 1, tiles.length - 1)]?.focus();
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const nextIndex = Math.min(focusIndex + 1, tiles.length - 1);
+    const prevIndex = Math.max(focusIndex - 1, 0);
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      setFocusIndex(nextIndex);
+      refs.current[nextIndex]?.focus();
+      return;
     }
-    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      e.preventDefault();
-      setFocusIndex((s) => Math.max(s - 1, 0));
-      refs.current[Math.max(focusIndex - 1, 0)]?.focus();
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      setFocusIndex(prevIndex);
+      refs.current[prevIndex]?.focus();
     }
   };
 
   return (
     <div>
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-white/60">Universe</h3>
-      <div
-        role="list"
-        onKeyDown={onKeyDown}
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        {tiles.map((item, idx) => {
+      <div role="list" onKeyDown={onKeyDown} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {tiles.map((item, index) => {
           const isAvailable = available.length === 0 || available.includes(item.href);
           return (
             <Link
@@ -51,16 +51,18 @@ export default function ModuleShelf({ items, available = [] }: ModuleShelfProps)
               className={clsx(
                 "group flex h-28 flex-col justify-between rounded-2xl border p-4 transition focus:outline-none",
                 isAvailable
-                  ? "bg-[#0a0b11] border-white/8 hover:border-white/15"
-                  : "bg-[#050507] border-white/5 opacity-60 pointer-events-none"
+                  ? "border-white/8 bg-[#0a0b11] hover:border-white/15"
+                  : "pointer-events-none border-white/5 bg-[#050507] opacity-60"
               )}
-              ref={(el) => (refs.current[idx] = el)}
+              ref={(element) => {
+                refs.current[index] = element;
+              }}
               aria-disabled={!isAvailable}
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/6 text-white/90">
-                    <Icon name={item.icon as any} size={16} />
+                    <Icon name={item.icon} size={16} />
                   </span>
                   <div className="text-sm font-semibold text-white">{item.label}</div>
                 </div>
