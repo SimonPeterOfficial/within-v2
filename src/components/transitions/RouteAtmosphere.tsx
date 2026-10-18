@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
  * grain levels, and glow colors.
  *
  * This is NOT a visual transition — it is an environmental shift.
- * The page content fades in via the existing PageTransition component.
+ * Route transitions are handled by PortalTransition in layout.tsx.
  */
 const ROUTE_ATMOSPHERE: Record<string, { mesh: string; aurora: string; glow: string }> = {
   "/home": { mesh: "home", aurora: "1", glow: "rgba(168,85,247,0.45)" },

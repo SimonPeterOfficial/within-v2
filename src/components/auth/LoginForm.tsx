@@ -95,15 +95,24 @@ export default function LoginForm() {
     router.push(target);
   };
 
-  const handleOAuth = (provider: string) => {
+  const handleOAuth = async (provider: string) => {
     setOauthLoading(provider);
-    // OAuth is architecturally ready but not yet configured.
-    // In a real implementation, this would redirect to the OAuth provider.
-    setTimeout(() => {
-      setFormError(`${provider} sign-in is coming soon. Use email for now.`);
+    try {
+      const result = await fetch(`/api/auth/oauth/${provider}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callbackUrl: window.location.pathname }),
+      });
+      const data = (await result.json()) as { ok: boolean; error?: string };
+      if (!result.ok || !data.ok) {
+        setFormError(data.error ?? `${provider} sign-in is not available.`);
+      }
+    } catch {
+      setFormError(`${provider} sign-in is not available.`);
+    } finally {
       setOauthLoading(null);
       requestAnimationFrame(() => errorRef.current?.focus());
-    }, 800);
+    }
   };
 
   return (

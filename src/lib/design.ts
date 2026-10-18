@@ -83,29 +83,34 @@ export const moodColors = {
  * the universe comes from here so headlines never drift between sections.
  * Consume via the <Text> primitive or directly.
  *
- * GEN 21 — the scale now runs display → whisper with deliberate breathing
- * room between levels: fewer weights, wider measure, quieter labels. The
- * eyebrow is no longer always-loud emerald; it carries the mood light at
- * low opacity so hierarchy comes from rhythm, not color saturation. */
+ * GEN 22 — the scale runs display → whisper with deliberate breathing
+ * room between levels: fewer weights, wider measure, quieter labels.
+ * Line-heights are tuned for comfortable reading at every size.
+ * Tracking is tight on headlines, relaxed on labels, and natural on body.
+ * The eyebrow carries the mood light at low opacity so hierarchy comes
+ * from rhythm, not color saturation.
+ */
 export const typography = {
-  /** Largest statement — the landing hero */
-  display: "font-display font-medium text-6xl leading-[0.98] tracking-[-0.03em] md:text-8xl",
-  /** Page-level hero heading */
-  hero: "font-display font-medium text-4xl leading-[1.02] tracking-[-0.02em] md:text-6xl",
-  /** Section headings — editorial, wide-set */
+  /** Largest statement — the landing hero. Imposing but not dominant. */
+  display: "font-display font-medium text-7xl leading-[0.94] tracking-[-0.04em] md:text-[5rem] lg:text-7xl",
+  /** Page-level hero heading — present without shouting. */
+  hero: "font-display font-medium text-5xl leading-[1.0] tracking-[-0.03em] md:text-[4rem] lg:text-5xl",
+  /** Section headings — editorial, wide-set. */
   sectionTitle: "font-display font-semibold text-3xl leading-[1.08] tracking-[-0.02em] md:text-5xl",
-  /** Sub-section headings */
+  /** Sub-section headings — clear but subordinate. */
   subsection: "font-display font-medium text-2xl leading-[1.12] tracking-[-0.01em] md:text-3xl",
-  /** Supportive subheadings — follows the world's ink, dark or crystal */
+  /** Lead — intro text between headline and body. Readable, spacious. */
+  lead: "font-sans text-lg leading-[1.6] tracking-[-0.01em] text-[rgba(var(--mood-rgb),0.88)] md:text-xl",
+  /** Supportive subheadings — follows the world's ink, dark or crystal. */
   subtitle: "text-lg leading-relaxed text-ui-soft",
-  /** Default body copy */
-  body: "text-base leading-relaxed",
-  /** Small auxiliary text */
-  caption: "text-sm text-ui-faint",
-  /** Micro text — metadata, timestamps */
-  micro: "text-xs text-ui-faint",
-  /** Uppercase kicker above titles — the mood-lit spine marker */
-  eyebrow: "text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(var(--mood-rgb),0.75)]",
-  /** Compact labels (chips, form labels) */
-  label: "text-[11px] font-medium uppercase tracking-[0.2em]"
+  /** Default body copy — comfortable measure, easy on the eyes. */
+  body: "font-sans text-base leading-[1.7] tracking-[-0.005em] text-[rgba(var(--mood-rgb),0.92)]",
+  /** Small auxiliary text — clear but never tiny. */
+  caption: "font-sans text-sm leading-relaxed tracking-[0.01em] text-[rgba(var(--mood-rgb),0.7)]",
+  /** Micro text — metadata, timestamps. Small but still legible. */
+  micro: "font-sans text-xs leading-none tracking-[0.04em] text-[rgba(var(--mood-rgb),0.55)]",
+  /** Uppercase kicker above titles — the mood-lit spine marker. */
+  eyebrow: "font-sans text-[11px] font-semibold uppercase tracking-[0.4em] text-[rgba(var(--mood-rgb),0.8)]",
+  /** Compact labels (chips, form labels). */
+  label: "font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-[rgba(var(--mood-rgb),0.8)]"
 } as const;

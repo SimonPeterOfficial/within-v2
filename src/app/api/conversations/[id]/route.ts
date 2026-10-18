@@ -50,7 +50,7 @@ export async function POST(request: Request, { params }: Params) {
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
   // Messages are the most abuse-sensitive surface: 30 per minute.
-  const limited = rateLimit(`messages:${user.id}`, 30, 60_000);
+  const limited = await rateLimit(`messages:${user.id}`, 30, 60_000);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, error: "Slow down a little." }, { status: 429 });
   }

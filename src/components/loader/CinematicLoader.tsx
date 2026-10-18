@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCinematicIntro } from "@/lib/useCinematicIntro";
 import { playWithinIdent } from "@/lib/within-sound";
@@ -9,6 +9,7 @@ import LoaderWordmark from "@/components/loader/LoaderWordmark";
 import LoaderRipples from "@/components/loader/LoaderRipples";
 import LoaderWaterSurface from "@/components/loader/LoaderWaterSurface";
 import AuriPresence from "@/components/auri/AuriPresence";
+import { useEntrance } from "@/components/entrance/EntranceProvider";
 
 type Phase = "hidden" | "spark" | "pulse" | "surface" | "gather" | "ripples" | "cosmic" | "letters" | "credit" | "out" | "done";
 
@@ -66,26 +67,30 @@ const RETURNING_TIMELINE: Array<[Phase, number]> = [
 
 export default function CinematicLoader() {
   const { play, reduced, returning, markSeen } = useCinematicIntro();
+  const { markReady } = useEntrance();
   const [phase, setPhase] = useState<Phase>("hidden");
   const skippedRef = useRef(false);
   const completedRef = useRef(false);
   const timersRef = useRef<number[]>([]);
 
-  const finish = () => {
+  const finish = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
     markSeen();
+    // Signal the hero that the entrance sequence is complete so the two
+    // play as one coherent system rather than competing animations.
+    markReady();
     setPhase("done");
-  };
+  }, [markSeen, markReady]);
 
-  const skip = () => {
+  const skip = useCallback(() => {
     if (skippedRef.current) return;
     skippedRef.current = true;
     timersRef.current.forEach((id) => window.clearTimeout(id));
     const out = window.setTimeout(() => setPhase("out"), 0);
     const end = window.setTimeout(finish, 950);
     timersRef.current = [out, end];
-  };
+  }, [finish]);
 
   useEffect(() => {
     if (!play) return;
@@ -120,8 +125,7 @@ export default function CinematicLoader() {
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [play, reduced]);
+  }, [play, reduced, returning, finish, skip]);
 
   const visible = phase !== "hidden" && phase !== "done";
   const dissolving = phase === "out" || phase === "done";

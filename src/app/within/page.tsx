@@ -31,7 +31,7 @@ export default function WithinPage() {
     pathname: "/within",
     moodId,
     isAuthenticated: !!user,
-    firstName: user?.name.trim().split(/\s+/)[0],
+    firstName: user?.name?.trim().split(/\s+/)?.[0],
     firstOpen: false,
     openCount: 1,
   };

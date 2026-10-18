@@ -24,7 +24,7 @@ export async function POST(_request: Request, { params }: Params) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
-  const limited = rateLimit(`community-join:${user.id}`, 15, 60_000);
+  const limited = await rateLimit(`community-join:${user.id}`, 15, 60_000);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, error: "Slow down a little." }, { status: 429 });
   }

@@ -66,9 +66,10 @@ export async function findSerendipity(userId: string): Promise<SerendipityItem[]
 
   if (blockedIds.length >= 1000) return []; // absurd guard — never happens, cheap
 
-  // ── Candidate pool: published, recent, not own, not followed, not blocked ──
+  // ── Candidate pool: published, public, recent, not own, not followed, not blocked ──
   const conditions = [
     eq(content.status, "published"),
+    eq(content.visibility, "public"),
     ne(content.creatorId, userId),
     sql`${content.publishedAt} > now() - interval '60 days'`,
     notInArray(content.creatorId, [...blockedIds, ...followedIds, userId].filter((v, i, a) => a.indexOf(v) === i)),

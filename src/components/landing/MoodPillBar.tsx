@@ -43,9 +43,9 @@ export default function MoodPillBar() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="crystal-elevated crystal-edge crystal-sheen depth-medium rounded-3xl p-5"
+        className="rounded-3xl p-5 border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] backdrop-blur-sm shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       >
-        <p className="relative z-[2] mb-4 px-1 text-[13px] font-medium text-[#44435e]">
+        <p className="relative z-[2] mb-4 px-1 text-[13px] font-medium text-[var(--elysian-ink-soft)]">
           How are you feeling WithIn?
         </p>
 
@@ -67,9 +67,7 @@ export default function MoodPillBar() {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                className={`group relative flex items-center gap-2 overflow-hidden rounded-full px-5 py-2.5 text-[13px] font-medium transition-colors duration-400 crystal-focus ${
-                  active ? "text-white" : "text-[#5f5e74] hover:text-[#232136]"
-                }`}
+                className={`group relative flex items-center gap-2 overflow-hidden rounded-full px-5 py-2.5 text-[13px] font-medium transition-colors duration-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] ${active ? "text-white" : "text-[var(--elysian-ink-soft)] hover:text-[var(--elysian-ink)]"}`}
                 style={
                   active
                     ? {
@@ -77,8 +75,8 @@ export default function MoodPillBar() {
                         boxShadow: `0 4px 24px ${rgbString(color, 0.4)}, inset 0 1px 0 rgba(255,255,255,0.4)`,
                       }
                     : {
-                        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9)",
-                        background: "rgba(255,255,255,0.42)",
+                        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
+                        background: "rgba(255,255,255,0.04)",
                       }
                 }
               >

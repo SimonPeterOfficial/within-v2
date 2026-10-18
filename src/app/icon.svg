@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="within-mark-sweep" x1="12" y1="8" x2="88" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stopColor="#a78bfa" />
+      <stop offset="1" stopColor="#34d399" />
+    </linearGradient>
+    <radialGradient id="within-mark-core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
+      <stop offset="0.45" stopColor="#a78bfa" stopOpacity="0.55" />
+      <stop offset="1" stopColor="#a78bfa" stopOpacity="0" />
+    </radialGradient>
+  </defs>
+
+  {/* The aperture ring — a gap at 45° upper-right: the world is open. */}
+  <circle cx="50" cy="50" r="34" stroke="url(#within-mark-sweep)" strokeWidth="6" strokeLinecap="round" strokeDasharray="188 26" strokeDashoffset="-13" transform="rotate(-45 50 50)" />
+
+  {/* The light within — a soft core bloom. */}
+  <circle cx="50" cy="50" r="17" fill="url(#within-mark-core)" />
+  <circle cx="50" cy="50" r="7.5" fill="#ffffff" opacity="0.92" />
+
+  {/* The spark on the aperture — the presence at the opening. */}
+  <circle cx="74.5" cy="24.5" r="4" fill="#34d399" opacity="0.95" />
+</svg>

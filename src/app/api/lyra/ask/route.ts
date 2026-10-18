@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
-  const limited = rateLimit(`lyra:ask:${user.id}`, 30, 60_000);
+  const limited = await rateLimit(`lyra:ask:${user.id}`, 30, 60_000);
   if (!limited.ok) return NextResponse.json({ ok: false, error: "Too many questions — pause a moment." }, { status: 429 });
 
   let body: { question?: string };

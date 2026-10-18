@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const user = await requireUser();
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
-  const limited = rateLimit(`journeys:create:${user.id}`, 20, 60_000);
+  const limited = await rateLimit(`journeys:create:${user.id}`, 20, 60_000);
   if (!limited.ok) return NextResponse.json({ ok: false, error: "Slow down — try again shortly." }, { status: 429 });
 
   let body: { title?: string; description?: string };

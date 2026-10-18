@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
   // Abuse-sensitive: 20 social mutations per minute.
-  const limited = rateLimit(`social:${user.id}`, 20, 60_000);
+  const limited = await rateLimit(`social:${user.id}`, 20, 60_000);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, error: "Slow down a little." }, { status: 429 });
   }

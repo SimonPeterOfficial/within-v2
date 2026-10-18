@@ -28,7 +28,7 @@ function toAuthUser(user: User): AuthSession["user"] {
 }
 
 export async function POST(request: Request) {
-  const limited = rateLimit(`signin:${clientKeyFrom(request)}`, 15, 60_000);
+  const limited = await rateLimit(`signin:${clientKeyFrom(request)}`, 15, 60_000);
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: `Too many attempts. Try again in ${limited.retryAfterSeconds}s.` },

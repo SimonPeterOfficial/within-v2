@@ -2,42 +2,48 @@
 
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useCallback, useEffect, useRef } from "react";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import GlowBackground from "@/components/effects/GlowBackground";
 import StarField from "@/components/sanctuary/StarField";
 import PresenceMemory from "@/components/effects/PresenceMemory";
-import AuriHeart, { AuriCaption } from "@/components/sanctuary/AuriHeart";
+import WithinMark from "@/components/ui/WithinMark";
+import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 import { blurUp, staggerContainer } from "@/lib/animations";
 import { fireRipple } from "@/lib/ripple";
+import { recordVisit } from "@/lib/light-memory";
+import { useEntrance } from "@/components/entrance/EntranceProvider";
 
 /**
- * The WithIn landing hero — the opening scene of a cinematic universe,
- * composed to match the reference design:
+ * The WithIn landing hero — the threshold into a living world.
  *
- *   LEFT   — eyebrow → the great gradient "WithIn" wordmark → the
- *            editorial subtitle → "Enter WithIn →" + "Explore the Universe"
- *   RIGHT  — Auri heart: winged owl in her ring of light, nebula behind,
- *            "Auri is here." caption + whisper indicator
- *   MOTIF  — light on water (the glowing point with concentric ripples)
+ * Composition: one focal point (the aperture mark holding light),
+ * the wordmark beneath it, a concise editorial statement, and two
+ * tactile entry actions. Everything else recedes into atmosphere.
  *
- * The pointer drives a soft parallax drift. Typography hierarchy:
- * wordmark → statement → body → metadata.
+ * The hero waits for the cinematic loader to signal readiness before
+ * beginning its staggered reveal — loader + hero play as one coherent
+ * entrance system, not two competing animations.
+ *
+ * Auri is deliberately absent here — she lives in the corner orb
+ * (AuriOrb) and appears only as a presence, never as a permanent
+ * mascot pasted onto the hero (BRAND.md).
  */
 export default function Hero() {
   const prefersReducedMotion = useReducedMotionSafe();
+  const { ready } = useEntrance();
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const smx = useSpring(mx, { stiffness: 50, damping: 20 });
   const smy = useSpring(my, { stiffness: 50, damping: 20 });
-  const nebulaX = useTransform(smx, [-0.5, 0.5], [26, -26]);
-  const nebulaY = useTransform(smy, [-0.5, 0.5], [18, -18]);
-  const starsX = useTransform(smx, [-0.5, 0.5], [12, -12]);
-  const starsY = useTransform(smy, [-0.5, 0.5], [8, -8]);
-  const auriX = useTransform(smx, [-0.5, 0.5], [12, -12]);
-  const auriY = useTransform(smy, [-0.5, 0.5], [8, -8]);
-  const wordmarkX = useTransform(smx, [-0.5, 0.5], [5, -5]);
-  const wordmarkY = useTransform(smx, [-0.5, 0.5], [3, -3]);
+  const markX = useTransform(smx, [-0.5, 0.5], [6, -6]);
+  const markY = useTransform(smy, [-0.5, 0.5], [4, -4]);
+  const nebulaX = useTransform(smx, [-0.5, 0.5], [20, -20]);
+  const nebulaY = useTransform(smy, [-0.5, 0.5], [14, -14]);
+  const starsX = useTransform(smx, [-0.5, 0.5], [10, -10]);
+  const starsY = useTransform(smy, [-0.5, 0.5], [6, -6]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     mx.set(event.clientX / window.innerWidth - 0.5);
@@ -50,10 +56,9 @@ export default function Hero() {
       onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
       className="relative overflow-hidden bg-[#02030a] text-white"
     >
-      {/* ── Deep background ── */}
+      {/* ── Deep background: atmospheric glow + painted arrival ── */}
       <GlowBackground variant="hero" />
 
-      {/* The painted arrival — atmospheric backdrop, receding behind the copy */}
       <div aria-hidden className="absolute inset-0">
         <Image
           src="/within-home.png"
@@ -61,169 +66,236 @@ export default function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-[0.65]"
+          className="object-cover opacity-[0.55]"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,3,10,0.45)_0%,rgba(2,3,10,0.25)_45%,rgba(2,3,10,0.78)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#02030a]/30 via-[#02030a]/55 to-[#02030a]" />
       </div>
 
-      {/* Nebula layers — deepest parallax */}
+      {/* ── Nebula fields — deepest parallax ── */}
       <motion.div
         aria-hidden
         style={{ x: prefersReducedMotion ? 0 : nebulaX, y: prefersReducedMotion ? 0 : nebulaY }}
         className="pointer-events-none absolute inset-0"
       >
-        {/* The purple nebula field around Auri (right side, like the reference) */}
-        <div className="absolute right-[2%] top-[4%] h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.13)_0%,rgba(76,29,149,0.06)_45%,transparent_70%)] blur-veil" />
-        <div className="absolute right-[16%] top-[36%] h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.08),transparent_68%)] blur-haze" />
-        {/* Teal whisper bottom-left, as the reference's dark water */}
-        <div className="absolute bottom-[6%] left-[4%] h-72 w-72 rounded-full bg-teal-500/[0.03] blur-smoke" />
-        <div className="absolute left-[38%] top-[52%] h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/[0.04] blur-haze" />
+        <div className="absolute right-[8%] top-[10%] h-[40rem] w-[40rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.10)_0%,rgba(76,29,149,0.04)_45%,transparent_70%)] blur-veil" />
+        <div className="absolute left-[10%] top-[45%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.06),transparent_65%)] blur-haze" />
+        <div className="absolute bottom-[8%] left-[8%] h-64 w-64 rounded-full bg-teal-500/[0.025] blur-smoke" />
       </motion.div>
 
-      {/* Starfield — mid parallax */}
+      {/* ── Starfield — mid parallax ── */}
       <motion.div
         aria-hidden
         style={{ x: prefersReducedMotion ? 0 : starsX, y: prefersReducedMotion ? 0 : starsY }}
         className="pointer-events-none absolute inset-0"
       >
-        <StarField count={56} seed={3} />
+        <StarField count={48} seed={3} />
       </motion.div>
 
       <PresenceMemory />
 
-      {/* ── The hero stage ── */}
-      <div className="relative mx-auto flex min-h-[calc(100svh-1rem)] w-full max-w-[1400px] flex-col px-6 pt-24 sm:px-8 lg:px-12">
-        <div className="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-4">
-          {/* ══ LEFT — the editorial statement ══ */}
-          <motion.div
-            variants={staggerContainer(0.16, 0.3)}
-            initial="hidden"
-            animate="show"
-            className="relative z-10 max-w-2xl"
-          >
-            {/* Eyebrow — quiet violet */}
-            <motion.p
-              variants={blurUp}
-              className="text-[13px] font-medium tracking-[0.08em] text-[#8b7cc8]"
-            >
-              A Universe That Feels You.
-            </motion.p>
-
-            {/* The great wordmark — white → violet → teal, like the reference */}
-            <motion.div variants={blurUp} className="mt-4">
-              <motion.h1
-                style={{
-                  x: prefersReducedMotion ? 0 : wordmarkX,
-                  y: prefersReducedMotion ? 0 : wordmarkY,
-                }}
-                className="select-none bg-[linear-gradient(92deg,#ffffff_0%,#f1ecff_34%,#a78bfa_58%,#67e8f9_86%,#5eead4_100%)] bg-clip-text font-display text-[clamp(4.5rem,11vw,9.5rem)] font-medium leading-[0.95] tracking-[-0.03em] text-transparent"
-              >
-                WithIn
-              </motion.h1>
-              {/* Soft light bloom behind the wordmark */}
-              <div
-                aria-hidden
-                className="pointer-events-none -mt-10 h-24 w-[60%] rounded-full bg-[radial-gradient(ellipse,rgba(167,139,250,0.12),transparent_70%)] blur-2xl"
-              />
-            </motion.div>
-
-            {/* Subtitle — the editorial promise */}
-            <motion.p
-              variants={blurUp}
-              className="mt-6 max-w-md text-[15px] leading-[1.75] text-gray-400/85 md:text-base"
-            >
-              Stories. Emotions. People. Imagination.
-              <br />
-              All connected. All WithIn.
-            </motion.p>
-
-            {/* CTAs — tactile, rounded-xl like the reference */}
-            <motion.div variants={blurUp} className="mt-10 flex flex-wrap items-center gap-4">
-              <a
-                href="/signup"
-                onClick={(e) => fireRipple(e)}
-                className="group inline-flex items-center gap-3 rounded-xl bg-[linear-gradient(120deg,#8b5cf6_0%,#7c3aed_55%,#6d28d9_100%)] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_8px_32px_rgba(124,58,237,0.4),inset_0_1px_0_rgba(255,255,255,0.22)] transition-all duration-300 hover:shadow-[0_10px_44px_rgba(124,58,237,0.55),inset_0_1px_0_rgba(255,255,255,0.25)]"
-              >
-                Enter WithIn
-                <motion.span
-                  aria-hidden
-                  animate={prefersReducedMotion ? undefined : { x: [0, 4, 0] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  →
-                </motion.span>
-              </a>
-              <a
-                href="/discover"
-                onClick={(e) => fireRipple(e)}
-                className="inline-flex items-center rounded-xl border border-white/[0.09] bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200/90 backdrop-blur transition-all duration-300 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-white"
-              >
-                Explore the Universe
-              </a>
-            </motion.div>
-          </motion.div>
-
-          {/* ══ RIGHT — Auri heart, the winged presence ══ */}
-          <motion.div
-            style={{ x: prefersReducedMotion ? 0 : auriX, y: prefersReducedMotion ? 0 : auriY }}
-            className="relative z-10 hidden items-center justify-center md:flex"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94, filter: "blur(10px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center"
-            >
-              <AuriHeart size={430} wings showRing />
-
-              {/* Caption — "Auri is here." */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.1, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="-mt-6"
-              >
-                <AuriCaption />
-              </motion.div>
-
-              {/* Whisper indicator — two dots like the reference carousel cue */}
-              <div aria-hidden className="mt-5 flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#a78bfa] shadow-[0_0_8px_rgba(167,139,250,0.8)]" />
-                <span className="h-1.5 w-1.5 rounded-full border border-white/20 bg-white/[0.06]" />
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* ── Light on Water — the signature WithIn motif, left-of-center ── */}
+      {/* ── Ivory horizon band — soft light at the base, like dawn over
+           the deep. Grounds the composition without competing with the
+           aperture focal point. ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[40%] top-[64%] -translate-x-1/2 -translate-y-1/2"
-      >
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[12rem] bg-gradient-to-t from-[var(--elysian-horizon)] via-[var(--elysian-horizon)] to-transparent"
+      />
+
+      {/* ── Hero stage: centered composition ── */}
+      <div className="relative mx-auto flex min-h-[calc(100svh-1rem)] w-full max-w-[1400px] flex-col items-center px-6 pt-20 sm:pt-24 lg:pt-32 pb-32">
+        <motion.div
+          variants={staggerContainer(0.14, 0.25)}
+          initial="hidden"
+          animate={ready ? "show" : "hidden"}
+          className="relative z-10 flex flex-col items-center gap-6 text-center max-w-2xl"
+        >
+          {/* Eyebrow — the central idea, quiet */}
+          <motion.p
+            variants={blurUp}
+            className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[rgba(var(--mood-rgb),0.75)]"
+          >
+            A light that refuses to go out.
+          </motion.p>
+
+          {/* The aperture mark — single focal point, brand light */}
+          <motion.div
+            variants={blurUp}
+            style={{ x: prefersReducedMotion ? 0 : markX, y: prefersReducedMotion ? 0 : markY }}
+            className="relative"
+          >
+            {/* Aperture response — signature interaction. The threshold ring
+                 widens and brightens as the pointer approaches the mark,
+                 reinforcing "the world is open." Throttled, transform-only,
+                 off under Reduced Motion and on touch devices. */}
+            <ApertureRing prefersReducedMotion={prefersReducedMotion} />
+            <WithinMark variant="mark" size={112} className="drop-shadow-[0_0_40px_rgba(139,92,246,0.35)]" />
+            {/* Soft bloom behind the mark */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-8 rounded-full bg-[radial-gradient(ellipse,rgba(167,139,250,0.18),transparent_75%)] blur-[140px]"
+            />
+          </motion.div>
+
+          {/* Wordmark — WithIn as an insignia */}
+          <motion.h1
+            variants={blurUp}
+            className="select-none mt-2 bg-[linear-gradient(92deg,#ffffff_0%,#f1ecff_30%,#a78bfa_55%,#67e8f9_85%,#5eead4_100%)] bg-clip-text font-display text-[clamp(3rem,9vw,5.5rem)] font-medium leading-[0.96] tracking-[-0.035em] text-transparent"
+          >
+            WithIn
+          </motion.h1>
+
+          {/* Supporting statement — deliberate line break */}
+          <motion.p
+            variants={blurUp}
+            className="mt-6 max-w-md text-[15px] leading-[1.75] text-[var(--elysian-ink-soft)] md:text-base"
+          >
+            Stories. Emotions. People.
+            <br />
+            A universe built around how you feel.
+          </motion.p>
+
+          {/* Entry actions — liquid glass, tactile, clear hierarchy */}
+          <motion.div
+            variants={blurUp}
+            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          >
+            <Button
+              href="/signup"
+              variant="gradient"
+              size="lg"
+              data-cta-entrance
+              onClick={(e) => {
+                fireRipple(e);
+                recordVisit("/signup");
+              }}
+              className="shadow-[0_0_36px_rgba(var(--mood-rgb),0.45)] hover:shadow-[0_0_52px_rgba(var(--mood-rgb),0.6)]"
+            >
+              Enter WithIn
+              <Icon name="forward" size={13} className="ml-1" />
+            </Button>
+            <Button
+              href="/discover"
+              variant="outline"
+              size="lg"
+              onClick={(e) => {
+                fireRipple(e);
+                recordVisit("/discover");
+              }}
+              className="hover:border-white/[0.2]"
+            >
+              Explore
+            </Button>
+          </motion.div>
+        </motion.div>
+
+        {/* ── Light on Water — signature motif, below the wordmark ──
+             A single gentle breath, not a habitual pulse. Motion with purpose,
+             never decoration for its own sake (BRAND.md §5). */}
         <motion.div
           animate={
             prefersReducedMotion
               ? undefined
-              : { opacity: [0.35, 0.7, 0.35], scale: [1, 1.3, 1] }
+              : { opacity: [0.35, 0.6, 0.35], scale: [1, 1.15, 1] }
           }
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="relative h-2 w-2 rounded-full bg-white shadow-[0_0_16px_rgba(167,139,250,0.7),0_0_50px_rgba(167,139,250,0.35)]"
+          transition={{ duration: 6, repeat: 1, ease: "easeInOut" }}
+          className="pointer-events-none mt-12 relative h-2 w-2 rounded-full bg-white shadow-[0_0_16px_rgba(167,139,250,0.6)]"
         />
-        {!prefersReducedMotion && (
-          <>
-            <span className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(167,139,250,0.06)] [animation:rippleBreath_6s_ease-in-out_infinite]" />
-            <span className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(167,139,250,0.04)] [animation:rippleBreath_6s_ease-in-out_1.5s_infinite]" />
-            <span className="absolute left-1/2 top-1/2 h-60 w-60 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.02] [animation:rippleBreath_6s_ease-in-out_3s_infinite]" />
-          </>
-        )}
       </div>
 
       {/* Deep vignette — cinematic framing */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_34%,rgba(0,0,0,0.72)_100%)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.80)_100%)]" />
 
       {/* Bottom fade into the mood bar */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#02030a] via-[#02030a]/75 to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#02030a] via-[#02030a]/60 to-transparent" />
     </section>
+  );
+}
+
+/**
+ * ApertureRing — the signature interaction of the living threshold.
+ *
+ * A soft luminous ring around the aperture mark. Under normal motion it
+ * breathes slowly; when the pointer approaches, the breathing origin shifts
+ * toward the pointer, as if the aperture is responding to the visitor's
+ * presence. Transform-origin + pointer tracking only; off under Reduced
+ * Motion and on touch devices.
+ *
+ * Pointer response uses CSS variables updated via direct DOM manipulation
+ * (zero React re-renders), matching the PresenceField pattern. Breathing is
+ * handled by a CSS keyframe so it never fights the pointer response.
+ */
+function ApertureRing({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef(0);
+
+  const applyResponse = useCallback(
+    (container: HTMLDivElement, ox: number, oy: number) => {
+      container.style.setProperty("--aperture-ox", `${ox}%`);
+      container.style.setProperty("--aperture-oy", `${oy}%`);
+    },
+    []
+  );
+
+  const resetResponse = useCallback((container: HTMLDivElement) => {
+    applyResponse(container, 50, 50);
+  }, [applyResponse]);
+
+  const handleMove = useCallback(
+    (event: MouseEvent) => {
+      if (prefersReducedMotion) return;
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = event.clientX - cx;
+      const dy = event.clientY - cy;
+      const distance = Math.hypot(dx, dy);
+      const radius = Math.max(rect.width, rect.height) * 1.6;
+
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = requestAnimationFrame(() => {
+        const current = containerRef.current;
+        if (!current) return;
+        if (distance < radius) {
+          applyResponse(current, 50 + (dx / rect.width) * 100, 50 + (dy / rect.height) * 100);
+        } else {
+          resetResponse(current);
+        }
+      });
+    },
+    [prefersReducedMotion, applyResponse, resetResponse]
+  );
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    resetResponse(container);
+
+    container.addEventListener("mousemove", handleMove, { passive: true });
+    container.addEventListener("mouseleave", () => resetResponse(container), { passive: true });
+
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      container.removeEventListener("mousemove", handleMove);
+      container.removeEventListener("mouseleave", () => resetResponse(container));
+    };
+  }, [prefersReducedMotion, handleMove, resetResponse]);
+
+  return (
+    <div
+      ref={containerRef}
+      aria-hidden
+      className={`pointer-events-none absolute inset-[-28%] rounded-full border border-[rgba(var(--mood-rgb),0.25)] blur-[40px] ${prefersReducedMotion ? "" : "aperture-breathe"}`}
+      style={{
+        ...(prefersReducedMotion
+          ? { opacity: 0.45, transformOrigin: "center center" }
+          : { transformOrigin: "var(--aperture-ox, 50%) var(--aperture-oy, 50%)" }),
+      }}
+    />
   );
 }

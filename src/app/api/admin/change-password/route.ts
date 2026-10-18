@@ -16,7 +16,7 @@ import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
   const clientKey = clientKeyFrom(request);
-  const limited = rateLimit(`admin-change-password:${clientKey}`, 5, 15 * 60 * 1000);
+  const limited = await rateLimit(`admin-change-password:${clientKey}`, 5, 15 * 60 * 1000);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, error: "Too many attempts." }, { status: 429 });
   }

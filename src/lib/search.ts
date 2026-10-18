@@ -40,6 +40,8 @@ export type UniverseEntry = {
   meta: string;
   /** Where the card leads */
   href: string;
+  /** Optional source image (cover art, photography, book cover…) */
+  src?: string;
   /** Searchable tags */
   tags: string[];
   /** Optional 0–5 rating */

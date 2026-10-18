@@ -35,8 +35,9 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
         }
       })
       .catch(() => {
-        // Network error — middleware already checked, assume valid
-        setVerified(true);
+        // Network error — fail closed: do not assume the session is valid.
+        // Redirect to login so the user re-verifies.
+        router.replace("/admin/login");
       });
 
     return () => controller.abort();

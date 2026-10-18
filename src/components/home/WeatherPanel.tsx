@@ -9,6 +9,7 @@ import {
   PHASE_LABEL,
   dayCharacter,
 } from "@/lib/atlas/sky";
+import { useEnvironment } from "@/lib/environment";
 
 const subscribeAlways = () => () => {};
 const getClientLocale = () => Intl.DateTimeFormat().resolvedOptions().locale;
@@ -25,15 +26,45 @@ const getServerLocale = () => "en-US";
 export default function WeatherPanel() {
   const now = useAtlasTime();
   const locale = useSyncExternalStore(subscribeAlways, getClientLocale, getServerLocale);
+  const { weather } = useEnvironment();
 
   const sun = sunPosition(now);
   const climate = climateEstimate(now);
   const forecast = forecastEstimate(now);
-  const clouds = dayCharacter(now); // deterministic per day
+  const clouds = dayCharacter(now);
 
-  const condition = sun.phase === "night" ? "Clear night" : clouds > 0.66 ? "Partly cloudy" : clouds > 0.33 ? "Soft clouds" : "Clear sky";
-  // The temperature follows the day's actual curve — the honest estimate.
-  const currentC = Math.round(climate.lowC + (climate.highC - climate.lowC) * climate.daytime01);
+  // Live weather from the environment watch takes precedence.
+  const hasLiveWeather = weather !== null && weather.tempC !== null;
+  const currentC = hasLiveWeather ? weather.tempC : Math.round(climate.lowC + (climate.highC - climate.lowC) * climate.daytime01);
+
+  const condition = hasLiveWeather
+    ? weather.label
+    : sun.phase === "night"
+      ? "Clear night"
+      : clouds > 0.66
+        ? "Partly cloudy"
+        : clouds > 0.33
+          ? "Soft clouds"
+          : "Clear sky";
+
+  const glyph = hasLiveWeather
+    ? (() => {
+        switch (weather.state) {
+          case "clear":
+            return sun.phase === "night" ? "🌙" : "☀️";
+          case "cloudy":
+            return "⛅";
+          case "rain":
+            return "🌧";
+          case "storm":
+            return "⛈";
+          case "snow":
+            return "❄";
+        }
+      })()
+    : sun.phase === "night"
+      ? "🌙"
+      : "☀️";
 
   const dayLabels = ["Today", "Thu", "Fri", "Sat", "Sun"];
   const startIndex = 0;
@@ -73,44 +104,44 @@ export default function WeatherPanel() {
                 boxShadow: "0 3px 12px rgba(255,220,160,0.35), inset 0 1px 0 rgba(255,255,255,0.6)",
               }}
             >
-              {sun.phase === "night" ? "🌙" : "☀️"}
+              {glyph}
             </span>
             <div>
-              <p className="font-display text-[26px] font-medium leading-none text-[#2c2a48]">
+              <p className="font-display text-[26px] font-medium leading-none text-ui-ink">
                 {currentC}°C
               </p>
-              <p className="mt-1 text-[11.5px] font-medium text-[#5f5e74]">{condition}</p>
+              <p className="mt-1 text-[11.5px] font-medium text-ui-ink-soft">{condition}</p>
             </div>
           </div>
         </div>
 
         {/* Location — WithIn's home shore */}
-        <p className="mt-3 flex items-center gap-1.5 text-[12px] font-medium text-[#5f5e74]">
+        <p className="mt-3 flex items-center gap-1.5 text-[12px] font-medium text-ui-ink-soft">
           <span aria-hidden>📍</span>
           Moonlight Bay
         </p>
 
         {/* The 4-day estimate strip */}
-        <div className="mt-4 grid grid-cols-4 gap-2 border-t border-white/50 pt-3.5">
+        <div className="mt-4 grid grid-cols-4 gap-2 border-t border-ui-line pt-3.5">
           {forecast.slice(0, 4).map((day, index) => (
             <div key={index} className="text-center">
-              <p className="text-[10.5px] font-semibold text-[#44435e]">
+              <p className="text-[10.5px] font-semibold text-ui-ink-soft">
                 {dayLabels[startIndex + index + 1] ?? new Date(now.getTime() + (index + 1) * 86400000).toLocaleDateString(locale, { weekday: "short" })}
               </p>
               <p aria-hidden className="mt-1 text-base">
                 {clouds > 0.5 ? "⛅" : "☀️"}
               </p>
-              <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-[#2c2a48]">
+              <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-ui-ink">
                 {day.highC}°
               </p>
-              <p className="text-[10px] tabular-nums text-[#8b8aa0]">{day.lowC}°</p>
+              <p className="text-[10px] tabular-nums text-ui-faint">{day.lowC}°</p>
             </div>
           ))}
         </div>
 
-        {/* The honesty line — small but unmissable */}
-        <p className="mt-3.5 text-[9.5px] leading-relaxed text-[#8b8aa0]">
-          {PHASE_LABEL[sun.phase]} · {climate.label.toLowerCase()} climate estimate — not a live forecast.
+        {/* The honesty line — labels the source so nothing is misrepresented */}
+        <p className="mt-3.5 text-[9.5px] leading-relaxed text-ui-faint">
+          {hasLiveWeather ? "Live weather · Open-Meteo" : `${PHASE_LABEL[sun.phase]} · ${climate.label.toLowerCase()} climate estimate — not a live forecast.`}
         </p>
       </div>
     </aside>

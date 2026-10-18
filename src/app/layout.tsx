@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { AuthProvider } from "@/lib/auth/session";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/lib/theme";
@@ -12,6 +13,7 @@ import PresenceField from "@/components/effects/PresenceField";
 import MemoryRipple from "@/components/effects/MemoryRipple";
 import UniverseTracker from "@/components/universe/UniverseTracker";
 import RouteAtmosphere from "@/components/transitions/RouteAtmosphere";
+import PortalTransition from "@/components/transitions/PortalTransition";
 import Breath from "@/components/effects/Breath";
 import ScrollProgress from "@/components/effects/ScrollProgress";
 import PulseTrail from "@/components/effects/PulseTrail";
@@ -74,15 +76,16 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-white">
         <ThemeProvider>
           <EnvironmentProvider>
-            <AuthProvider>
-              <ToastProvider>
+            <ClerkProvider>
+              <AuthProvider>
+                <ToastProvider>
               <a
                 href="#main"
                 className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-black"
               >
                 Skip to content
               </a>
-              {children}
+              <PortalTransition>{children}</PortalTransition>
               <GrainOverlay />
               <PresenceField />
               <PointerLight />
@@ -94,8 +97,9 @@ export default function RootLayout({
               <ScrollProgress />
               <PulseTrail />
               <SpeedInsights />
-              </ToastProvider>
-            </AuthProvider>
+                </ToastProvider>
+              </AuthProvider>
+            </ClerkProvider>
           </EnvironmentProvider>
         </ThemeProvider>
       </body>

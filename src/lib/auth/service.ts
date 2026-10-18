@@ -11,7 +11,14 @@
  *   fetchCurrentSession→ GET  /api/auth/me   (restores identity on mount)
  */
 
-import type { AuthResult, AuthService, AuthSession, ResetResult, SignInInput, SignUpInput } from "./types";
+import type {
+  AuthResult,
+  AuthService,
+  AuthSession,
+  ResetResult,
+  SignInInput,
+  SignUpInput,
+} from "./types";
 
 const API = "/api/auth";
 
@@ -42,18 +49,44 @@ function clearLegacyStorage() {
 }
 
 /**
- * Restores the real session from the server after hydration.
- * Returns null when unauthenticated (or the network is unreachable —
- * the app degrades to the unauthenticated experience).
+ * Result of restoring the session from the server after hydration.
+ *
+ *   - authenticated   → a valid session exists (legacy or Clerk-mapped)
+ *   - linking_required → Clerk-authenticated but no local WITHIN mapping yet
+ *   - unauthenticated → no valid session
  */
-export async function fetchCurrentSession(): Promise<AuthSession | null> {
+export type SessionRestoreResult =
+  | { status: "authenticated"; session: AuthSession }
+  | { status: "linking_required"; clerkUserId: string }
+  | { status: "unauthenticated" };
+
+/**
+ * Restores the real session from the server after hydration.
+ * Degrades gracefully to unauthenticated when the network is unreachable.
+ */
+export async function fetchCurrentSession(): Promise<SessionRestoreResult> {
   try {
     const response = await fetch(`${API}/me`, { cache: "no-store" });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      // 401 with account_linking_required means Clerk-authenticated but unmapped.
+      if (response.status === 401) {
+        const data = (await response.json()) as {
+          ok: boolean;
+          error?: string;
+          clerkUserId?: string;
+        };
+        if (data.error === "account_linking_required" && data.clerkUserId) {
+          return { status: "linking_required", clerkUserId: data.clerkUserId };
+        }
+      }
+      return { status: "unauthenticated" };
+    }
     const data = (await response.json()) as { ok: boolean; session?: AuthSession };
-    return data.ok && data.session ? data.session : null;
+    return data.ok && data.session
+      ? { status: "authenticated", session: data.session }
+      : { status: "unauthenticated" };
   } catch {
-    return null;
+    return { status: "unauthenticated" };
   }
 }
 

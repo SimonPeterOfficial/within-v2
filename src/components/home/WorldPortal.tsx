@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { fireRipple } from "@/lib/ripple";
 import { blurUp } from "@/lib/animations";
+import { recordVisit, getVisitGlow } from "@/lib/light-memory";
 
 export type WorldPortalData = {
   name: string;
@@ -34,23 +35,29 @@ export type WorldPortalData = {
  * Material: glass-crystal (Level 2 — moderate translucency)
  */
 export default function WorldPortal({ portal, index }: { portal: WorldPortalData; index: number }) {
+  const glow = getVisitGlow(portal.href);
   return (
     <motion.div
       variants={blurUp}
       custom={index}
       className="group relative"
     >
+      {glow > 0 && (
+        <div
+          aria-hidden
+          className="absolute inset-0 rounded-[24px]"
+          style={{
+            boxShadow: `inset 0 0 0 1px rgba(var(--mood-rgb), ${glow * 0.15}), 0 0 24px rgba(var(--mood-rgb), ${glow * 0.06})`,
+          }}
+        />
+      )}
       <Link
         href={portal.href}
-        onClick={(e) => fireRipple(e)}
-        className={`
-          crystal-portal world-entrance relative flex h-[190px] flex-col overflow-hidden rounded-[24px]
-          transition-all duration-500
-          portal-resting portal-hover portal-touch
-          hover:-translate-y-1.5 hover:depth-high
-          focus-ring
-          ${portal.worldClass}
-        `}
+        onClick={(e) => {
+          fireRipple(e);
+          recordVisit(portal.href);
+        }}
+        className={`crystal-portal world-entrance relative flex h-[190px] flex-col overflow-hidden rounded-[24px] transition-all duration-500 portal-resting portal-hover portal-touch hover:-translate-y-1.5 hover:depth-high focus-ring ${portal.worldClass}`}
         aria-label={`${portal.name} — ${portal.line}`}
       >
         {/* The world scene — layered gradients */}

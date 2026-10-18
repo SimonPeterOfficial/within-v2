@@ -122,15 +122,13 @@ export default function UniverseStrip() {
             <Link
               href={card.href}
               onClick={(e) => fireRipple(e)}
-              className={`group crystal-soft crystal-edge depth-medium crystal-press relative flex h-full min-h-[130px] flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-[3px] ${
-                card.cinematic ? "p-5" : "p-3.5"
-              }`}
+              className={`group relative flex h-full min-h-[130px] flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-[3px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] backdrop-blur-sm ${card.cinematic ? "p-5" : "p-3.5"}`}
             >
               {/* The atmospheric cover */}
               <div
                 aria-hidden
                 className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.05]"
-                style={{ background: card.cover, opacity: 0.9 }}
+                style={{ background: card.cover, opacity: 0.85 }}
               />
               {/* Star dust */}
               <div
@@ -141,8 +139,8 @@ export default function UniverseStrip() {
                     "radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.5), transparent), radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.35), transparent), radial-gradient(1.5px 1.5px at 55% 55%, rgba(255,255,255,0.25), transparent)",
                 }}
               />
-              {/* Bottom fade for legibility — into the crystal, not the dark */}
-              <div aria-hidden className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-white/85 via-white/40 to-transparent" />
+              {/* Bottom fade for legibility — into obsidian, not light */}
+              <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#02030a] via-[#02030a]/60 to-transparent" />
 
               {/* Content */}
               <div className={`relative mt-auto ${card.cinematic ? "max-w-[75%]" : ""}`}>
@@ -150,14 +148,14 @@ export default function UniverseStrip() {
                   <Icon
                     name={card.icon}
                     size={card.cinematic ? 18 : 14}
-                    className={card.warm ? "text-amber-500" : "text-[#7c6ce0]"}
+                    className={card.warm ? "text-amber-500" : "text-[var(--elysian-ink-soft)]"}
                     strokeWidth={1.8}
                   />
-                  <span className={`font-semibold text-[#232136] ${card.cinematic ? "font-display text-2xl" : "text-[13px]"}`}>
+                  <span className={`font-semibold text-[var(--elysian-ink)] ${card.cinematic ? "font-display text-2xl" : "text-[13px]"}`}>
                     {card.name}
                   </span>
                 </div>
-                <p className={`mt-1 leading-snug text-[#5f5e74] ${card.cinematic ? "text-sm" : "text-[11px]"}`}>
+                <p className={`mt-1 leading-snug text-[var(--elysian-ink-faint)] ${card.cinematic ? "text-sm" : "text-[11px]"}`}>
                   {card.line}
                 </p>
               </div>

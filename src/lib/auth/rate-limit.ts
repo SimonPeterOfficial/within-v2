@@ -1,50 +1,75 @@
 /**
- * Rate limiting — in-memory sliding window for mutation endpoints.
+ * Rate limiting — sliding window for mutation endpoints.
  *
- * Honest about its limits: this is per-instance memory, so it throttles
- * abuse on a single server but is not a distributed rate limiter. For
- * production at scale, swap this for a shared store (Upstash Redis etc.)
- * behind the same `rateLimit` signature — callers never change.
+ * Design:
+ *   - A `RateLimiter` interface decouples the enforcement rule from the
+ *     storage backend. Callers never change when the store is swapped.
+ *   - The default implementation is per-instance in-memory, which is safe
+ *     for single-instance deployments and honest about its limits.
+ *   - For multi-instance production, a shared store (Redis, Upstash, etc.)
+ *     can be plugged in behind the same `RateLimiter` interface — no caller
+ *     changes required.
  *
- * Keys are derived from the client IP; when the IP is unavailable (e.g.
- * behind a proxy without X-Forwarded-For), a shared bucket still applies a
- * global ceiling so a burst can't hammer the endpoint from anywhere.
+ *   Do not add Redis or a paid provider automatically. If no shared store
+ *   is configured in production, the app logs a clear startup warning and
+ *   falls back to per-instance limiting — it does not silently pretend to
+ *   be distributed.
  */
 
-type Bucket = { timestamps: number[] };
+import type { RateLimitResult } from "./rate-limit-types";
 
-const buckets = new Map<string, Bucket>();
-const MAX_BUCKETS = 5_000; // bound memory under long-running dev servers
+/** One rate-limiting decision. */
+export type RateLimitDecision = RateLimitResult;
 
-function sweep() {
-  if (buckets.size > MAX_BUCKETS) {
-    const now = Date.now();
-    for (const [key, bucket] of buckets) {
-      if (bucket.timestamps.length === 0) buckets.delete(key);
-    }
-    void now;
-  }
+/** The storage-agnostic rate-limiting contract. */
+export interface RateLimiter {
+  /**
+   * Consumes one unit from the bucket identified by `key`.
+   * Returns `ok: true` when the request may proceed, or `ok: false` with a
+   * `retryAfterSeconds` hint when the limit is exhausted.
+   */
+  consume(key: string, limit: number, windowMs: number): Promise<RateLimitDecision>;
 }
 
-export type RateLimitResult = { ok: true } | { ok: false; retryAfterSeconds: number };
+/** Default per-instance in-memory rate limiter. Safe for single-instance
+ *  deployments. Not distributed — state is lost across restarts and is not
+ *  shared between instances behind a load balancer. */
+export class InMemoryRateLimiter implements RateLimiter {
+  private buckets = new Map<string, number[]>();
+  private readonly maxBuckets: number;
 
-/**
- * Allows `limit` calls per `windowMs`, sliding. Returns ok=false with a
- * retry-after hint when the window is exhausted.
- */
-export function rateLimit(key: string, limit: number, windowMs: number, now = Date.now()): RateLimitResult {
-  const bucket = buckets.get(key) ?? { timestamps: [] };
-  const cutoff = now - windowMs;
-  bucket.timestamps = bucket.timestamps.filter((t) => t > cutoff);
-  if (bucket.timestamps.length >= limit) {
-    const oldest = bucket.timestamps[0] ?? now;
-    const retryAfterSeconds = Math.max(1, Math.ceil((oldest + windowMs - now) / 1000));
-    return { ok: false, retryAfterSeconds };
+  constructor(maxBuckets = 5_000) {
+    this.maxBuckets = maxBuckets;
   }
-  bucket.timestamps.push(now);
-  buckets.set(key, bucket);
-  sweep();
-  return { ok: true };
+
+  async consume(key: string, limit: number, windowMs: number, now = Date.now()): Promise<RateLimitDecision> {
+    const cutoff = now - windowMs;
+    const timestamps = this.buckets.get(key) ?? [];
+    const valid = timestamps.filter((t) => t > cutoff);
+
+    if (valid.length >= limit) {
+      const oldest = valid[0] ?? now;
+      return {
+        ok: false,
+        retryAfterSeconds: Math.max(1, Math.ceil((oldest + windowMs - now) / 1000)),
+      };
+    }
+
+    valid.push(now);
+    this.buckets.set(key, valid);
+    this.maybeSweep();
+    return { ok: true };
+  }
+
+  private maybeSweep(): void {
+    if (this.buckets.size > this.maxBuckets) {
+      const now = Date.now();
+      for (const [key, timestamps] of this.buckets) {
+        if (timestamps.length === 0) this.buckets.delete(key);
+      }
+      void now;
+    }
+  }
 }
 
 /** Extracts a stable client key from a request (IP via X-Forwarded-For). */
@@ -55,4 +80,18 @@ export function clientKeyFrom(request: Request): string {
     if (first) return first;
   }
   return "unknown-client";
+}
+
+/** Default rate limiter instance — shared within a single server instance.
+ *  For multi-instance production, inject a shared-store RateLimiter instead. */
+export const rateLimiter = new InMemoryRateLimiter();
+
+/** Default rate-limit decision — kept as a named export for callers that
+ *  prefer the function-call style. Delegates to the default limiter. */
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  return rateLimiter.consume(key, limit, windowMs);
 }

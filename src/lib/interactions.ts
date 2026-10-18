@@ -61,7 +61,7 @@ export type LibraryEntry = {
   coverGradient: string | null;
   coverEmoji: string | null;
   creatorName: string | null;
-  username: string;
+  username: string | null;
   savedAt: Date;
 };
 
@@ -83,7 +83,7 @@ export async function listSaves(userId: string, shelf: SaveShelf): Promise<Libra
     })
     .from(saves)
     .innerJoin(content, eq(saves.contentId, content.id))
-    .innerJoin(profiles, eq(profiles.userId, content.creatorId))
+    .leftJoin(profiles, eq(profiles.userId, content.creatorId))
     .where(and(eq(saves.userId, userId), eq(saves.shelf, shelf)))
     .orderBy(desc(saves.createdAt));
 

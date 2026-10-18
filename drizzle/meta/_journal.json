@@ -43,6 +43,27 @@
       "when": 1791385727389,
       "tag": "0005_dear_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792246778767,
+      "tag": "0006_fresh_marauders",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792331680538,
+      "tag": "0007_acoustic_james_howlett",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792331764405,
+      "tag": "0008_supreme_orphan",
+      "breakpoints": true
     }
   ]
 }

@@ -29,19 +29,30 @@ const TOKEN_PREFIX = "admin_";
 /**
  * The admin password — read from environment variables only.
  * NEVER hardcode, NEVER expose to client, NEVER log.
- * Falls back to a development default only in non-production.
+ * No development fallback is provided. An administrator password must be
+ * configured explicitly via ADMIN_PASSWORD or the admin_credentials table.
  */
 function getAdminPassword(): string {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) {
-    // Development fallback — clearly logged, never in production
-    if (process.env.NODE_ENV === "production") {
-      console.error("[ADMIN AUTH] CRITICAL: ADMIN_PASSWORD not set in production!");
-      throw new Error("ADMIN_PASSWORD environment variable is required");
-    }
-    return "dev-password-not-set";
+    throw new Error("ADMIN_PASSWORD environment variable is required.");
   }
   return password;
+}
+
+/**
+ * Startup validation for admin authentication configuration.
+ * Throws if the admin password is not configured in production.
+ * Call this during application boot to fail closed rather than silently
+ * allowing an insecure fallback.
+ */
+export function validateAdminAuthConfig(): void {
+  const password = process.env.ADMIN_PASSWORD;
+  if (process.env.NODE_ENV === "production" && !password) {
+    throw new Error(
+      "ADMIN_PASSWORD is required in production. Admin access is unavailable until configured."
+    );
+  }
 }
 
 /* ── Timing-safe comparison ──────────────────────────────────────────── */

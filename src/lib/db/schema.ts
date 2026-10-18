@@ -65,7 +65,8 @@ export type NotificationType =
   | "reaction"
   | "moderation_result"
   | "subscription"
-  | "system";
+  | "system"
+  | "content_submitted";
 
 /** Things an admin action can touch — for the audit log. */
 export type AuditTargetType =
@@ -84,10 +85,15 @@ export const users = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     email: text("email").notNull(),
-    /** scrypt hash — never the raw password, never logged. */
-    passwordHash: text("password_hash").notNull(),
-    /** Per-user random salt for the scrypt hash. */
-    passwordSalt: text("password_salt").notNull(),
+    /** Clerk external identity — maps a Clerk user to this WITHIN user. Nullable
+     *  so existing accounts are unaffected until they link via Clerk. Unique to
+     *  prevent one Clerk identity from mapping to multiple WITHIN accounts. */
+    clerkId: text("clerk_id"),
+    /** scrypt hash — never the raw password, never logged. Nullable for
+     *  Clerk-only accounts that have no legacy password. */
+    passwordHash: text("password_hash"),
+    /** Per-user random salt for the scrypt hash. Nullable for Clerk-only accounts. */
+    passwordSalt: text("password_salt"),
     name: text("name").notNull(),
     role: text("role").$type<UserRole>().notNull().default("user"),
     status: text("status").$type<UserStatus>().notNull().default("active"),
@@ -95,7 +101,10 @@ export const users = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
   },
-  (table) => [uniqueIndex("users_email_unique").on(table.email)],
+  (table) => [
+    uniqueIndex("users_email_unique").on(table.email),
+    uniqueIndex("users_clerk_id_unique").on(table.clerkId),
+  ],
 );
 
 export type User = typeof users.$inferSelect;
@@ -234,6 +243,53 @@ export const reactions = pgTable(
 
 export type Reaction = typeof reactions.$inferSelect;
 export type NewReaction = typeof reactions.$inferInsert;
+
+/* ── Content links — idea relationships between works ──────────────────
+ * A user can link one content item to another as "responds to",
+ * "inspired by", "contradicts", or "references". Links are directional:
+ * source → target. They enable knowledge maps, idea connection
+ * discovery, and collaborative understanding without duplicating
+ * underlying content objects. */
+
+export type ContentLinkType = "responds-to" | "inspired-by" | "contradicts" | "references";
+
+export const contentLinks = pgTable(
+  "content_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** The content item that links out. */
+    sourceContentId: uuid("source_content_id")
+      .notNull()
+      .references(() => content.id, { onDelete: "cascade" }),
+    /** The content item being linked to. */
+    targetContentId: uuid("target_content_id")
+      .notNull()
+      .references(() => content.id, { onDelete: "cascade" }),
+    /** The user who created the link. */
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** The kind of relationship. */
+    linkType: text("link_type").$type<ContentLinkType>().notNull(),
+    /** Optional user-written context for why the link exists. */
+    context: text("context"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("content_links_unique").on(
+      table.sourceContentId,
+      table.targetContentId,
+      table.userId,
+      table.linkType,
+    ),
+    index("content_links_source_idx").on(table.sourceContentId),
+    index("content_links_target_idx").on(table.targetContentId),
+    index("content_links_user_idx").on(table.userId),
+  ],
+);
+
+export type ContentLink = typeof contentLinks.$inferSelect;
+export type NewContentLink = typeof contentLinks.$inferInsert;
 
 /* ── Follows ───────────────────────────────────────────────────────── */
 
@@ -738,3 +794,51 @@ export type NewAdminCredential = typeof adminCredentials.$inferInsert;
 
 export type AdminResetToken = typeof adminResetTokens.$inferSelect;
 export type NewAdminResetToken = typeof adminResetTokens.$inferInsert;
+
+/* ── Outbox — durable event recording ──────────────────────────────────
+ * The business change and the durable record of the event are committed
+ * atomically in the same database transaction. A worker picks up pending
+ * events and delivers them to registered handlers with retries and
+ * idempotency. Events carry only minimal, safe data — never secrets or
+ * private message bodies. */
+
+export type OutboxStatus = "pending" | "completed" | "failed";
+
+export const outboxEvents = pgTable(
+  "outbox_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Globally unique event identifier — idempotency key for consumers. */
+    eventId: text("event_id").notNull().unique(),
+    /** What happened. */
+    eventType: text("event_type").notNull(),
+    /** Schema version of the payload for forward-compatible evolution. */
+    schemaVersion: integer("schema_version").notNull().default(1),
+    /** Minimal, validated event data — no secrets, no private bodies. */
+    payload: jsonb("payload").notNull(),
+    /** Processing status. */
+    status: text("status").$type<OutboxStatus>().notNull().default("pending"),
+    /** Number of delivery attempts made. */
+    attempts: integer("attempts").notNull().default(0),
+    /** Maximum attempts before the event is marked failed (dead-lettered). */
+    maxAttempts: integer("max_attempts").notNull().default(10),
+    /** Earliest time at which the next attempt may run. */
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull(),
+    /** Lock held by a worker while processing; null when not in flight. */
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+    /** When the event was recorded. */
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    /** When the event was last processed (completed or failed). */
+    processedAt: timestamp("processed_at", { withTimezone: true }),
+    /** Bounded, safe error summary — no secrets or stack traces. */
+    lastError: text("last_error"),
+  },
+  (table) => [
+    index("outbox_events_status_idx").on(table.status, table.nextAttemptAt),
+    index("outbox_events_type_idx").on(table.eventType),
+    index("outbox_events_lock_idx").on(table.lockedUntil),
+  ],
+);
+
+export type OutboxEvent = typeof outboxEvents.$inferSelect;
+export type NewOutboxEvent = typeof outboxEvents.$inferInsert;

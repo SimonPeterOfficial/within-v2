@@ -34,7 +34,7 @@ function toAuthUser(user: User): AuthSession["user"] {
 }
 
 export async function POST(request: Request) {
-  const limited = rateLimit(`signup:${clientKeyFrom(request)}`, 10, 60_000);
+  const limited = await rateLimit(`signup:${clientKeyFrom(request)}`, 10, 60_000);
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: `Too many attempts. Try again in ${limited.retryAfterSeconds}s.` },
@@ -74,47 +74,53 @@ export async function POST(request: Request) {
   }
 
   const { hash, salt } = await hashPassword(password);
-  const created = await db
-    .insert(users)
-    .values({ name: name.trim(), email: normalizedEmail, passwordHash: hash, passwordSalt: salt })
-    .returning();
 
-  const user = created[0];
-  if (!user) {
-    return NextResponse.json({ ok: false, error: "Could not create the account." }, { status: 500 });
-  }
+  // User + profile are created in a single transaction so an account can
+  // never exist without its profile, and a profile can never reference a
+  // missing user. If either insert fails, the whole transaction rolls back
+  // and no partial account remains. Session creation stays outside the
+  // transaction — an httpOnly cookie cannot participate in a DB transaction,
+  // and a failed session issuance must not delete a valid account.
+  const createdUser = await db.transaction(async (tx) => {
+    const [user] = await tx
+      .insert(users)
+      .values({ name: name.trim(), email: normalizedEmail, passwordHash: hash, passwordSalt: salt })
+      .returning();
+    if (!user) {
+      throw new Error("Could not create the account.");
+    }
 
-  // Derive a unique public username; retry with a numeric suffix on clash.
-  let username = deriveUsername(name, normalizedEmail);
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const clash = await db
-      .select({ id: profiles.id })
-      .from(profiles)
-      .where(eq(profiles.username, username))
-      .limit(1);
-    if (clash.length === 0) break;
-    username = `${deriveUsername(name, normalizedEmail).slice(0, 26)}-${Math.floor(Math.random() * 900) + 100}`;
-  }
+    // Derive a unique public username; retry with a numeric suffix on clash.
+    let username = deriveUsername(name, normalizedEmail);
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const clash = await tx
+        .select({ id: profiles.id })
+        .from(profiles)
+        .where(eq(profiles.username, username))
+        .limit(1);
+      if (clash.length === 0) break;
+      username = `${deriveUsername(name, normalizedEmail).slice(0, 26)}-${Math.floor(Math.random() * 900) + 100}`;
+    }
 
-  try {
-    await db.insert(profiles).values({
+    await tx.insert(profiles).values({
       userId: user.id,
       username,
       displayName: user.name,
     });
-  } catch {
-    // Profile creation failed — don't leave an orphaned account behind.
-    await db.delete(users).where(eq(users.id, user.id)).catch(() => undefined);
-    return NextResponse.json({ ok: false, error: "Could not create the profile." }, { status: 500 });
-  }
 
-  await createUserSession(user);
-  await touchUserActivity(user.id);
+    return user;
+  });
+
+  // Session creation is outside the transaction. If it fails, the account
+  // still exists — the user can sign in normally. We do not delete the
+  // account merely because session issuance failed.
+  await createUserSession(createdUser);
+  await touchUserActivity(createdUser.id);
 
   return NextResponse.json({
     ok: true,
     session: {
-      user: toAuthUser(user),
+      user: toAuthUser(createdUser),
       token: "session",
       createdAt: Date.now(),
     } satisfies AuthSession,

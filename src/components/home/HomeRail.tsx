@@ -35,10 +35,10 @@ type RecentRow = {
 };
 
 const RECENT: RecentRow[] = [
-  { icon: "message", label: "Messages", sub: "3 new", href: "/conversations" },
-  { icon: "users", label: "Communities", sub: "2 new", href: "/communities" },
-  { icon: "bell", label: "Notifications", sub: "5 new", href: "/home#notifications" },
-  { icon: "wallet", label: "Wallet", sub: "Open", href: "/settings" },
+  { icon: "message", label: "Messages", sub: "Your conversations", href: "/conversations" },
+  { icon: "users", label: "Communities", sub: "Quiet rooms, kindred souls", href: "/communities" },
+  { icon: "bell", label: "Notifications", sub: "Activity feed", href: "/home#notifications" },
+  { icon: "sparkles", label: "Within", sub: "The heart of WithIn", href: "/within" },
 ];
 
 const QUICK: { icon: IconName; label: string; href: string }[] = [
@@ -78,21 +78,21 @@ export default function HomeRail() {
         className="crystal-elevated crystal-edge depth-low rounded-3xl p-5"
       >
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/55 text-[#7c6ce0] ring-1 ring-white/70">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-ui-surface text-[#7c6ce0] ring-1 ring-ui-line">
             <Icon name="sparkles" size={14} />
           </span>
           <div>
-            <p className="text-[13.5px] font-semibold text-[#232136]">Daily Within</p>
-            <p className="text-[10.5px] text-[#8b8aa0]">
+            <p className="text-[13.5px] font-semibold text-ui-ink">Daily Within</p>
+            <p className="text-[10.5px] text-ui-faint">
               {now.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
             </p>
           </div>
         </div>
-        <p className="mt-4 font-display text-[15px] leading-relaxed text-[#44435e]">
+        <p className="mt-4 font-display text-[15px] leading-relaxed text-ui-ink-soft">
           {seed.image[0].toUpperCase() + seed.image.slice(1)} —{" "}
-          <span className="text-[#6f6e88]">{seed.feeling}</span>.
+          <span className="text-ui-faint">{seed.feeling}</span>.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-[#8b8aa0]">
+        <p className="mt-2 text-[12px] leading-relaxed text-ui-faint">
           Not all who wander are lost. Some are just finding what matters.
         </p>
       </motion.section>
@@ -103,24 +103,24 @@ export default function HomeRail() {
         aria-label="Quick actions"
         className="crystal-elevated crystal-edge depth-low rounded-3xl p-5"
       >
-        <p className="text-[13px] font-semibold text-[#232136]">Quick Actions</p>
+        <p className="text-[13px] font-semibold text-ui-ink">Quick Actions</p>
         <ul className="mt-3 flex flex-col">
           {QUICK.map((action) => (
             <li key={action.label}>
               <Link
                 href={action.href}
-                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-white/45"
+                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-ui-surface"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/55 text-[#6f6e88] ring-1 ring-white/70 transition-colors group-hover:text-[#232136]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ui-surface text-ui-ink-soft ring-1 ring-ui-line transition-colors group-hover:text-ui-ink">
                   <Icon name={action.icon} size={14} strokeWidth={1.8} />
                 </span>
-                <span className="flex-1 text-[13px] font-medium text-[#44435e] group-hover:text-[#232136]">
+                <span className="flex-1 text-[13px] font-medium text-ui-ink-soft group-hover:text-ui-ink">
                   {action.label}
                 </span>
                 <Icon
                   name="chevronRight"
                   size={13}
-                  className="text-[#8b8aa0] transition-transform group-hover:translate-x-0.5 group-hover:text-[#44435e]"
+                  className="text-ui-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ui-ink-soft"
                 />
               </Link>
             </li>
@@ -129,18 +129,18 @@ export default function HomeRail() {
             <button
               type="button"
               onClick={openAuri}
-              className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-white/45"
+              className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-ui-surface"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white" style={{ background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.95), rgba(var(--mood-rgb),0.72))", boxShadow: "0 3px 10px rgba(var(--mood-rgb),0.3)" }}>
                 <Icon name="sparkles" size={14} strokeWidth={1.8} />
               </span>
-              <span className="flex-1 text-[13px] font-medium text-[#44435e] group-hover:text-[#232136]">
+              <span className="flex-1 text-[13px] font-medium text-ui-ink-soft group-hover:text-ui-ink">
                 Talk to Auri
               </span>
               <Icon
                 name="chevronRight"
                 size={13}
-                className="text-[#8b8aa0] transition-transform group-hover:translate-x-0.5 group-hover:text-[#44435e]"
+                className="text-ui-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ui-ink-soft"
               />
             </button>
           </li>
@@ -153,27 +153,27 @@ export default function HomeRail() {
         aria-label="Recent activity"
         className="crystal-elevated crystal-edge depth-low rounded-3xl p-5"
       >
-        <p className="text-[13px] font-semibold text-[#232136]">Recent</p>
+        <p className="text-[13px] font-semibold text-ui-ink">Recent</p>
         <ul className="mt-3 flex flex-col">
           {RECENT.map((row) => (
             <li key={row.label}>
               <Link
                 href={row.href}
-                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-white/45"
+                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-ui-surface"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/55 text-[#6f6e88] ring-1 ring-white/70 transition-colors group-hover:text-[#232136]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ui-surface text-ui-ink-soft ring-1 ring-ui-line transition-colors group-hover:text-ui-ink">
                   <Icon name={row.icon} size={14} strokeWidth={1.8} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-medium text-[#44435e] group-hover:text-[#232136]">
+                  <span className="block truncate text-[13px] font-medium text-ui-ink-soft group-hover:text-ui-ink">
                     {row.label}
                   </span>
-                  <span className="block truncate text-[10.5px] text-[#8b8aa0]">{row.sub}</span>
+                  <span className="block truncate text-[10.5px] text-ui-faint">{row.sub}</span>
                 </span>
                 <Icon
                   name="chevronRight"
                   size={13}
-                  className="text-[#8b8aa0] transition-transform group-hover:translate-x-0.5 group-hover:text-[#44435e]"
+                  className="text-ui-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ui-ink-soft"
                 />
               </Link>
             </li>
@@ -197,12 +197,12 @@ export default function HomeRail() {
           }}
         />
         <div className="relative">
-          <p className="font-display text-[15px] font-medium leading-snug text-[#232136]">
+          <p className="font-display text-[15px] font-medium leading-snug text-ui-ink">
             Something unexpected awaits you…
           </p>
           <Link
             href="/explore"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/60 px-5 py-2.5 text-[13px] font-semibold text-[#232136] ring-1 ring-white/80 backdrop-blur transition hover:bg-white/85"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ui-raised px-5 py-2.5 text-[13px] font-semibold text-ui-ink ring-1 ring-ui-line backdrop-blur transition hover:bg-white/85"
           >
             Discover
             <Icon name="forward" size={13} />

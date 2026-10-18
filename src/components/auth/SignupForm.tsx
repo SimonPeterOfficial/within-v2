@@ -93,13 +93,24 @@ export default function SignupForm() {
     router.push("/onboarding");
   };
 
-  const handleOAuth = (provider: string) => {
+  const handleOAuth = async (provider: string) => {
     setOauthLoading(provider);
-    setTimeout(() => {
-      setFormError(`${provider} sign-up is coming soon. Use email for now.`);
+    try {
+      const result = await fetch(`/api/auth/oauth/${provider}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callbackUrl: window.location.pathname }),
+      });
+      const data = (await result.json()) as { ok: boolean; error?: string };
+      if (!result.ok || !data.ok) {
+        setFormError(data.error ?? `${provider} sign-up is not available.`);
+      }
+    } catch {
+      setFormError(`${provider} sign-up is not available.`);
+    } finally {
       setOauthLoading(null);
       requestAnimationFrame(() => errorRef.current?.focus());
-    }, 800);
+    }
   };
 
   return (

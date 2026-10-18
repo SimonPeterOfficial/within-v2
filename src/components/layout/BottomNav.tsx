@@ -6,33 +6,28 @@ import { motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import Icon from "@/components/ui/Icon";
 import type { IconName } from "@/components/ui/Icon";
-
-type NavItem = {
-  label: string;
-  href: string;
-  icon: IconName;
-};
-
-const PRIMARY_NAV: NavItem[] = [
-  { label: "Home", href: "/home", icon: "home" },
-  { label: "Discover", href: "/discover", icon: "discover" },
-  { label: "Within", href: "/within", icon: "sparkles" },
-  { label: "People", href: "/connections", icon: "users" },
-  { label: "Profile", href: "/profile", icon: "profile" },
-];
+import { recordVisit } from "@/lib/light-memory";
 
 /**
  * The mobile bottom navigation — WithIn's spatial dock.
  *
- * GEN 21: the dock is no longer a boxed ribbon — it is a layer of the
- * atmosphere itself. No border, no card: just icons floating on the dark,
- * a soft light-well rising from below, and a luminous orb that blooms
- * under the place you are. The center (Within) is deliberately closest
- * to the thumb — the door to Auri is always under the hand.
+ * Curated from the unified UNIVERSE_NAV so mobile and desktop navigation
+ * always agree on where each door leads. The center (Within) is
+ * deliberately closest to the thumb — the door to Auri is always under
+ * the hand.
  */
 export default function BottomNav() {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotionSafe();
+
+  // A thumb-friendly subset of the unified nav for the mobile dock.
+  const PRIMARY_NAV: { label: string; href: string; icon: IconName }[] = [
+    { label: "Home", href: "/home", icon: "home" },
+    { label: "Discover", href: "/discover", icon: "discover" },
+    { label: "Within", href: "/within", icon: "sparkles" },
+    { label: "Connections", href: "/connections", icon: "users" },
+    { label: "Profile", href: "/profile", icon: "profile" },
+  ];
 
   return (
     <nav
@@ -68,6 +63,7 @@ export default function BottomNav() {
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
                 className="relative flex flex-1 flex-col items-center gap-1.5 px-1 py-2"
+                onClick={() => recordVisit(item.href)}
               >
                 {/* The bloom — light under the active place */}
                 {isActive && (

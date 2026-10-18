@@ -57,6 +57,11 @@
   --color-ui-surface: var(--ui-surface);
   --color-ui-raised: var(--ui-raised);
   --color-ui-line: var(--ui-line);
+
+  /* Focus ring — consistent, visible, mood-tuned. */
+  --color-focus-ring: rgba(var(--mood-rgb), 0.6);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
 }
 
 html {
@@ -161,11 +166,38 @@ html {
   --surface-gradient-subtle: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
   --surface-gradient-elevated: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
 
+  /* Surface depth — subtle tonal variation between adjacent surfaces so
+     layering is legible without borders everywhere. */
+  --surface-depth-1: rgba(255, 255, 255, 0.02);
+  --surface-depth-2: rgba(255, 255, 255, 0.04);
+  --surface-depth-3: rgba(255, 255, 255, 0.06);
+
   /* Atmosphere intensity — time of day tunes these; the aurora and mesh
      read them so the world breathes with the hour. */
   --atmos-mesh: 1;
   --atmos-aurora: 1;
   --atmos-grain: 1;
+
+  /* ── PORTAL TRANSITION (Engine III — The Signature) ─────────────────
+     The aperture mark scales from a nav item to frame the entering
+     destination. These tokens keep the portal consistent across routes. */
+  --portal-scale-duration: 0.55;
+  --portal-ease: [0.16, 1, 0.3, 1];
+  --portal-glow: rgba(var(--mood-rgb), 0.35);
+  --portal-border: rgba(255, 255, 255, 0.5);
+
+  /* ── ELYSIAN — Landing surface tokens ───────────────────────────────
+     Controlled illumination for the entrance experience: obsidian
+     darkness, violet/indigo light, warm ivory typography. */
+  --elysian-bg: #02030a;
+  --elysian-surface: rgba(255, 255, 255, 0.03);
+  --elysian-line: rgba(255, 255, 255, 0.08);
+  --elysian-ink: #f7f5f0;           /* warm ivory — primary text */
+  --elysian-ink-soft: #c9c3b8;      /* muted ivory — supporting text */
+  --elysian-ink-faint: #8a8478;     /* faint ivory — auxiliary text */
+  --elysian-glow: rgba(168, 85, 247, 0.25);   /* controlled violet light */
+  --elysian-glow-strong: rgba(168, 85, 247, 0.45);
+  --elysian-horizon: rgba(247, 245, 240, 0.06); /* soft ivory horizon band */
 }
 
 /* Light theme — the same universe, a brighter room */
@@ -195,8 +227,8 @@ body {
 
 /* Keyboard focus — the premium outline that follows the mood */
 :focus-visible {
-  outline: 2px solid rgba(var(--mood-rgb), 0.7);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* Native cursor affordance — Tailwind v4 preflight leaves buttons on default */
@@ -631,6 +663,26 @@ html[data-theme-day="birthday"] .time-glow {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes apertureBreathe {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.06);
+  }
+}
+
+/* Reduced motion disables the aperture breath */
+@media (prefers-reduced-motion: reduce) {
+  .aperture-breathe {
+    animation: none;
+    opacity: 0.45;
+    transform: scale(1);
+  }
 }
 
 .animate-glow {
@@ -2062,6 +2114,17 @@ html[data-breath="awake"] .aurora-root {
 }
 @utility motion-cinematic {
   transition-duration: 1200ms;
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── ELYSIAN motion tokens — entrance and hero-specific timing ─────────
+   Slower, more deliberate timing for the cinematic entrance. */
+@utility motion-entrance {
+  transition-duration: 900ms;
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+@utility motion-emergence {
+  transition-duration: 1400ms;
   transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 

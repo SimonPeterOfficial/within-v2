@@ -33,6 +33,7 @@ const ROUTES = [
   { path: "/creators", markers: ["The people who make it", "Creator"] },
   { path: "/creators/mira-okoye", markers: ["Mira Okoye", "Filmmaker of quiet skies"] },
   { path: "/sanctuary", markers: ["<html", "WithIn"] },
+  { path: "/time", markers: ["Time", "The present moment"] },
   { path: "/profile", markers: ["Welcome", "Enter WithIn"] },
   { path: "/settings", markers: ["Welcome", "Enter WithIn"] },
   { path: "/icon.svg", markers: ["<svg"] }

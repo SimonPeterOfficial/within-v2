@@ -13,17 +13,9 @@
 
 import "server-only";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
-import {
-  db,
-  content,
-  contentViews,
-  follows,
-  profiles,
-  users,
-  type Content,
-  type ContentStatus,
-  type ContentType,
-} from "@/lib/db";
+import { db, content, contentViews, profiles, users, type Content, type ContentStatus, type ContentType } from "@/lib/db";
+import { recordEvent } from "@/lib/events/outbox";
+import { buildEvent } from "@/lib/events/types";
 import { hasRole } from "@/lib/auth/authorization";
 import { createNotification, logAdminAction } from "@/lib/auth/server";
 import { validateDescription, validateTags, validateTitle } from "@/lib/auth/validation";
@@ -127,13 +119,34 @@ export async function submitContent(userId: string, contentId: string): Promise<
   if (row.creatorId !== userId) return { ok: false, error: "You can only submit your own content." };
   if (row.status !== "draft") return { ok: false, error: "Only drafts can be submitted." };
 
-  const updated = await db
-    .update(content)
-    .set({ status: "submitted", updatedAt: new Date() })
-    .where(eq(content.id, contentId))
-    .returning();
+  return await db.transaction(async (tx) => {
+    const updated = await tx
+      .update(content)
+      .set({ status: "submitted", updatedAt: new Date() })
+      .where(eq(content.id, contentId))
+      .returning();
 
-  return { ok: true, content: updated[0] };
+    const contentRow = updated[0];
+
+    // Record the submission event durably in the same transaction as the
+    // state change. The outbox worker will deliver it with retries and
+    // idempotency; if the transaction rolls back, no orphaned event remains.
+    await recordEvent(tx, buildEvent({
+      type: "content.submitted",
+      entityType: "content",
+      entityId: contentRow.id,
+      actorId: userId,
+      correlationId: null,
+      data: {
+        contentId: contentRow.id,
+        title: contentRow.title,
+        creatorId: contentRow.creatorId,
+        submittedAt: new Date().toISOString(),
+      },
+    }));
+
+    return { ok: true, content: contentRow };
+  });
 }
 
 /** Fetches one content row by id (for ownership checks). */
@@ -222,32 +235,35 @@ export async function publishContent(creatorId: string, contentId: string): Prom
   if (row.creatorId !== creatorId) return { ok: false, error: "You can only publish your own content." };
   if (row.status !== "approved") return { ok: false, error: "Only approved content can be published." };
 
-  const updated = await db
-    .update(content)
-    .set({ status: "published", publishedAt: new Date(), updatedAt: new Date() })
-    .where(eq(content.id, contentId))
-    .returning();
+  return await db.transaction(async (tx) => {
+    const now = new Date();
+    const updated = await tx
+      .update(content)
+      .set({ status: "published", publishedAt: now, updatedAt: now })
+      .where(eq(content.id, contentId))
+      .returning();
 
-  const result = updated[0];
+    const contentRow = updated[0];
 
-  // Followers hear about it — capped so one creator can't flood the queue.
-  const followers = await db
-    .select({ id: follows.followerId })
-    .from(follows)
-    .where(eq(follows.followeeId, creatorId))
-    .limit(200);
-
-  for (const follower of followers) {
-    await createNotification({
-      userId: follower.id,
-      type: "creator_published",
+    // Record the publication event durably in the same transaction as the
+    // business change. The outbox worker will deliver it with retries and
+    // idempotency; if the transaction rolls back, no orphaned event remains.
+    await recordEvent(tx, buildEvent({
+      type: "content.published",
+      entityType: "content",
+      entityId: contentRow.id,
       actorId: creatorId,
-      contentId: result.id,
-      message: `${result.title} is live.`,
-    });
-  }
+      correlationId: null,
+      data: {
+        contentId: contentRow.id,
+        title: contentRow.title,
+        creatorId: contentRow.creatorId,
+        publishedAt: now.toISOString(),
+      },
+    }));
 
-  return { ok: true, content: result };
+    return { ok: true, content: contentRow };
+  });
 }
 
 /* ── Discovery — published, public content only ─────────────────────── */
@@ -283,6 +299,7 @@ export function toUniverseEntry(row: Content, creatorName: string): UniverseEntr
     emoji: row.coverEmoji ?? "✦",
     meta: `${CONTENT_TYPE_LABEL[row.type]}${row.publishedAt ? ` · ${new Date(row.publishedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}` : ""}`,
     href: `/content/${row.id}`,
+    src: row.mediaRef ?? undefined,
     tags: row.tags ?? [],
     statusLabel: "New",
     moods: [],
@@ -296,7 +313,7 @@ export function toUniverseEntry(row: Content, creatorName: string): UniverseEntr
 export async function listPublishedContent(filters: DiscoveryFilters = {}): Promise<UniverseEntry[]> {
   const { type, category, query, limit = 48, offset = 0 } = filters;
 
-  const conditions = [eq(content.status, "published")];
+  const conditions = [eq(content.status, "published"), eq(content.visibility, "public")];
   if (type) conditions.push(eq(content.type, type));
   if (category) conditions.push(eq(content.category, category));
   if (query) {
@@ -318,7 +335,7 @@ export async function listPublishedContent(filters: DiscoveryFilters = {}): Prom
       username: profiles.username,
     })
     .from(content)
-    .innerJoin(profiles, eq(profiles.userId, content.creatorId))
+    .leftJoin(profiles, eq(profiles.userId, content.creatorId))
     .where(and(...conditions))
     .orderBy(desc(content.publishedAt))
     .limit(limit)
@@ -331,7 +348,10 @@ export async function listPublishedContent(filters: DiscoveryFilters = {}): Prom
 
 /** Count of published content — for honest empty-state decisions. */
 export async function countPublishedContent(): Promise<number> {
-  const rows = await db.select({ n: count() }).from(content).where(eq(content.status, "published"));
+  const rows = await db
+    .select({ n: count() })
+    .from(content)
+    .where(and(eq(content.status, "published"), eq(content.visibility, "public")));
   return rows[0]?.n ?? 0;
 }
 
@@ -342,11 +362,9 @@ export async function getContentForViewer(contentId: string, viewerId?: string |
       row: content,
       creatorName: profiles.displayName,
       username: profiles.username,
-      creatorRole: users.role,
     })
     .from(content)
     .innerJoin(profiles, eq(profiles.userId, content.creatorId))
-    .innerJoin(users, eq(users.id, content.creatorId))
     .where(eq(content.id, contentId))
     .limit(1);
 
@@ -354,9 +372,23 @@ export async function getContentForViewer(contentId: string, viewerId?: string |
   if (!item) return null;
 
   const isOwner = viewerId != null && item.row.creatorId === viewerId;
-  const isModerator = item.creatorRole === "moderator" || item.creatorRole === "admin" || item.creatorRole === "super_admin";
+  // Moderator access is decided by the VIEWER's role, never the content
+  // creator's role. A viewer's own moderator status does not depend on who
+  // created the content they are trying to see.
+  let isModerator = false;
+  if (viewerId) {
+    const viewer = await db.select({ role: users.role }).from(users).where(eq(users.id, viewerId)).limit(1);
+    const viewerRole = viewer[0]?.role;
+    isModerator =
+      viewerRole === "moderator" || viewerRole === "admin" || viewerRole === "super_admin";
+  }
 
   if (item.row.status !== "published" && !isOwner && !isModerator) return null;
+
+  // Published content: enforce visibility boundaries. Public and unlisted
+  // rows are retrievable by id (never listed unless public); private rows
+  // are owner + moderator only.
+  if (item.row.visibility === "private" && !isOwner && !isModerator) return null;
 
   return item;
 }
@@ -378,11 +410,17 @@ export async function getContentViewCount(contentId: string): Promise<number> {
   return rows[0]?.n ?? 0;
 }
 
-/** Published content by a creator — for their public profile. */
+/** Published, public content by a creator — for their public profile. */
 export async function listPublishedByCreator(userId: string): Promise<Content[]> {
   return db
     .select()
     .from(content)
-    .where(and(eq(content.creatorId, userId), eq(content.status, "published")))
+    .where(
+      and(
+        eq(content.creatorId, userId),
+        eq(content.status, "published"),
+        eq(content.visibility, "public"),
+      ),
+    )
     .orderBy(desc(content.publishedAt));
 }

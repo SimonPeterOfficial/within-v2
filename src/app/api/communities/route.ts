@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ ok: false, error: "Sign in required." }, { status: 401 });
 
   // Community creation is abuse-sensitive: 3 per hour.
-  const limited = rateLimit(`community-create:${user.id}`, 3, 3_600_000);
+  const limited = await rateLimit(`community-create:${user.id}`, 3, 3_600_000);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, error: "Take a breath — try again later." }, { status: 429 });
   }

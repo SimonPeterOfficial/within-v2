@@ -15,13 +15,17 @@ import { NextResponse } from "next/server";
 import {
   verifyAdminCredentials,
   createAdminSession,
+  validateAdminAuthConfig,
 } from "@/lib/admin/auth";
 import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
 
 export async function POST(request: Request) {
+  // Fail closed if admin auth is not configured.
+  validateAdminAuthConfig();
+
   // Rate limit: 5 attempts per 15 minutes per IP
   const clientKey = clientKeyFrom(request);
-  const rateResult = rateLimit(`admin-login:${clientKey}`, 5, 15 * 60 * 1000);
+  const rateResult = await rateLimit(`admin-login:${clientKey}`, 5, 15 * 60 * 1000);
   if (!rateResult.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many attempts. Please try again later." },

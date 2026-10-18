@@ -52,18 +52,18 @@ export default function Footer() {
         <div className="pointer-events-none absolute -bottom-32 right-1/5 h-64 w-64 rounded-full bg-emerald-600/[0.04] blur-smoke" />
 
         <div className="relative">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-emerald-400/45">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--elysian-ink-soft)]">
             Stay close
           </p>
-          <h2 className="mx-auto mt-5 max-w-xl font-display text-3xl font-medium leading-[1.06] tracking-[-0.02em] md:text-4xl">
+          <h2 className="mx-auto mt-5 max-w-xl font-display text-3xl font-medium leading-[1.06] tracking-[-0.02em] md:text-4xl text-[var(--elysian-ink)]">
             A quiet letter, once a week.
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-gray-400/60">
+          <p className="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-[var(--elysian-ink-faint)]">
             Stories, originals, and community moments — delivered gently, never often enough to feel loud.
           </p>
 
           {subscribed ? (
-            <p className="mx-auto mt-8 max-w-md rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-6 py-3 text-sm text-emerald-300/90">
+            <p className="mx-auto mt-8 max-w-md rounded-full border border-[rgba(139,92,246,0.25)] bg-[rgba(139,92,246,0.08)] px-6 py-3 text-sm text-[var(--elysian-ink-soft)]">
               {"You're in. Welcome to the world within."}
             </p>
           ) : (
@@ -75,7 +75,7 @@ export default function Footer() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="flex-1 rounded-full border border-white/[0.07] bg-black/40 px-6 py-3 text-sm text-white placeholder-gray-500 outline-none backdrop-blur transition-all duration-300 focus:border-emerald-400/35 focus:bg-black/50 focus:shadow-[0_0_16px_rgba(52,211,153,0.08)]"
+                className="flex-1 rounded-full border border-[rgba(255,255,255,0.07)] bg-black/40 px-6 py-3 text-sm text-white placeholder-[var(--elysian-ink-faint)]/60 outline-none backdrop-blur transition-all duration-300 focus:border-[rgba(var(--mood-rgb),0.45)] focus:bg-black/50 focus:shadow-[0_0_16px_rgba(52,211,153,0.08)]"
               />
               <Button type="submit" variant="gradient" size="md">
                 Join
@@ -95,7 +95,7 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <Logo />
-            <p className="mt-4 max-w-xs text-[13px] leading-[1.7] text-gray-500/60">
+            <p className="mt-4 max-w-xs text-[13px] leading-[1.7] text-[var(--elysian-ink-faint)]">
               A universe where stories, emotions, and people connect.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -103,7 +103,7 @@ export default function Footer() {
                 <a
                   key={social}
                   href="#"
-                  className="rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-gray-400 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.05] hover:text-white"
+                  className="rounded-full border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] px-3 py-1.5 text-[11px] font-medium text-[var(--elysian-ink-faint)] transition-all duration-300 hover:border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white"
                 >
                   {social}
                 </a>
@@ -112,8 +112,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400/70">Explore</h4>
-            <ul className="mt-4 space-y-2 text-sm text-gray-500/70">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--elysian-ink-faint)]">Explore</h4>
+            <ul className="mt-4 space-y-2 text-sm text-[var(--elysian-ink-faint)]">
               {exploreLinks.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="transition-colors duration-300 hover:text-white">
@@ -125,8 +125,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400/70">Company</h4>
-            <ul className="mt-4 space-y-2 text-sm text-gray-500/70">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--elysian-ink-faint)]">Company</h4>
+            <ul className="mt-4 space-y-2 text-sm text-[var(--elysian-ink-faint)]">
               {companyLinks.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="transition-colors duration-300 hover:text-white">
@@ -138,23 +138,23 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400/70">Get the app</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--elysian-ink-faint)]">Get the app</h4>
             <div className="mt-4 space-y-2">
-              <button className="w-full rounded-full border border-white/[0.06] bg-white/[0.02] px-5 py-2.5 text-left text-sm text-gray-400/70 backdrop-blur transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.05] hover:text-white">
-                <span className="block text-[10px] uppercase tracking-wider text-gray-500/60">
+              <button className="w-full rounded-full border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] px-5 py-2.5 text-left text-sm text-[var(--elysian-ink-faint)] backdrop-blur transition-all duration-300 hover:border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white">
+                <span className="block text-[10px] uppercase tracking-wider text-[var(--elysian-ink-faint)]/60">
                   Download on the
                 </span>
                 App Store
               </button>
-              <button className="w-full rounded-full border border-white/[0.06] bg-white/[0.02] px-5 py-2.5 text-left text-sm text-gray-400/70 backdrop-blur transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.05] hover:text-white">
-                <span className="block text-[10px] uppercase tracking-wider text-gray-500/60">Get it on</span>
+              <button className="w-full rounded-full border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] px-5 py-2.5 text-left text-sm text-[var(--elysian-ink-faint)] backdrop-blur transition-all duration-300 hover:border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white">
+                <span className="block text-[10px] uppercase tracking-wider text-[var(--elysian-ink-faint)]/60">Get it on</span>
                 Google Play
               </button>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/[0.05] pt-8 text-sm text-gray-500/60 sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.05)] pt-8 text-sm text-[var(--elysian-ink-faint)]/80 sm:flex-row">
           <p>&copy; 2026 WithIn. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="transition-colors duration-300 hover:text-white">Privacy</a>

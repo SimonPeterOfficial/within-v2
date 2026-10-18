@@ -12,22 +12,25 @@
  */
 
 import "server-only";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/neon-serverless";
 import * as schema from "./schema";
 
 export * from "./schema";
 
 function getDatabaseUrl(): string {
-  const url = process.env.DATABASE_URL;
+  // Prefer the unpooled (direct) connection so multi-step operations can
+  // use database transactions. The pooled DATABASE_URL (neon-http mode)
+  // does not support transactions, which breaks the outbox pattern used
+  // by submitContent(), publishContent(), and related workflows.
+  const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
   if (!url) {
     if (process.env.NODE_ENV === "production") {
-      throw new Error("DATABASE_URL is required in production.");
+      throw new Error("DATABASE_URL_UNPOOLED is required in production.");
     }
     // Development without a database: every query fails loudly with a clear
     // message instead of silently pretending the platform persists.
     throw new Error(
-      "DATABASE_URL is not set. Add your Neon connection string to .env.local " +
+      "DATABASE_URL_UNPOOLED is not set. Add your Neon unpooled connection string to .env.local " +
         "(see https://neon.tech/docs/connect/connect-from-any-app).",
     );
   }
@@ -35,7 +38,7 @@ function getDatabaseUrl(): string {
 }
 
 /** The single Drizzle instance — shared by every server module. */
-export const db = drizzle(neon(getDatabaseUrl()), { schema });
+export const db = drizzle(getDatabaseUrl(), { schema });
 
 export type { User, NewUser, UserRole, UserStatus } from "./schema";
 export type {
@@ -47,6 +50,7 @@ export type {
 } from "./schema";
 export type { Profile, NewProfile } from "./schema";
 export type { Save, NewSave, SaveShelf } from "./schema";
+export type { ContentLink, NewContentLink, ContentLinkType } from "./schema";
 export type { Follow, NewFollow } from "./schema";
 export type { Report, NewReport, ReportStatus, ReportSeverity } from "./schema";
 export type { Notification, NewNotification, NotificationType } from "./schema";
@@ -61,3 +65,4 @@ export type { CommunityMember, NewCommunityMember } from "./schema";
 export type { AuditLog, NewAuditLog, AuditTargetType } from "./schema";
 export type { World, NewWorld, WorldStatus, WorldVisibility } from "./schema";
 export type { Journey, NewJourney, JourneyStatus, JourneyItemSource, JourneyItem, NewJourneyItem } from "./schema";
+export type { OutboxEvent, NewOutboxEvent, OutboxStatus } from "./schema";

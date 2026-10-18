@@ -18,6 +18,8 @@ type ButtonProps = {
   onClick?: (event?: React.MouseEvent) => void;
   ariaLabel?: string;
   disabled?: boolean;
+  /** When true, the button shows a loading state and cannot be activated. */
+  loading?: boolean;
 };
 
 const sizes: Record<ButtonSize, string> = {
@@ -31,11 +33,11 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     "btn-tactile bg-[rgba(var(--mood-rgb),1)] text-white font-bold hover:shadow-[0_0_32px_rgba(var(--mood-rgb),0.35)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   gradient:
-    "btn-tactile text-white font-bold hover:shadow-[0_0_36px_rgba(168,85,247,0.3)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+    "btn-tactile text-white font-bold hover:shadow-[0_0_36px_rgba(var(--mood-rgb),0.3)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
   outline:
     "btn-tactile border border-ui-line bg-ui-surface text-ui-ink font-semibold backdrop-blur-sm hover:border-ui-line hover:bg-ui-raised focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
   ghost: "text-ui-faint font-semibold hover:text-ui-ink hover:bg-ui-surface focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.3)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
-  light: "btn-tactile bg-white text-[#232136] font-semibold hover:shadow-[0_4px_20px_rgba(255,255,255,0.12)] focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+  light: "btn-tactile bg-white text-ui-ink font-semibold hover:shadow-[0_4px_20px_rgba(var(--mood-rgb),0.12)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--mood-rgb),0.3)] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
 };
 
 /**
@@ -54,21 +56,23 @@ export default function Button({
   className = "",
   onClick,
   ariaLabel,
-  disabled = false
+  disabled = false,
+  loading = false
 }: ButtonProps) {
   const isGradient = variant === "gradient";
+  const isDisabled = disabled || loading;
   const classes = clsx(
     "inline-flex select-none items-center justify-center rounded-full transition-all duration-200 ease-out active:scale-[0.97] hover:scale-[1.015]",
     sizes[size],
     variants[variant],
-    disabled && "pointer-events-none opacity-50",
+    isDisabled && "pointer-events-none opacity-50",
     className
   );
   const style = isGradient ? { backgroundImage: gradients.brand } : undefined;
 
   if (href) {
     // A disabled link must not be focusable or navigable, so it becomes a span.
-    if (disabled) {
+    if (isDisabled) {
       return (
         <span className={classes} style={style} aria-disabled="true">
           {children}
@@ -101,8 +105,8 @@ export default function Button({
       type={type}
       onClick={onClick}
       aria-label={ariaLabel}
-      aria-disabled={disabled}
-      disabled={disabled}
+      aria-disabled={isDisabled}
+      disabled={isDisabled}
       className={classes}
       style={style}
     >

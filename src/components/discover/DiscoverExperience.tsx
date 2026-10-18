@@ -1,17 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import ContentCard from "@/components/ui/cards/ContentCard";
+import FeaturedEditorialCard from "@/components/ui/cards/FeaturedEditorialCard";
 import AuriEmptyState from "@/components/ui/states/AuriEmptyState";
 import AuriSuggestion from "@/components/sanctuary/AuriSuggestion";
 import SearchField from "@/components/discover/SearchField";
 import FilterBar from "@/components/discover/FilterBar";
 import { searchEntries, entryCounts, UNIVERSE, type UniverseEntry, type UniverseFilter } from "@/lib/search";
 import { staggerContainer, slideUp } from "@/lib/animations";
+import ConstellationView from "@/components/discover/ConstellationView";
 
 /** Status chip tone per shelf label — keeps cards quiet but legible. */
 const statusTone = (status?: string): "mood" | "emerald" | "warm" | "neutral" | undefined => {
@@ -37,6 +39,31 @@ const statusTone = (status?: string): "mood" | "emerald" | "warm" | "neutral" | 
 export default function DiscoverExperience({ entries }: { entries?: UniverseEntry[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<UniverseFilter>("All");
+  const [view, setView] = useState<"grid" | "constellation">("grid");
+  const [serendipity, setSerendipity] = useState<{ id: string; title: string; creatorName: string | null; username: string; category: string | null; coverGradient: string | null; coverEmoji: string | null; whyThis: string; source: "saved_category" | "new_voice" }[] | null>(null);
+  const [serendipityLoading, setSerendipityLoading] = useState(true);
+  const [serendipityDismissed, setSerendipityDismissed] = useState(false);
+
+  // Serendipity — genuine unexpected discovery, fetched once on mount.
+  // Only shown when not searching and not dismissed.
+  useEffect(() => {
+    if (serendipityDismissed) return;
+
+    fetch("/api/serendipity")
+      .then(async (res) => {
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.ok ? (data.items ?? []) : [];
+      })
+      .then((items) => {
+        setSerendipity(items);
+        setSerendipityLoading(false);
+      })
+      .catch(() => {
+        setSerendipity([]);
+        setSerendipityLoading(false);
+      });
+  }, [serendipityDismissed]);
 
   const collection = entries ?? UNIVERSE;
   const serverDriven = entries !== undefined;
@@ -61,7 +88,109 @@ export default function DiscoverExperience({ entries }: { entries?: UniverseEntr
         <FilterBar active={filter} onChange={setFilter} counts={counts} />
       </div>
 
-      {/* Editorial browse state — curated rails, then everything */}
+      {/* View toggle — Grid or Constellation */}
+      {!searching && (
+        <div className="mt-6 flex items-center gap-3">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[rgba(var(--mood-rgb),0.6)]">
+            View
+          </span>
+          <div className="flex items-center rounded-xl border border-white/[0.14] bg-white/[0.03] p-1 backdrop-blur">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-label="Grid view"
+              aria-pressed={view === "grid"}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                view === "grid"
+                  ? "bg-white/[0.12] text-white ring-1 ring-[rgba(var(--mood-rgb),0.5)]"
+                  : "text-[rgba(var(--mood-rgb),0.4)] hover:bg-white/[0.06]"
+              }`}
+            >
+              <Icon name="book" size={13} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("constellation")}
+              aria-label="Constellation view"
+              aria-pressed={view === "constellation"}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                view === "constellation"
+                  ? "bg-white/[0.12] text-white ring-1 ring-[rgba(var(--mood-rgb),0.5)]"
+                  : "text-[rgba(var(--mood-rgb),0.4)] hover:bg-white/[0.06]"
+              }`}
+            >
+              <Icon name="sparkles" size={13} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Serendipity — this crossed your path */}
+      {!searching && !serendipityDismissed && (
+        <div className="mt-12">
+          {serendipityLoading ? (
+            <div className="flex items-center gap-3 text-xs text-gray-400/70">
+              <span className="h-3 w-3 rounded-full border-[2px] border-current animate-spin" />
+              <span>Something unexpected is gathering…</span>
+            </div>
+          ) : serendipity && serendipity.length > 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-[linear-gradient(135deg,#a78bfa_0%,#34d399_100%)] flex items-center justify-center">
+                    <Icon name="sparkles" size={14} className="text-white" />
+                  </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#a78bfa]">
+                    This crossed your path
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSerendipityDismissed(true)}
+                  aria-label="Dismiss serendipity suggestion"
+                  className="rounded-full p-1 text-gray-400 transition hover:bg-white/10 hover:text-white"
+                >
+                  <Icon name="close" size={12} />
+                </button>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {serendipity.map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    title={item.title}
+                    creator={item.creatorName ?? item.username ?? "Unknown"}
+                    description={item.whyThis}
+                    meta={item.category ?? undefined}
+                    href={`/content/${item.id}`}
+                    cover={{
+                      gradient: item.coverGradient ?? "from-white/10 via-white/5 to-transparent",
+                      emoji: item.coverEmoji ?? "✦",
+                    }}
+                    variant="compact"
+                    badges={[
+                      {
+                        label: item.source === "saved_category" ? "Matches your taste" : "A new voice",
+                        tone: item.source === "saved_category" ? "emerald" : "mood",
+                      },
+                    ]}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 text-xs text-gray-500/60 py-4">
+              <span aria-hidden>✦</span>
+              <span>The path is quiet here. Explore a shelf instead.</span>
+              <span aria-hidden>✦</span>
+            </div>
+          )}
+        </div>
+      )}
       {browsing && filter === "All" && (
         <>
           <div className="mt-12">
@@ -80,20 +209,42 @@ export default function DiscoverExperience({ entries }: { entries?: UniverseEntr
                   </h2>
                 </div>
               </div>
-              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {featured.slice(0, 4).map((entry, index) => (
-                  <ContentCard
-                    key={entry.id}
-                    title={entry.title}
-                    creator={entry.by}
-                    description={entry.description}
-                    meta={entry.meta}
-                    href={entry.href}
-                    cover={{ gradient: entry.gradient, emoji: entry.emoji }}
-                    badges={[{ label: "Featured", tone: "mood" as const }]}
-                    delay={index * 0.06}
+              <div className="mt-6 gap-8 sm:flex sm:items-end">
+                {featured.length > 0 && (
+                  <FeaturedEditorialCard
+                    key={featured[0].id}
+                    title={featured[0].title}
+                    description={featured[0].description}
+                    category={featured[0].category}
+                    creator={featured[0].by}
+                    cover={{
+                      gradient: featured[0].gradient,
+                      emoji: featured[0].emoji,
+                      src: featured[0].src,
+                      alt: featured[0].title,
+                    }}
+                    href={featured[0].href}
+                    delay={0.06}
+                    className="md:w-[60%]"
                   />
-                ))}
+                )}
+                {featured.slice(1).length > 0 && (
+                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {featured.slice(1, 4).map((entry, index) => (
+                      <ContentCard
+                        key={entry.id}
+                        title={entry.title}
+                        creator={entry.by}
+                        description={entry.description}
+                        meta={entry.meta}
+                        href={entry.href}
+                        cover={{ gradient: entry.gradient, emoji: entry.emoji, src: entry.src, alt: entry.title }}
+                        badges={[{ label: "Featured", tone: "mood" as const }]}
+                        delay={0.12 + index * 0.06}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -119,7 +270,7 @@ export default function DiscoverExperience({ entries }: { entries?: UniverseEntr
                       meta={entry.meta}
                       href={entry.href}
                       variant="compact"
-                      cover={{ gradient: entry.gradient, emoji: entry.emoji }}
+                      cover={{ gradient: entry.gradient, emoji: entry.emoji, src: entry.src, alt: entry.title }}
                       badges={[{ label: "New", tone: "emerald" as const }]}
                     />
                   </div>
@@ -132,7 +283,12 @@ export default function DiscoverExperience({ entries }: { entries?: UniverseEntr
 
       {/* Results */}
       <div className="mt-12 min-h-[30vh]">
-        {results.length > 0 ? (
+        {view === "constellation" && !searching && results.length > 0 ? (
+          <ConstellationView
+            entries={results as unknown as { id: string; title: string; category: string; by: string; description: string; gradient: string; emoji: string; href: string; tags: string[]; moods: string[] }[]}
+            className="pb-20"
+          />
+        ) : results.length > 0 ? (
           <motion.div
             key={`${filter}-${query}`}
             variants={staggerContainer(0.05, 0.08)}
@@ -148,7 +304,7 @@ export default function DiscoverExperience({ entries }: { entries?: UniverseEntr
                   description={entry.description}
                   meta={entry.meta}
                   href={entry.href}
-                  cover={{ gradient: entry.gradient, emoji: entry.emoji }}
+                  cover={{ gradient: entry.gradient, emoji: entry.emoji, src: entry.src, alt: entry.title }}
                   badges={
                     entry.statusLabel
                       ? [{ label: entry.statusLabel, tone: statusTone(entry.statusLabel) ?? "neutral" }]

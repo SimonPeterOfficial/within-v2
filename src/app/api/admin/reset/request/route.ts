@@ -24,7 +24,7 @@ import { rateLimit, clientKeyFrom } from "@/lib/auth/rate-limit";
 export async function POST(request: Request) {
   // Rate limit: 3 requests per hour per IP
   const clientKey = clientKeyFrom(request);
-  const rateResult = rateLimit(`admin-reset:${clientKey}`, 3, 60 * 60 * 1000);
+  const rateResult = await rateLimit(`admin-reset:${clientKey}`, 3, 60 * 60 * 1000);
   if (!rateResult.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again later." },

@@ -9,6 +9,8 @@ import { useSession } from "@/lib/auth/session";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { spring } from "@/lib/animations";
+import { recordVisit } from "@/lib/light-memory";
+import NavGlow from "@/components/layout/NavGlow";
 
 export type SidebarItem = {
   label: string;
@@ -51,7 +53,7 @@ export default function Sidebar({ items }: SidebarProps) {
 
   const close = () => setOpen(false);
   const isAuthenticated = status === "authenticated";
-  const initial = user?.name.trim().charAt(0).toUpperCase() ?? "G";
+  const initial = user?.name?.trim().charAt(0).toUpperCase() ?? "G";
 
   // Route links: highlight the matching pathname (deferred, per the
   // set-state-in-effect rule — section scroll-spy owns the rest of the time).
@@ -107,6 +109,7 @@ export default function Sidebar({ items }: SidebarProps) {
     const isActive = active === item.href;
     return (
       <span className="relative flex w-full items-center gap-3.5 px-4 py-2.5">
+        <NavGlow href={item.href} />
         {isActive && (
           <motion.span
             layoutId="sidebar-active"
@@ -182,11 +185,19 @@ export default function Sidebar({ items }: SidebarProps) {
                 </p>
               )}
               {item.route ? (
-                <Link href={item.href} className={itemClasses()}>
+                <Link
+                  href={item.href}
+                  className={itemClasses()}
+                  onClick={() => recordVisit(item.href)}
+                >
                   {railItem(item)}
                 </Link>
               ) : (
-                <a href={item.href} className={itemClasses()}>
+                <a
+                  href={item.href}
+                  className={itemClasses()}
+                  onClick={() => recordVisit(item.href)}
+                >
                   {railItem(item)}
                 </a>
               )}

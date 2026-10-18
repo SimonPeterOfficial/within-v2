@@ -41,27 +41,27 @@ export default function ContextualRail({
       className="crystal-elevated crystal-edge depth-low rounded-3xl p-5"
       aria-label={title}
     >
-      <p className="text-[13px] font-semibold text-[#232136]">{title}</p>
+      <p className="text-[13px] font-semibold text-ui-ink">{title}</p>
       <ul className="mt-3 flex flex-col">
         {destinations.map((dest) => (
           <li key={dest.label}>
             <Link
               href={dest.href}
-              className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-white/45"
+              className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-ui-surface"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/55 text-[#6f6e88] ring-1 ring-white/70 transition-colors group-hover:text-[#232136]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ui-surface text-ui-faint ring-1 ring-ui-line transition-colors group-hover:text-ui-ink">
                 <Icon name={dest.icon} size={14} strokeWidth={1.8} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-medium text-[#44435e] group-hover:text-[#232136]">
+                <span className="block truncate text-[13px] font-medium text-ui-ink-soft group-hover:text-ui-ink">
                   {dest.label}
                 </span>
-                <span className="block truncate text-[10.5px] text-[#8b8aa0]">{dest.line}</span>
+                <span className="block truncate text-[10.5px] text-ui-faint">{dest.line}</span>
               </span>
               <Icon
                 name="chevronRight"
                 size={13}
-                className="text-[#8b8aa0] transition-transform group-hover:translate-x-0.5 group-hover:text-[#44435e]"
+                className="text-ui-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ui-ink-soft"
               />
             </Link>
           </li>

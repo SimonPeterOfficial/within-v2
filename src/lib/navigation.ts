@@ -1,22 +1,45 @@
 import type { SidebarItem } from "@/components/layout/Sidebar";
 
 /**
- * The universe navigation — one list of routes shared by every corner of
- * WithIn (sanctuary shell, discover, originals, profile…). Adding a corner
- * here makes it reachable everywhere with a single entry.
+ * The universe navigation — the single source of truth for every WithIn
+ * destination. Every shell (sidebar, bottom nav, command palette) derives
+ * from this list so labels, hrefs, icons, and groups can never drift apart.
+ *
+ * Only routes that actually exist are included. Destinations referenced in
+ * the product map but without a route (Library, Worlds, Serendipity, Trace)
+ * are intentionally absent — linking to nothing is worse than omitting.
+ *
+ * Groups:
+ *   Core     — arrival and orientation (Home, Sanctuary)
+ *   Discover — exploration and media (Discover, Originals, Books, Music, Photography, Explore)
+ *   You      — personal identity and reflection (Profile, Mirror, Connections)
+ *   Create   — creative spaces (Studio, Journey)
+ *   Systems  — account and platform (Messages, Within, Atlas, Constellation, Settings)
  */
 export const UNIVERSE_NAV: SidebarItem[] = [
-  { label: "Sanctuary", href: "/home", icon: "home", route: true },
-  { label: "Discover", href: "/discover", icon: "discover", route: true },
-  { label: "Originals", href: "/originals", icon: "originals", route: true },
-  { label: "Books", href: "/books", icon: "book", route: true },
-  { label: "Music", href: "/music", icon: "music", route: true },
-  { label: "Photography", href: "/photography", icon: "camera", route: true },
-  { label: "Communities", href: "/communities", icon: "users", route: true },
-  { label: "Mirror", href: "/mirror", icon: "eye", route: true },
-  { label: "Creators", href: "/creators", icon: "sparkles", route: true },
-  { label: "Profile", href: "/profile", icon: "profile", route: true },
-  { label: "Settings", href: "/settings", icon: "settings", route: true }
+  { label: "Home", href: "/home", icon: "home", route: true, group: "Core" },
+  { label: "Sanctuary", href: "/sanctuary", icon: "heart", route: true, group: "Core" },
+
+  { label: "Discover", href: "/discover", icon: "discover", route: true, group: "Discover" },
+  { label: "Originals", href: "/originals", icon: "originals", route: true, group: "Discover" },
+  { label: "Books", href: "/books", icon: "book", route: true, group: "Discover" },
+  { label: "Music", href: "/music", icon: "music", route: true, group: "Discover" },
+  { label: "Photography", href: "/photography", icon: "camera", route: true, group: "Discover" },
+  { label: "Explore", href: "/explore", icon: "stories", route: true, group: "Discover" },
+
+  { label: "Profile", href: "/profile", icon: "profile", route: true, group: "You" },
+  { label: "Mirror", href: "/mirror", icon: "eye", route: true, group: "You" },
+  { label: "Connections", href: "/connections", icon: "users", route: true, group: "You" },
+
+  { label: "Studio", href: "/studio", icon: "dashboard", route: true, group: "Create" },
+  { label: "Journey", href: "/journey", icon: "star", route: true, group: "Create" },
+
+  { label: "Messages", href: "/conversations", icon: "message", route: true, group: "Systems" },
+  { label: "Within", href: "/within", icon: "sparkles", route: true, group: "Systems" },
+  { label: "Atlas", href: "/atlas", icon: "globe", route: true, group: "Systems" },
+  { label: "Time", href: "/time", icon: "clock", route: true, group: "Systems" },
+  { label: "Constellation", href: "/constellation", icon: "users", route: true, group: "Systems" },
+  { label: "Settings", href: "/settings", icon: "settings", route: true, group: "Systems" },
 ];
 
 /**

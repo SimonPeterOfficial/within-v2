@@ -14,6 +14,7 @@ import SanctuaryDuo from "@/components/landing/SanctuaryDuo";
 // It is imported through a client "gate" because Next.js 16 only allows
 // `ssr: false` inside Client Components (see CinematicLoaderGate).
 import CinematicLoaderGate from "@/components/loader/CinematicLoaderGate";
+import { EntranceProvider } from "@/components/entrance/EntranceProvider";
 
 // Sections beyond the reference fold are code-split so the first paint stays
 // lean — the landing opens with darkness and light, then the universe unfolds.
@@ -34,39 +35,41 @@ export default function Home() {
           aurora → light rays → particles → stars, all drifting in slow motion */}
       <DepthLayers preset="home" />
 
-      <CinematicLoaderGate />
+      <EntranceProvider>
+        <CinematicLoaderGate />
 
-      <main id="main" className="relative">
-        {/* 01 — ARRIVAL: The hero opens the universe (reference layout:
-            left-aligned wordmark + winged Auri in her ring of light) */}
-        <Hero />
+        <main id="main" className="relative">
+          {/* 01 — ARRIVAL: The hero opens the universe (reference layout:
+              left-aligned wordmark + winged Auri in her ring of light) */}
+          <Hero />
 
-        {/* 02 — RECOGNITION: The mood pill bar, floating under the hero */}
-        <div className="relative z-20 -mt-10 pb-2">
+          {/* 02 — RECOGNITION: The mood pill bar, floating under the hero */}
+          <div className="relative z-20 -mt-10 pb-2">
+            <Suspense fallback={null}>
+              <MoodPillBar />
+            </Suspense>
+          </div>
+
+          {/* 03 — EXPLORATION: The eight doors into WithIn */}
+          <UniverseStrip />
+
+          {/* 04 — BELONGING: Your Sanctuary + Auri sees you (the closing duo) */}
+          <SanctuaryDuo />
+
+          {/* 05 — POSSIBILITY: Originals + Community conversations */}
           <Suspense fallback={null}>
-            <MoodPillBar />
+            <OriginalsShowcase trailerHref="/signup" />
           </Suspense>
-        </div>
+          <Suspense fallback={null}>
+            <RecentDiscussions id="community" />
+          </Suspense>
 
-        {/* 03 — EXPLORATION: The eight doors into WithIn */}
-        <UniverseStrip />
-
-        {/* 04 — BELONGING: Your Sanctuary + Auri sees you (the closing duo) */}
-        <SanctuaryDuo />
-
-        {/* 05 — POSSIBILITY: Originals + Community conversations */}
-        <Suspense fallback={null}>
-          <OriginalsShowcase trailerHref="/signup" />
-        </Suspense>
-        <Suspense fallback={null}>
-          <RecentDiscussions id="community" />
-        </Suspense>
-
-        {/* 06 — INVITATION: The final door */}
-        <Suspense fallback={null}>
-          <FinaleCTA primaryHref="/signup" />
-        </Suspense>
-      </main>
+          {/* 06 — INVITATION: The final door */}
+          <Suspense fallback={null}>
+            <FinaleCTA primaryHref="/signup" />
+          </Suspense>
+        </main>
+      </EntranceProvider>
 
       <Footer />
       <AuriOrb />
