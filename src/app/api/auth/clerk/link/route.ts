@@ -15,7 +15,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { currentClerkUserId } from "@/lib/auth/clerk";
 import { eq } from "drizzle-orm";
 import { db, users } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   // ── 1. Verify Clerk authentication ─────────────────────────────────
-  const { userId: clerkUserId } = await auth();
+  const clerkUserId = await currentClerkUserId();
   if (!clerkUserId) {
     return NextResponse.json(
       { ok: false, error: "Clerk authentication required." },

@@ -23,34 +23,43 @@ const RETURNED_KEY = "within:cinematic:returned";
  *
  * Returns:
  *   `play` — whether the sequence should run
+ *   `decided` — whether the session check has resolved at all. The loader
+ *     uses this to honour its readiness contract even when the cinematic
+ *     will NOT play (already seen / storage unavailable): otherwise the
+ *     hero would wait on an entrance signal that never comes.
  *   `reduced` — whether reduced motion is active (skip animations, use fades)
  *   `returning` — whether this browser has seen the full Genesis before
  *   `markSeen` — call when the sequence finishes so it doesn't repeat
  *
- * Hydration-safe: `play` is always `false` during SSR and the first client
- * pass — the sessionStorage check happens inside an effect, so server HTML
- * always matches hydration.
+ * Hydration-safe: `play` and `decided` are always `false` during SSR and
+ * the first client pass — the sessionStorage check happens inside an
+ * effect, so server HTML always matches hydration.
  */
 export function useCinematicIntro() {
   const prefersReducedMotion = useReducedMotionSafe();
   const [play, setPlay] = useState(false);
+  const [decided, setDecided] = useState(false);
   const [returning, setReturning] = useState(false);
 
   useEffect(() => {
     let seen = false;
     let hasReturnedBefore = false;
+    let storageFailed = false;
     try {
       seen = sessionStorage.getItem(GATE_KEY) != null;
       hasReturnedBefore = localStorage.getItem(RETURNED_KEY) === "1";
     } catch {
-      return; // storage unavailable — skip the cinematic
+      storageFailed = true; // storage unavailable — skip the cinematic
     }
-    if (seen) return;
 
-    // Defer state update to avoid hydration mismatch
+    // Defer all decision state to a frame: keeps SSR/hydration identical
+    // and avoids synchronous setState inside the effect body.
     const frame = requestAnimationFrame(() => {
-      setReturning(hasReturnedBefore);
-      setPlay(true);
+      setDecided(true);
+      if (!storageFailed && !seen) {
+        setReturning(hasReturnedBefore);
+        setPlay(true);
+      }
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -65,5 +74,5 @@ export function useCinematicIntro() {
     }
   };
 
-  return { play, reduced: prefersReducedMotion, returning, markSeen };
+  return { play, decided, reduced: prefersReducedMotion, returning, markSeen };
 }

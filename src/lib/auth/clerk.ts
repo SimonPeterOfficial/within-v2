@@ -5,6 +5,26 @@ import { eq } from "drizzle-orm";
 import { db, users, profiles, type User, type Profile } from "@/lib/db";
 
 /**
+ * Reads the Clerk-authenticated userId, or null when Clerk is not usable.
+ *
+ * `auth()` throws when clerkMiddleware() has not run (or Clerk keys are
+ * missing) rather than resolving to "no session". During the Clerk
+ * coexistence period the product must keep working on the legacy session
+ * in exactly that state — so a Clerk wiring problem is treated as "no Clerk
+ * identity" and legacy authentication proceeds unchanged. This never
+ * fabricates a user; it only declines to claim one.
+ */
+export async function currentClerkUserId(): Promise<string | null> {
+  try {
+    const { userId } = await auth();
+    return userId ?? null;
+  } catch {
+    // Clerk not configured / clerkMiddleware not mounted — legacy auth continues.
+    return null;
+  }
+}
+
+/**
  * Resolves the current Clerk-authenticated identity to a local WITHIN user.
  *
  * Clerk establishes who is authenticated; WITHIN determines what that person
@@ -20,7 +40,7 @@ export async function resolveClerkUser(): Promise<{
   user: User;
   profile: Profile | null;
 } | null> {
-  const { userId: clerkUserId } = await auth();
+  const clerkUserId = await currentClerkUserId();
   if (!clerkUserId) return null;
 
   const existing = await db

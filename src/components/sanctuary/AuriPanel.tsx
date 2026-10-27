@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
+import { useMountedSafe } from "@/lib/useMountedSafe";
 import {
   auriGreeting,
   auriLocationLine,
@@ -100,7 +101,15 @@ export default function AuriPanel({ context, moodId, onMoodSelect, onClose, onPr
 
   const greeting = useMemo(() => auriGreeting(context), [context]);
   const selectedMood = getMood(moodId);
-  const statusLine = `${TIME_GREETINGS[context.period]} — here with you.`;
+  // Hydration-safe: the time greeting resolves only after mount. The server
+  // cannot know the visitor's real time of day (period falls back to a
+  // neutral default during SSR), so a server-rendered "Good morning" never
+  // matched the client's real period (e.g. "Good evening") and React logged
+  // a hydration mismatch on every visit outside the fallback hour.
+  const mounted = useMountedSafe();
+  const statusLine = mounted
+    ? `${TIME_GREETINGS[context.period]} — here with you.`
+    : "Here with you.";
 
   // Open with a contextual greeting — the panel always feels like a first
   // word. Captured once at mount: the conversation must never be reset when

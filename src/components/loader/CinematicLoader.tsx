@@ -53,7 +53,7 @@ const RETURNING_TIMELINE: Array<[Phase, number]> = [
 ];
 
 export default function CinematicLoader() {
-  const { play, reduced, returning, markSeen } = useCinematicIntro();
+  const { play, decided, reduced, returning, markSeen } = useCinematicIntro();
   const { markReady } = useEntrance();
   const [phase, setPhase] = useState<Phase>("hidden");
   const skippedRef = useRef(false);
@@ -67,6 +67,15 @@ export default function CinematicLoader() {
     markReady();
     setPhase("done");
   }, [markSeen, markReady]);
+
+  // Readiness contract: the loader OWNS the entrance signal. When the
+  // session check has resolved but the cinematic will not play (already
+  // seen this session, or storage unavailable), no timeline will ever run
+  // and `finish` is never reached — signal readiness here so the hero is
+  // never stuck behind a gate that produced nothing.
+  useEffect(() => {
+    if (decided && !play) markReady();
+  }, [decided, play, markReady]);
 
   const skip = useCallback(() => {
     if (skippedRef.current) return;

@@ -4,6 +4,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import AtlasHeading from "@/components/atlas/AtlasHeading";
 import { useAtlasTime } from "@/lib/atlas/useAtlasTime";
 import { siderealTime, culminatingConstellation } from "@/lib/atlas/cosmos";
+import { useMountedSafe } from "@/lib/useMountedSafe";
 
 /**
  * StarClock — the hours told by stars instead of the sun. Shows true local
@@ -12,6 +13,11 @@ import { siderealTime, culminatingConstellation } from "@/lib/atlas/cosmos";
  */
 export default function StarClock() {
   const now = useAtlasTime();
+  // Locale-dependent text resolves only after mount — the server's ICU
+  // defaults render a different format (e.g. 19:44:00) than the browser's
+  // real user locale (e.g. 07:44:00 PM), which made React log a hydration
+  // mismatch and regenerate the tree on every visit.
+  const mounted = useMountedSafe();
   const lst = siderealTime(now);
   const culminating = culminatingConstellation(now);
 
@@ -46,7 +52,9 @@ export default function StarClock() {
       {/* Clock vs stars */}
       <div className="mt-5 flex items-center justify-between rounded-2xl border border-white/[0.05] bg-white/[0.02] px-4 py-3">
         <span className="text-[12px] text-gray-500">Your clock</span>
-        <span className="text-[13px] tabular-nums text-gray-300">{localTime}</span>
+        <span className="text-[13px] tabular-nums text-gray-300">
+          {mounted ? localTime : "\u00b7\u00b7\u00b7"}
+        </span>
       </div>
 
       {/* Culminating constellation */}

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import AtlasHeading from "@/components/atlas/AtlasHeading";
 import { useAtlasTime } from "@/lib/atlas/useAtlasTime";
+import { useMountedSafe } from "@/lib/useMountedSafe";
 
 /**
  * TimeRift — a window that keeps yesterday. The rift holds the exact sky
@@ -26,6 +27,10 @@ function riftLine(key: number): string {
 
 export default function TimeRift() {
   const now = useAtlasTime();
+  // Locale-dependent date text resolves only after mount — the server's ICU
+  // defaults differ from the browser's real locale, which otherwise logs a
+  // hydration mismatch on the rendered string.
+  const mounted = useMountedSafe();
   const todayKey = dayKey(now, 0);
   const yesterdayKey = dayKey(now, 1);
   const today = new Date(now);
@@ -65,7 +70,7 @@ export default function TimeRift() {
               {side.label}
             </p>
             <p className="relative mt-1 font-display text-lg font-medium text-white">
-              {fmt(side.date)}
+              {mounted ? fmt(side.date) : "\u00b7\u00b7\u00b7"}
             </p>
             <div className="relative mt-3 space-y-1" aria-hidden>
               {[0, 1, 2, 3, 4, 5].map((star) => (

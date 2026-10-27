@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
@@ -56,20 +55,10 @@ export default function Hero() {
       onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
       className="relative overflow-hidden bg-[#02030a] text-white"
     >
-      {/* ── Deep background: atmospheric glow + painted arrival ── */}
+      {/* ── Deep background: atmospheric glow only. The old static hero
+           photograph was removed (stability mission) — darkness, light,
+           and the starfield carry the threshold. No replacement image. ── */}
       <GlowBackground variant="hero" />
-
-      <div aria-hidden className="absolute inset-0">
-        <Image
-          src="/within-home.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-[0.55]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#02030a]/30 via-[#02030a]/55 to-[#02030a]" />
-      </div>
 
       {/* ── Nebula fields — deepest parallax ── */}
       <motion.div

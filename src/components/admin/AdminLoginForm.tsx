@@ -82,7 +82,7 @@ export default function AdminLoginForm() {
             id="admin-password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
-            placeholder="••••••••"
+            placeholder="Enter Password Here"
             required
             value={password}
             onChange={(e) => { setPassword(e.target.value); setError(null); }}

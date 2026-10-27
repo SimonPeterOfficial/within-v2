@@ -14,16 +14,17 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { getSessionUser } from "@/lib/auth/server";
-import { resolveClerkUser } from "@/lib/auth/clerk";
+import { resolveClerkUser, currentClerkUserId } from "@/lib/auth/clerk";
 import type { AuthSession } from "@/lib/auth/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   // ── 1. Clerk authentication (takes precedence when configured) ─────
-  const { userId: clerkUserId } = await auth();
+  // Null when Clerk isn't configured (no keys / clerkMiddleware) — the
+  // legacy session below is the fallback, as during coexistence.
+  const clerkUserId = await currentClerkUserId();
   if (clerkUserId) {
     const resolved = await resolveClerkUser();
     if (resolved) {

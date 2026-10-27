@@ -7,6 +7,7 @@ import AtlasHeading from "@/components/atlas/AtlasHeading";
 import { useAtlasTime } from "@/lib/atlas/useAtlasTime";
 import { useEnvironment } from "@/lib/environment";
 import { onMoodChange } from "@/lib/mood";
+import { useMountedSafe } from "@/lib/useMountedSafe";
 import {
   blendMoods,
   moodColorHex,
@@ -26,6 +27,10 @@ export default function MoodLab() {
   useEffect(() => onMoodChange(() => bump((n) => n + 1)), []);
   const liveMood = moodId ?? null;
   const now = useAtlasTime();
+  // Locale-dependent clock text resolves only after mount — the server's ICU
+  // defaults differ from the browser's real locale, which otherwise logs a
+  // hydration mismatch on the rendered string.
+  const mounted = useMountedSafe();
 
   const weather = weatherForMood(liveMood);
   const others = [
@@ -105,7 +110,7 @@ export default function MoodLab() {
       )}
 
       <p className="mt-auto pt-4 text-[11px] text-gray-600">
-        The weather describes the room, never the person · {now.toLocaleTimeString()}
+        The weather describes the room, never the person · {mounted ? now.toLocaleTimeString() : "\u00b7\u00b7\u00b7"}
       </p>
     </GlassCard>
   );

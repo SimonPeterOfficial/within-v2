@@ -15,7 +15,24 @@ import { useSyncExternalStore } from "react";
  * actually advances (via `onStoreChange`), never on sub-second drift.
  */
 
-const floorToMinute = () => new Date(Math.floor(Date.now() / 60000) * 60000);
+/*
+ * Cached minute snapshot — `useSyncExternalStore` requires `getSnapshot` to
+ * return a stable value between changes. Returning a fresh `Date` on every
+ * call made React treat the store as changed on every render ("result of
+ * getSnapshot should be cached"), which sent consumers into an infinite
+ * re-render loop that crashed the TopBar on /home (maximum update depth).
+ */
+let cachedMinuteMs = -1;
+let cachedMinute: Date = new Date(0);
+
+const floorToMinute = () => {
+  const ms = Math.floor(Date.now() / 60000) * 60000;
+  if (ms !== cachedMinuteMs) {
+    cachedMinuteMs = ms;
+    cachedMinute = new Date(ms);
+  }
+  return cachedMinute;
+};
 
 const subscribe = (onStoreChange: () => void) => {
   const interval = setInterval(onStoreChange, 1000);

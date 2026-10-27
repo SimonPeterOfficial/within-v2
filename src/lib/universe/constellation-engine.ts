@@ -74,11 +74,17 @@ function positionFor(id: string, kind: ConstellationKind): { x: number; y: numbe
     kind === "creator" ? 26 : kind === "work" ? 50 : kind === "community" ? 72 : 88;
   const angle = (h % 360) * (Math.PI / 180);
   const radius = 14 + (h % 17); // 14–30 from band center
-  const x = 50 + Math.cos(angle) * radius * 1.6;
-  const y = band + Math.sin(angle) * radius * 0.55 - 20;
+  // Rounded to 4 decimals — raw trigonometric floats serialize (~6 digits)
+  // differently through the browser's CSSOM than through React, so hydration
+  // flagged every node's left/top as mismatched attributes. Rounding keeps
+  // the layout identical to the eye (well under half a percent) while both
+  // sides now agree on the exact string.
+  const round4 = (n: number) => Number(n.toFixed(4));
+  const x = round4(50 + Math.cos(angle) * radius * 1.6);
+  const y = round4(band + Math.sin(angle) * radius * 0.55 - 20);
   return {
-    x: Math.max(6, Math.min(94, x)),
-    y: Math.max(8, Math.min(92, y)),
+    x: Math.max(6, Math.min(94, round4(x))),
+    y: Math.max(8, Math.min(92, round4(y))),
   };
 }
 
