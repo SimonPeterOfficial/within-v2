@@ -14,7 +14,6 @@ const primaryModules = [
   { label: "Home", href: "/home", summary: "Your universe" },
   { label: "Atlas", href: "/atlas", summary: "Temporal map" },
   { label: "Time", href: "/time", summary: "Your now" },
-  { label: "Weather", href: "/weather", summary: "The room around you" },
   { label: "Explore", href: "/explore", summary: "New rooms" },
   { label: "Profile", href: "/profile", summary: "Your presence" },
 ];
@@ -63,7 +62,7 @@ export default function LandingPage() {
                   <Link
                     key={module.href}
                     href={module.href}
-                    className="group flex min-h-[124px] flex-col justify-between rounded-2xl border border-white/8 bg-[#0a0b11] p-4 transition-colors hover:border-white/15 hover:bg-[#10131a] focus:outline-none focus:ring-2 focus:ring-white/15"
+                    className="group flex min-h-[124px] flex-col justify-between rounded-2xl border border-white/8 bg-[#0a0b11] p-4 transition-colors hover:border-white/15 hover:bg-[#10131a] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--mood-rgb),0.5)]"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-base font-semibold text-white">{module.label}</span>
