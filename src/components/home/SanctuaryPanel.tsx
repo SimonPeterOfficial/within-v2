@@ -27,8 +27,12 @@ type Room = {
 const ROOMS: Room[] = [
   { icon: "book", title: "Journal", sub: "Write your thoughts", href: "/mirror" },
   { icon: "camera", title: "Memories", sub: "Relive your moments", href: "/photography" },
-  { icon: "sun", title: "Mood", sub: "Check in with yourself", href: "/mirror#mood" },
-  { icon: "mic", title: "Voice Notes", sub: "Capture your voice", href: "/sanctuary" },
+  // Mission 02 link repair: /mirror#mood was a dead anchor and Voice Notes
+  // pointed back into /sanctuary for a feature that does not exist yet.
+  // Mood now lands on the Atlas mood instruments (MoodWeather/MoodLab),
+  // which are live. A real voice-notes feature remains an open product
+  // decision (docs/vision/sanctuary-implementation-plan.md O-6).
+  { icon: "sun", title: "Mood", sub: "Moods, in time", href: "/atlas" },
   { icon: "sparkles", title: "Private Auri", sub: "Just for you", href: "/within", auri: true, accent: true },
 ];
 

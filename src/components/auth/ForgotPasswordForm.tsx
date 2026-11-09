@@ -5,10 +5,9 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthInput from "@/components/auth/AuthInput";
 import FormStatus from "@/components/auth/FormStatus";
-import Button from "@/components/ui/Button";
-import GradientText from "@/components/ui/GradientText";
 import SuccessState from "@/components/ui/states/SuccessState";
 import { useSession } from "@/lib/auth/session";
+import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -18,6 +17,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 export default function ForgotPasswordForm() {
   const { requestPasswordReset } = useSession();
+  const prefersReducedMotion = useReducedMotionSafe();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,14 +45,19 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="space-y-5">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
-          Find your way <GradientText>back</GradientText>.
+      <motion.div
+        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center"
+      >
+        <h1 className="font-display text-[30px] font-medium leading-[1.12] tracking-[-0.02em] ink-title">
+          Find your way <span className="italic text-[#8a7bd6]">back</span>.
         </h1>
-        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
+        <p className="mt-3 text-[14px] leading-relaxed ink-body">
           Enter your email and we&apos;ll send you a reset link.
         </p>
-      </div>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {sent ? (
@@ -67,9 +72,12 @@ export default function ForgotPasswordForm() {
               title="Check your inbox"
               description="If an account exists, a reset link is on its way — usually within a minute."
               action={
-                <Button href="/login" variant="outline" size="lg" className="w-full">
+                <a
+                  href="/login"
+                  className="pill-glass crystal-focus w-full px-5 py-3.5 text-[13px] font-semibold"
+                >
                   Back to log in
-                </Button>
+                </a>
               }
             />
           </motion.div>
@@ -81,7 +89,7 @@ export default function ForgotPasswordForm() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-5"
           >
             <AnimatePresence>
@@ -102,13 +110,24 @@ export default function ForgotPasswordForm() {
               }}
             />
 
-            <Button type="submit" variant="gradient" size="lg" className="w-full" disabled={loading}>
-              {loading ? "Sending…" : "Send reset link"}
-            </Button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="pill-lit crystal-press crystal-focus relative w-full py-3.5 text-[13px] font-semibold disabled:opacity-40"
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#392f66]/25 border-t-[#392f66]/85" />
+                  Sending…
+                </span>
+              ) : (
+                "Send reset link"
+              )}
+            </button>
 
-            <p className="text-center text-sm text-gray-400">
+            <p className="text-center text-[13px] ink-body">
               Remembered it after all?{" "}
-              <Link href="/login" className="font-semibold text-white transition hover:text-emerald-300">
+              <Link href="/login" className="font-semibold ink-title transition hover:text-[#7c6ce0]">
                 Log in
               </Link>
             </p>

@@ -18,23 +18,25 @@ import type { SidebarItem } from "@/components/layout/Sidebar";
  */
 export const UNIVERSE_NAV: SidebarItem[] = [
   { label: "Home", href: "/home", icon: "home", route: true, group: "Core" },
+  { label: "Explore", href: "/explore", icon: "discover", route: true, group: "Core" },
+  { label: "Messages", href: "/conversations", icon: "message", route: true, group: "Core" },
+  { label: "Communities", href: "/communities", icon: "users", route: true, group: "Core" },
+  { label: "Creators", href: "/creators", icon: "stories", route: true, group: "Core" },
   { label: "Sanctuary", href: "/sanctuary", icon: "heart", route: true, group: "Core" },
+  { label: "Mirror", href: "/mirror", icon: "eye", route: true, group: "Core" },
+
+  { label: "Studio", href: "/studio", icon: "dashboard", route: true, group: "Create" },
+  { label: "Journey", href: "/journey", icon: "star", route: true, group: "Create" },
 
   { label: "Discover", href: "/discover", icon: "discover", route: true, group: "Discover" },
   { label: "Originals", href: "/originals", icon: "originals", route: true, group: "Discover" },
   { label: "Books", href: "/books", icon: "book", route: true, group: "Discover" },
   { label: "Music", href: "/music", icon: "music", route: true, group: "Discover" },
   { label: "Photography", href: "/photography", icon: "camera", route: true, group: "Discover" },
-  { label: "Explore", href: "/explore", icon: "stories", route: true, group: "Discover" },
 
   { label: "Profile", href: "/profile", icon: "profile", route: true, group: "You" },
-  { label: "Mirror", href: "/mirror", icon: "eye", route: true, group: "You" },
   { label: "Connections", href: "/connections", icon: "users", route: true, group: "You" },
 
-  { label: "Studio", href: "/studio", icon: "dashboard", route: true, group: "Create" },
-  { label: "Journey", href: "/journey", icon: "star", route: true, group: "Create" },
-
-  { label: "Messages", href: "/conversations", icon: "message", route: true, group: "Systems" },
   { label: "Within", href: "/within", icon: "sparkles", route: true, group: "Systems" },
   { label: "Atlas", href: "/atlas", icon: "globe", route: true, group: "Systems" },
   { label: "Time", href: "/time", icon: "clock", route: true, group: "Systems" },

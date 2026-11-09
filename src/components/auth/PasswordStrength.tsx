@@ -43,12 +43,12 @@ export default function PasswordStrength({ value }: { value: string }) {
             initial={{ opacity: 0.35 }}
             animate={{ opacity: 1 }}
             className={`h-1 flex-1 rounded-full transition-colors duration-500 ${
-              segment <= score ? "bg-emerald-400" : "bg-white/10"
+              segment <= score ? "bg-[#7c6ce0]" : "bg-[#262143]/10"
             }`}
           />
         ))}
       </div>
-      <p className="mt-1.5 text-xs text-gray-400">{LABELS[score] ?? ""}</p>
+      <p className="mt-1.5 text-[11px] ink-faint">{LABELS[score] ?? ""}</p>
     </div>
   );
 }

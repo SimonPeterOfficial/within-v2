@@ -24,14 +24,37 @@ import { clsx } from "clsx";
  */
 
 type WithinMarkProps = {
-  variant?: "mark" | "wordmark" | "stacked" | "mono";
+  variant?: "mark" | "wordmark" | "stacked" | "mono" | "diamond";
   /** Pixel size of the symbol itself */
   size?: number;
   className?: string;
+  /** Ink of the wordmark — "white" for dark scenes, "dark" for the light world */
+  tone?: "white" | "dark" | "gold";
 };
 
 /** The brand sweep as SVG stops — same violet→emerald as --mood-rgb defaults. */
 const GRADIENT_ID = "within-mark-sweep";
+const DIAMOND_ID = "within-mark-diamond";
+
+/** The illustrated glyph — a four-point diamond of light, per the mockups. */
+function DiamondGlyph({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden className="shrink-0">
+      <defs>
+        <linearGradient id={DIAMOND_ID} x1="30" y1="10" x2="72" y2="92" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#f0dcae" />
+          <stop offset="0.55" stopColor="#cfa8e2" />
+          <stop offset="1" stopColor="#9d8fe8" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M50 6 Q55 42 94 50 Q55 58 50 94 Q45 58 6 50 Q45 42 50 6 Z"
+        fill={`url(#${DIAMOND_ID})`}
+      />
+      <circle cx="50" cy="50" r="9" fill="#fffdf4" opacity="0.85" />
+    </svg>
+  );
+}
 
 function MarkGlyph({ size, mono }: { size: number; mono: boolean }) {
   // Geometry is expressed in a 100-unit viewbox and scaled by size.
@@ -94,7 +117,31 @@ export default function WithinMark({
   variant = "mark",
   size = 28,
   className = "",
+  tone = "white",
 }: WithinMarkProps) {
+  const wordInk =
+    tone === "white"
+      ? "text-white"
+      : tone === "gold"
+        ? "text-[#97794a]"
+        : "text-[#262143]";
+
+  if (variant === "diamond") {
+    return (
+      <span className={clsx("inline-flex items-center gap-2.5", className)}>
+        <DiamondGlyph size={size} />
+        <span
+          className={clsx(
+            "font-display text-[20px] font-semibold tracking-[-0.01em]",
+            wordInk,
+          )}
+        >
+          With<span>In</span>
+        </span>
+      </span>
+    );
+  }
+
   if (variant === "mark") {
     return (
       <span className={clsx("inline-flex", className)}>

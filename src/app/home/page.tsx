@@ -55,6 +55,13 @@ export default async function HomePage() {
     "/within",
     "/constellation",
     "/settings",
+    // Real routes that ship with the Sanctuary/navigation work — every href
+    // below is a live page, so the shelf must not label them "Unavailable"
+    // (Law 16: no fake success).
+    "/sanctuary",
+    "/mirror",
+    "/connections",
+    "/creators",
   ];
 
   return (

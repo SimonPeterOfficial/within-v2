@@ -77,13 +77,12 @@ export default function WorldPortal({ portal, index }: { portal: WorldPortalData
           }}
         />
 
-        {/* The world's subject — drawn glyph */}
+        {/* The world's subject — a glass icon coin, not an emoji */}
         <span
           aria-hidden
-          className="absolute right-3 top-3 text-3xl opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
-          style={{ filter: "drop-shadow(0 2px 6px rgba(40,40,80,0.3))" }}
+          className="chip-glass absolute right-3 top-3 h-9 w-9 transition-all duration-500 group-hover:scale-110"
         >
-          {portal.glyph}
+          <Icon name={portal.icon} size={15} strokeWidth={1.9} />
         </span>
 
         {/* The glass fade — legibility into the light */}

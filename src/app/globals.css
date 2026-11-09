@@ -93,6 +93,13 @@ html {
   --within-emerald: #34d399;
   --within-cyan: #22d3ee;
   --within-indigo: #6366f1;
+  /* Sanctuary vocabulary — Celestial Serenity (docs/vision/sanctuary-spec.md §2).
+     Triplets (R, G, B) so any alpha can be composed on call. */
+  --within-violet-rgb: 139, 92, 246;
+  --within-gold-rgb: 218, 190, 132;
+  --within-ivory-rgb: 246, 240, 229;
+  --within-lavender-rgb: 196, 186, 224;
+  --within-sage-rgb: 137, 168, 148;
   --within-border: rgba(255, 255, 255, 0.1);
   --within-border-subtle: rgba(255, 255, 255, 0.06);
   --within-border-strong: rgba(255, 255, 255, 0.18);
@@ -1521,6 +1528,34 @@ html[data-breath="awake"] .aurora-root {
   --ui-line: rgba(255, 255, 255, 0.6);
 }
 
+/* ── Sanctuary dusk — the intimate room of the universe ────────────────
+   The third ink scope, after the dark root and the light Crystal World:
+   warm ivory ink over deep twilight-violet glass. It changes only the
+   token values — every component inside re-renders in Sanctuary's own
+   language with no fork (docs/vision/sanctuary-spec.md §2). The shell's
+   crystal-world background is cohersed here into a dusk wash so the
+   hand-built world shows through it, darkened toward evening. */
+.sanctuary-dusk {
+  --ui-ink: rgb(var(--within-ivory-rgb));
+  --ui-ink-soft: rgba(var(--within-ivory-rgb), 0.74);
+  --ui-ink-faint: rgba(var(--within-ivory-rgb), 0.5);
+  --ui-surface: rgba(26, 17, 50, 0.44);
+  --ui-raised: rgba(40, 27, 74, 0.55);
+  --ui-line: rgba(230, 220, 255, 0.15);
+}
+.sanctuary-dusk .crystal-world {
+  background:
+    radial-gradient(ellipse 120% 72% at 50% -18%, rgba(var(--within-lavender-rgb), 0.14) 0%, transparent 62%),
+    radial-gradient(ellipse 95% 58% at 50% 116%, rgba(var(--within-gold-rgb), 0.1) 0%, transparent 55%),
+    linear-gradient(
+      180deg,
+      rgba(13, 8, 28, 0.66) 0%,
+      rgba(21, 12, 42, 0.58) 46%,
+      rgba(36, 21, 60, 0.52) 100%
+    );
+  color: rgb(var(--within-ivory-rgb));
+}
+
 /* World portal — looking through a crystal window into another place.
    The scene sits behind glass; the light path reads as depth. */
 @utility crystal-portal {
@@ -2579,7 +2614,305 @@ html[data-breath="awake"] .aurora-root {
   .env-foreground,
   .env-water,
   .env-glass,
-  .env-auri {
+  .env-auri,
+  .worldscape {
     display: none !important;
   }
 }
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  REBIRTH — the illustrated world                                  ║
+   ║                                                                    ║
+   ║  Everything the WithIn mockups describe, in code:                  ║
+   ║   1. WORLDSCAPE   the painterly floating-city scene (WorldScape)   ║
+   ║   2. PANE         the liquid-glass material panels are cut from    ║
+   ║   3. CHIPS/PILLS  glass icon chips, glowing active pills           ║
+   ║   4. TYPE         serif display + letterspaced caps taglines      ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ── 1 · WORLDSCAPE — the scene, its motion, its retints ───────────── */
+.worldscape {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  contain: strict;
+  z-index: 0;
+}
+.worldscape__svg {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 90%;
+}
+.worldscape__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 135% 118% at 50% 42%, transparent 62%, rgba(23, 16, 50, 0.15) 100%),
+    linear-gradient(180deg, rgba(24, 17, 54, 0.12) 0%, transparent 12% 88%, rgba(24, 17, 54, 0.13) 100%);
+  z-index: 2;
+}
+/* Per-world colour cast — a page declares --scene-cast on itself. */
+.worldscape__tint {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-cast, transparent);
+  background-blend-mode: soft-light;
+  opacity: 0.8;
+  z-index: 3;
+}
+/* Scene presets — subtle, not costumes */
+[data-scene="studio"] .worldscape__svg {
+  filter: hue-rotate(12deg) saturate(1.04);
+}
+[data-scene="studio"] {
+  --scene-cast: linear-gradient(180deg, rgba(122, 108, 207, 0.14), transparent 60%, rgba(244, 200, 140, 0.1));
+}
+[data-scene="messages"] .worldscape__svg {
+  filter: hue-rotate(-6deg) brightness(1.02);
+}
+[data-scene="communities"] .worldscape__svg {
+  filter: hue-rotate(8deg) saturate(1.06);
+}
+/* Sancturuary dusk — the world leans toward evening: cooler, quieter,
+   with the warm gold horizon kept low and near. */
+[data-scene="sanctuary"] .worldscape__svg {
+  filter: hue-rotate(-9deg) saturate(0.94) brightness(0.82);
+}
+[data-scene="sanctuary"] {
+  --scene-cast: linear-gradient(
+    180deg,
+    rgba(28, 18, 62, 0.5) 0%,
+    rgba(54, 37, 100, 0.3) 50%,
+    rgba(214, 184, 122, 0.12) 88%
+  );
+}
+
+/* the scene breathes — all optional, all transform-only */
+@media (prefers-reduced-motion: no-preference) {
+  .ws-sun { animation: ws-sun-breathe 11s ease-in-out infinite alternate; }
+  .ws-clouds .ws-drift-slow { animation: ws-drift 240s linear infinite; }
+  .ws-clouds .ws-drift { animation: ws-drift 170s linear infinite; }
+  .ws-clouds .ws-drift-slower { animation: ws-drift-rev 300s linear infinite; }
+  .ws-island-a { animation: ws-bob 30s ease-in-out infinite alternate; }
+  .ws-island-b { animation: ws-bob-soft 38s ease-in-out infinite alternate; }
+  .ws-islet { animation: ws-bob-soft 31s ease-in-out infinite alternate; }
+  .ws-fall { opacity: 0.5; animation: ws-fall-flow 6s ease-in-out infinite; }
+  .ws-fall-late { animation: ws-fall-flow 7.5s ease-in-out infinite; }
+  .ws-mist { animation: ws-mist-breathe 16s ease-in-out infinite alternate; }
+}
+@keyframes ws-sun-breathe {
+  from { opacity: 0.9; }
+  to { opacity: 1; }
+}
+@keyframes ws-drift {
+  from { transform: translateX(-90px); }
+  to { transform: translateX(90px); }
+}
+@keyframes ws-drift-rev {
+  from { transform: translateX(70px); }
+  to { transform: translateX(-70px); }
+}
+@keyframes ws-bob {
+  from { transform: translateY(-6px); }
+  to { transform: translateY(7px); }
+}
+@keyframes ws-bob-soft {
+  from { transform: translateY(-4px); }
+  to { transform: translateY(5px); }
+}
+@keyframes ws-fall-flow {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(3px) scaleY(1.04); opacity: 0.42; }
+  37% { opacity: 0.62; }
+}
+@keyframes ws-mist-breathe {
+  from { opacity: 0.35; }
+  to { opacity: 0.62; }
+}
+
+/* ── 2 · PANE — the liquid glass the mockups are built from ────────── */
+@utility pane {
+  position: relative;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 1px rgba(53, 42, 104, 0.06),
+    0 18px 44px -18px rgba(35, 26, 74, 0.28);
+}
+@utility pane-strong {
+  position: relative;
+  background: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 22px 52px -20px rgba(35, 26, 74, 0.32);
+}
+@utility pane-soft {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(1.32);
+  -webkit-backdrop-filter: blur(16px) saturate(1.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    0 12px 32px -16px rgba(35, 26, 74, 0.22);
+}
+/* the hairline of liquid glass — a lit white edge that fades on the bottom */
+@utility edge-glass {
+  position: relative;
+  isolation: isolate;
+}
+.edge-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background:
+    linear-gradient(165deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.30) 34%,
+      rgba(255, 255, 255, 0.08) 68%,
+      rgba(255, 255, 255, 0.42) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 5;
+}
+/* slow glint that travels once across a pane, like light bending */
+.edge-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.13) 46%,
+    rgba(255, 255, 255, 0.03) 54%,
+    transparent 68%
+  );
+  background-size: 220% 100%;
+  transform: translateZ(0);
+  pointer-events: none;
+  z-index: 4;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .edge-glass::after { animation: pane-glint 16s ease-in-out infinite; }
+}
+@keyframes pane-glint {
+  0%, 65%, 100% { background-position: 115% 0; }
+  85% { background-position: -115% 0; }
+}
+
+/* ── 3 · CHIPS & PILLS — glass icon coins, glowing active state ────── */
+@utility chip-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.18));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 4px 12px -4px rgba(35, 26, 74, 0.28);
+  color: var(--chip-ink, #4a4173);
+}
+@utility chip-glass-hover {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, box-shadow 0.35s ease;
+}
+.chip-glass-hover:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.3));
+}
+.chip-glass-hover:active {
+  transform: translateY(0.5px) scale(0.97);
+}
+/* the active nav pill — a card of light with a soft bloom */
+@utility pill-glow {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62) 62%, rgba(255, 255, 255, 0.44));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    inset 0 -8px 16px rgba(139, 122, 236, 0.14),
+    0 6px 22px -4px rgba(255, 255, 255, 0.55),
+    0 10px 30px -10px rgba(124, 108, 224, 0.35);
+}
+/* small pill-shaped glass button (filter chips, "View all", actions) */
+@utility pill-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.14));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 6px 16px -6px rgba(35, 26, 74, 0.25);
+  color: var(--chip-ink, #4a4173);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, box-shadow 0.35s ease;
+}
+.pill-glass:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.24));
+}
+.pill-glass:active {
+  transform: translateY(0.5px) scale(0.98);
+}
+.pill-glass:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 0 2px rgba(139, 122, 236, 0.6),
+    0 0 0 6px rgba(139, 122, 236, 0.14);
+}
+/* the active filter chip — white card of light */
+@utility pill-lit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.78));
+  color: #2f2a55;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 8px 24px -6px rgba(255, 255, 255, 0.6),
+    0 10px 26px -10px rgba(124, 108, 224, 0.4);
+}
+
+/* ── 4 · TYPE — display serif + the universe tagline ────────────────── */
+@utility tagline-caps {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--tagline-ink, #6f688f);
+}
+@utility ink-title {
+  color: #262143;
+}
+@utility ink-body {
+  color: #514b76;
+}
+@utility ink-faint {
+  color: #7d7697;
+}
+
+/* section header — "✦ Explore" + "View All →" pattern from the mockups */
+@utility section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2f2a55;
+}
+

@@ -35,7 +35,7 @@ export default function AuthInput({
 
   return (
     <div className="text-left">
-      <label htmlFor={id} className="mb-2 block text-sm font-medium text-[#44435e]">
+      <label htmlFor={id} className="tagline-caps mb-2 block text-[9px]">
         {label}
       </label>
       <span className="relative block">
@@ -61,7 +61,7 @@ export default function AuthInput({
             type="button"
             onClick={() => setRevealed((current) => !current)}
             aria-label={revealed ? "Hide password" : "Show password"}
-            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/5 hover:text-white"
+            className="ink-faint absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition hover:bg-white/40 hover:ink-title"
           >
             {revealed ? <EyeOff className="h-4 w-4" aria-hidden /> : <Eye className="h-4 w-4" aria-hidden />}
           </button>
@@ -74,7 +74,7 @@ export default function AuthInput({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-2 px-3 text-xs text-rose-500"
+          className="mt-2 px-5 text-xs text-rose-500"
         >
           {error}
         </motion.p>

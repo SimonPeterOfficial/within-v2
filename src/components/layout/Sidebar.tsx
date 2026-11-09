@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { useSession } from "@/lib/auth/session";
 import Icon, { type IconName } from "@/components/ui/Icon";
+import WithinMark from "@/components/ui/WithinMark";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { spring } from "@/lib/animations";
 import { recordVisit } from "@/lib/light-memory";
@@ -31,12 +32,13 @@ type SidebarProps = {
 };
 
 /**
- * The crystal navigation rail — architectural glass.
+ * The navigation rail — floating liquid glass, per the illustrated world.
  *
- * Desktop: a floating crystal rail that feels like part of the world's
- * architecture. The WithIn wordmark on top, always-visible labels,
- * a luminous pill on the active item, and a user card at the bottom.
- * The rail is transparent — the world shows through it.
+ * Desktop: a pane of frosted glass drifting over the world. The diamond
+ * wordmark and the universe tagline at the top; nav rows as glass coin
+ * icons beside labels; the active room marked by a pill of light; a
+ * "You · Online" bubble at the bottom; the worlds' promise beneath it:
+ * Explore · Connect · Grow.
  *
  * Mobile: a full glass drawer with overlay, Escape-to-close, and scroll lock.
  */
@@ -105,45 +107,40 @@ export default function Sidebar({ items }: SidebarProps) {
     router.push("/");
   };
 
+  /**
+   * A nav row — glass coin icon, label, badge. The active room wears
+   * a pill of light beneath the row; the glow never blocks the hit area.
+   */
   const railItem = (item: SidebarItem) => {
     const isActive = active === item.href;
     return (
-      <span className="relative flex w-full items-center gap-3.5 px-4 py-2.5">
+      <span className="relative flex w-full items-center gap-3 px-2.5 py-[7px]">
         <NavGlow href={item.href} />
         {isActive && (
           <motion.span
             layoutId="sidebar-active"
             transition={spring}
-            className="absolute inset-x-2 inset-y-0.5 rounded-xl"
-            style={{
-              background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.18), rgba(var(--mood-rgb),0.09))",
-              boxShadow: "inset 0 0 0 1px rgba(var(--mood-rgb),0.32), inset 0 1px 0 rgba(255,255,255,0.6)",
-            }}
-          >
-            <span
-              aria-hidden
-              className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[rgba(var(--mood-rgb),1)]"
-              style={{ boxShadow: "0 0 8px rgba(var(--mood-rgb),0.55)" }}
-            />
-          </motion.span>
+            aria-hidden
+            className="absolute inset-0 rounded-[14px] pill-glow"
+          />
         )}
         <span
           aria-hidden
-          className={`relative shrink-0 transition-colors ${
-            isActive ? "text-[#5b4bc4]" : "text-[#6f6e88] group-hover/item:text-[#232136]"
+          className={`chip-glass chip-glass-hover relative h-[30px] w-[30px] shrink-0 ${
+            isActive ? "" : "opacity-90"
           }`}
         >
-          <Icon name={item.icon} size={17} strokeWidth={1.9} />
+          <Icon name={item.icon} size={15} strokeWidth={1.9} />
         </span>
         <span
-          className={`relative hidden whitespace-nowrap text-[13.5px] font-medium lg:inline ${
-            isActive ? "text-[#232136]" : "text-[#6f6e88] group-hover/item:text-[#232136]"
+          className={`relative hidden truncate text-[13.5px] font-medium lg:inline ${
+            isActive ? "ink-title" : "ink-body group-hover/item:ink-title"
           }`}
         >
           {item.label}
         </span>
         {typeof item.badge === "number" && item.badge > 0 && (
-          <span className="relative ml-auto hidden h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.92)] px-1 text-[10px] font-bold text-white lg:flex">
+          <span className="chip-glass relative ml-auto hidden h-[19px] min-w-[19px] items-center justify-center px-1 text-[10px] font-bold lg:flex">
             {item.badge}
           </span>
         )}
@@ -152,35 +149,40 @@ export default function Sidebar({ items }: SidebarProps) {
   };
 
   const itemClasses = () =>
-    "group/item block w-full transition-colors";
+    "group/item block w-full rounded-[14px] transition-colors";
+
+  const brand = (onClose?: () => void) => (
+    <Link
+      href="/home"
+      onClick={onClose}
+      aria-label="WithIn — home"
+      className="flex shrink-0 flex-col gap-1.5 px-5 pb-3 pt-5"
+    >
+      <WithinMark variant="diamond" size={27} tone="gold" />
+      <span className="tagline-caps text-[8.5px]">A universe that feels you</span>
+    </Link>
+  );
 
   return (
     <>
-      {/* ── Desktop: the floating crystal rail ────────── */}
+      {/* ── Desktop: the floating glass rail ───────────────────────── */}
       <nav
         aria-label="Primary"
-        className="crystal-rail glass-veil fixed inset-y-3 left-3 z-navigation hidden w-[200px] flex-col rounded-[26px] lg:flex"
+        className="pane edge-glass fixed inset-y-3 left-3 z-navigation hidden w-[212px] flex-col rounded-[26px] lg:flex"
       >
-        {/* Wordmark */}
-        <Link
-          href="/home"
-          aria-label="WithIn home"
-          className="flex h-16 shrink-0 items-center pl-6"
-        >
-          <span className="font-display text-[21px] font-semibold tracking-[-0.01em] text-[#232136]">
-            With<span className="text-[#7c6ce0]">In</span>
-          </span>
-        </Link>
+        {brand()}
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item, index) => (
             <span
               key={item.label}
-              className={`relative block w-full ${item.divider ? "before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-white/[0.06]" : ""}`}
+              className={`relative block w-full ${
+                item.divider ? "before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-white/[0.1]" : ""
+              }`}
             >
               {item.group && items[index - 1]?.group !== item.group && (
-                <p className="px-4 text-[10px] font-semibold uppercase tracking-[0.35em] text-[#8b8aa0]/70 py-2">
+                <p className="px-3 pb-1 pt-3 text-[9px] font-semibold uppercase tracking-[0.34em] text-[#8b8aa0]/80">
                   {item.group}
                 </p>
               )}
@@ -205,27 +207,38 @@ export default function Sidebar({ items }: SidebarProps) {
           ))}
         </div>
 
-        {/* User card — expands with the rail; opens the profile popover */}
+        {/* ── You — the presence bubble ─────────────────────────────── */}
         <div className="group/usercard relative shrink-0 border-t border-white/40 p-2">
+          <p className="px-2.5 pb-1 pt-1 text-[8px] font-semibold uppercase tracking-[0.34em] text-[#8b8aa0]/75">
+            Your world
+          </p>
           <button
             type="button"
             onClick={() => setUserCardOpen((openState) => !openState)}
             aria-expanded={userCardOpen}
             aria-label="Your account"
-            className="crystal-focus flex w-full items-center gap-3 rounded-2xl px-1.5 py-1.5 text-left transition hover:bg-white/50"
+            className="crystal-focus flex w-full items-center gap-2.5 rounded-2xl px-1 py-1.5 text-left transition hover:bg-white/45"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-amber-200 to-rose-400 text-[12px] font-bold text-[#232136] ring-2 ring-white/70">
-              {initial}
+            <span className="relative shrink-0">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-[#e9c9a8] to-[#cfa8e2] text-[12px] font-bold text-[#3a3160] ring-2 ring-white/80">
+                {initial}
+              </span>
+              <span
+                aria-hidden
+                className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-white/85"
+              />
             </span>
             <span className="relative hidden min-w-0 flex-1 lg:block">
-              <span className="block truncate text-[12.5px] font-semibold text-[#2c2a48]">
-                {user?.name ?? "Explorer"}
+              <span className="block truncate text-[12.5px] font-semibold ink-title">
+                {user?.name ?? "You"}
               </span>
-              <span className="block truncate text-[10.5px] text-[#8b8aa0]">Explorer</span>
+              <span className="block truncate text-[10.5px] text-[#8b8aa0]">
+                Online
+              </span>
             </span>
             <Icon
-              name="chevronRight"
-              size={12}
+              name="dots"
+              size={14}
               className={`hidden shrink-0 text-[#8b8aa0] transition-transform lg:block ${userCardOpen ? "rotate-90" : ""}`}
             />
           </button>
@@ -238,19 +251,19 @@ export default function Sidebar({ items }: SidebarProps) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 6, scale: 0.98 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                className="crystal-foreground crystal-edge depth-high absolute bottom-full left-0 z-10 mb-2 w-[208px] rounded-2xl p-2"
+                className="pane edge-glass absolute bottom-full left-0 z-10 mb-2 w-[196px] rounded-2xl p-1.5"
               >
                 <Link
                   href="/profile"
                   onClick={() => setUserCardOpen(false)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-white/60 hover:text-[#232136]"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium ink-body transition hover:bg-white/55 hover:ink-title"
                 >
                   <Icon name="profile" size={14} /> Your profile
                 </Link>
                 <Link
                   href="/settings"
                   onClick={() => setUserCardOpen(false)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-white/60 hover:text-[#232136]"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium ink-body transition hover:bg-white/55 hover:ink-title"
                 >
                   <Icon name="settings" size={14} /> Settings
                 </Link>
@@ -258,7 +271,7 @@ export default function Sidebar({ items }: SidebarProps) {
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#44435e] transition hover:bg-rose-50 hover:text-rose-600"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium text-[#514b76] transition hover:bg-rose-50/80 hover:text-rose-700"
                   >
                     <Icon name="logout" size={14} /> Sign out
                   </button>
@@ -266,6 +279,11 @@ export default function Sidebar({ items }: SidebarProps) {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* The worlds' promise */}
+          <p className="pb-1.5 pt-1 text-center text-[9px] font-semibold uppercase tracking-[0.28em] text-[#8b8aa0]/80">
+            Explore · Connect · Grow
+          </p>
         </div>
       </nav>
 
@@ -275,9 +293,9 @@ export default function Sidebar({ items }: SidebarProps) {
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="crystal-elevated crystal-edge depth-medium fixed bottom-24 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full text-[#5f5e74] transition hover:text-[#232136] lg:hidden"
+        className="pane chip-glass-hover fixed bottom-24 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full ink-body lg:hidden"
       >
-        <Icon name="menu" size={16} />
+        <Icon name="menu" size={17} />
       </button>
 
       {/* ── Mobile drawer ───────────────────────────────────────────── */}
@@ -292,7 +310,7 @@ export default function Sidebar({ items }: SidebarProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[45] cursor-default bg-[#2c2a48]/25 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[45] cursor-default bg-[#1f1940]/30 backdrop-blur-sm lg:hidden"
             />
             <motion.aside
               ref={panelRef}
@@ -306,60 +324,79 @@ export default function Sidebar({ items }: SidebarProps) {
                 duration: prefersReducedMotion ? 0 : 0.35,
                 ease: [0.16, 1, 0.3, 1]
               }}
-              className="crystal-foreground crystal-edge depth-high fixed inset-y-0 left-0 z-[55] flex w-72 flex-col rounded-r-[26px] p-6 outline-none lg:hidden"
+              className="pane edge-glass fixed inset-y-0 left-0 z-[55] flex w-[300px] max-w-[86vw] flex-col rounded-r-[30px] outline-none lg:hidden"
             >
-              <div className="flex items-center justify-between">
-                <Link href="/home" onClick={close} aria-label="WithIn home">
-                  <span className="font-display text-[21px] font-semibold tracking-[-0.01em] text-[#232136]">
-                    With<span className="text-[#7c6ce0]">In</span>
-                  </span>
-                </Link>
+              <div className="flex items-start justify-between">
+                {brand(close)}
                 <button
                   type="button"
                   onClick={close}
                   aria-label="Close menu"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/50 text-[#5f5e74] transition hover:bg-white/75 hover:text-[#232136]"
+                  className="chip-glass chip-glass-hover mt-4 mr-3 flex h-10 w-10 items-center justify-center ink-body"
                 >
-                  <Icon name="close" size={18} />
+                  <Icon name="close" size={17} />
                 </button>
               </div>
 
-              <nav className="mt-10 flex max-h-full flex-1 flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {items.map((item) => {
+              <nav className="mt-6 flex max-h-full flex-1 flex-col overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {items.map((item, index) => {
                   const isActive = active === item.href;
-                  const classes = `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                    isActive
-                      ? "bg-white/75 text-[#232136] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.8)]"
-                      : "text-[#5f5e74] hover:bg-white/45 hover:text-[#232136]"
+                  const classes = `group/item relative flex w-full items-center gap-3 rounded-[14px] px-2.5 py-2 text-sm font-medium transition ${
+                    isActive ? "pill-glow ink-title" : "ink-body hover:bg-white/40"
                   }`;
-                  return item.route ? (
-                    <Link key={item.label} href={item.href} onClick={close} className={classes}>
-                      <Icon name={item.icon} size={18} />
-                      {item.label}
-                      {typeof item.badge === "number" && item.badge > 0 && (
-                        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[rgba(var(--mood-rgb),0.92)] px-1 text-[10px] font-bold text-white">
-                          {item.badge}
-                        </span>
+                  return (
+                    <span
+                      key={item.label}
+                      className="relative block w-full"
+                    >
+                      {item.group && items[index - 1]?.group !== item.group && (
+                        <p className="px-3 pb-1 pt-3 text-[9px] font-semibold uppercase tracking-[0.34em] text-[#8b8aa0]/80">
+                          {item.group}
+                        </p>
                       )}
-                    </Link>
-                  ) : (
-                    <a key={item.label} href={item.href} onClick={close} className={classes}>
-                      <Icon name={item.icon} size={18} />
-                      {item.label}
-                    </a>
+                      {item.route ? (
+                        <Link href={item.href} onClick={close} className={classes}>
+                          <span className="chip-glass h-[30px] w-[30px] shrink-0">
+                            <Icon name={item.icon} size={15} strokeWidth={1.9} />
+                          </span>
+                          {item.label}
+                          {typeof item.badge === "number" && item.badge > 0 && (
+                            <span className="chip-glass ml-auto flex h-[19px] min-w-[19px] items-center justify-center px-1 text-[10px] font-bold">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      ) : (
+                        <a href={item.href} onClick={close} className={classes}>
+                          <span className="chip-glass h-[30px] w-[30px] shrink-0">
+                            <Icon name={item.icon} size={15} strokeWidth={1.9} />
+                          </span>
+                          {item.label}
+                        </a>
+                      )}
+                    </span>
                   );
                 })}
               </nav>
 
-              <div className="mt-6 border-t border-white/50 pt-5">
+              <div className="mt-6 border-t border-white/50 p-3">
+                <p className="px-2.5 pb-1.5 text-[8px] font-semibold uppercase tracking-[0.34em] text-[#8b8aa0]/75">
+                  Your world
+                </p>
                 {isAuthenticated ? (
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-amber-200 to-rose-400 text-xs font-bold text-[#232136] ring-2 ring-white/70">
-                        {initial}
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <span className="relative shrink-0">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#e9c9a8] to-[#cfa8e2] text-[12px] font-bold text-[#3a3160] ring-2 ring-white/80">
+                          {initial}
+                        </span>
+                        <span
+                          aria-hidden
+                          className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-white/85"
+                        />
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#232136]">{user?.name}</p>
+                        <p className="truncate text-sm font-semibold ink-title">{user?.name}</p>
                         <p className="truncate text-xs text-[#8b8aa0]">{user?.email}</p>
                       </div>
                     </div>
@@ -367,7 +404,7 @@ export default function Sidebar({ items }: SidebarProps) {
                       type="button"
                       onClick={handleSignOut}
                       aria-label="Sign out"
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/60 bg-white/50 text-[#5f5e74] transition hover:border-rose-300 hover:text-rose-500"
+                      className="chip-glass chip-glass-hover flex h-10 w-10 shrink-0 items-center justify-center ink-body"
                     >
                       <Icon name="logout" size={16} />
                     </button>
@@ -376,13 +413,16 @@ export default function Sidebar({ items }: SidebarProps) {
                   <Link
                     href="/login"
                     onClick={close}
-                    className="flex items-center justify-center gap-2 rounded-full border border-white/70 bg-white/55 px-4 py-3 text-sm font-semibold text-[#232136] transition hover:bg-white/80"
+                    className="pill-lit py-3 px-4 w-full text-sm font-semibold"
                   >
                     <Icon name="profile" size={16} />
-                    Log in
+                    Enter your universe
                   </Link>
                 )}
-                <div className="mt-4 flex justify-center">
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#8b8aa0]/80">
+                    Explore · Connect · Grow
+                  </p>
                   <ThemeToggle />
                 </div>
               </div>

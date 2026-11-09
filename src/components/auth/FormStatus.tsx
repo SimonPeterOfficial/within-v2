@@ -24,8 +24,8 @@ export default function FormStatus({ variant, children }: FormStatusProps) {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className={`flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-center text-sm ${
         isError
-          ? "border-rose-400/30 bg-rose-400/10 text-rose-300"
-          : "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+          ? "border-rose-400/45 bg-rose-400/12 text-rose-600"
+          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
       }`}
     >
       <Icon name={isError ? "alert" : "check"} size={15} />

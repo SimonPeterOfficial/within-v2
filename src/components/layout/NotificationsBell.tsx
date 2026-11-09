@@ -125,13 +125,13 @@ export default function NotificationsBell() {
         onClick={() => (open ? setOpen(false) : void openPanel())}
         aria-label={hasUnread ? "Notifications — new activity" : "Notifications"}
         aria-expanded={open}
-        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 shadow-dock backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+        className="chip-glass chip-glass-hover relative flex h-10 w-10 items-center justify-center"
       >
         <Icon name="inbox" size={16} />
         {hasUnread && (
           <span
             aria-hidden
-            className="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+            className="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.8)] ring-2 ring-white/80"
           />
         )}
       </button>
@@ -146,16 +146,14 @@ export default function NotificationsBell() {
             transition={{ duration: prefersReducedMotion ? 0.1 : 0.2, ease: [0.16, 1, 0.3, 1] }}
             role="dialog"
             aria-label="Notifications"
-            className="absolute bottom-12 right-0 z-[60] w-80 overflow-hidden rounded-modal border border-white/10 bg-[#0b0912]/95 shadow-soft backdrop-blur-2xl"
+            className="pane edge-glass absolute bottom-12 right-0 z-[60] w-80 overflow-hidden rounded-[22px]"
           >
-            <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gray-500">
-                Notifications
-              </p>
+            <div className="flex items-center justify-between border-b border-white/50 px-4 py-3">
+              <p className="tagline-caps text-[9px]">Notifications</p>
               <Link
                 href="/home"
                 onClick={() => setOpen(false)}
-                className="text-[11px] text-gray-500 transition hover:text-white"
+                className="text-[11px] font-medium ink-faint transition hover:ink-title"
               >
                 Home
               </Link>
@@ -166,8 +164,8 @@ export default function NotificationsBell() {
                 <div className="space-y-3 p-4">
                   {[0, 1, 2].map((index) => (
                     <div key={index} className="space-y-2">
-                      <div className="h-3 w-3/4 animate-pulse rounded-full bg-white/[0.07]" />
-                      <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-white/[0.05]" />
+                      <div className="h-3 w-3/4 animate-pulse rounded-full bg-[#262143]/10" />
+                      <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-[#262143]/[0.07]" />
                     </div>
                   ))}
                 </div>
@@ -175,11 +173,11 @@ export default function NotificationsBell() {
 
               {state === "error" && (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-gray-300">Couldn&apos;t reach your notifications.</p>
+                  <p className="text-sm ink-body">Couldn&apos;t reach your notifications.</p>
                   <button
                     type="button"
                     onClick={() => void openPanel()}
-                    className="mt-2 text-xs text-emerald-400 transition hover:text-emerald-300"
+                    className="mt-2 text-xs font-semibold text-[#7c6ce0] transition hover:text-[#5b4bc4]"
                   >
                     Try again
                   </button>
@@ -188,8 +186,8 @@ export default function NotificationsBell() {
 
               {state === "ready" && entries.length === 0 && (
                 <div className="px-4 py-10 text-center">
-                  <p className="text-sm text-gray-300">Nothing here yet.</p>
-                  <p className="mt-1.5 text-xs text-gray-600">
+                  <p className="text-sm ink-body">Nothing here yet.</p>
+                  <p className="mt-1.5 text-xs ink-faint">
                     When people follow you or creators you follow publish, it lands here.
                   </p>
                 </div>
@@ -199,8 +197,8 @@ export default function NotificationsBell() {
                 entries.map((entry) => {
                   const body = (
                     <>
-                      <p className="text-[13px] leading-relaxed text-gray-200">{entry.message}</p>
-                      <p className="mt-1 text-[11px] text-gray-600">{timeAgo(entry.createdAt)}</p>
+                      <p className="text-[13px] leading-relaxed ink-body">{entry.message}</p>
+                      <p className="mt-1 text-[11px] ink-faint">{timeAgo(entry.createdAt)}</p>
                     </>
                   );
                   return entry.href ? (
@@ -208,12 +206,12 @@ export default function NotificationsBell() {
                       key={entry.id}
                       href={entry.href}
                       onClick={() => setOpen(false)}
-                      className="block border-b border-white/[0.04] px-4 py-3 transition last:border-b-0 hover:bg-white/[0.04]"
+                      className="block border-b border-white/40 px-4 py-3 transition last:border-b-0 hover:bg-white/45"
                     >
                       {body}
                     </Link>
                   ) : (
-                    <div key={entry.id} className="block border-b border-white/[0.04] px-4 py-3 last:border-b-0">
+                    <div key={entry.id} className="block border-b border-white/40 px-4 py-3 last:border-b-0">
                       {body}
                     </div>
                   );

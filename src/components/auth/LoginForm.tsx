@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthInput from "@/components/auth/AuthInput";
 import FormStatus from "@/components/auth/FormStatus";
-import GradientText from "@/components/ui/GradientText";
 import { useSession } from "@/lib/auth/session";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
@@ -31,9 +30,11 @@ function OAuthButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] py-3 text-[13px] font-medium text-white/70 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-white active:scale-[0.98] disabled:opacity-40"
+      className="pill-glass w-full px-5 py-3 text-[13px] font-medium disabled:opacity-40"
     >
-      <span className="text-base">{icon}</span>
+      <span aria-hidden className="chip-glass h-7 w-7 text-[11px]">
+        {icon}
+      </span>
       Continue with {provider}
     </button>
   );
@@ -43,11 +44,9 @@ function OAuthButton({
 function AuthDivider() {
   return (
     <div className="relative flex items-center gap-4">
-      <div className="h-px flex-1 bg-white/[0.06]" />
-      <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-500/50">
-        or
-      </span>
-      <div className="h-px flex-1 bg-white/[0.06]" />
+      <div className="h-px flex-1 bg-[#262143]/15" />
+      <span className="tagline-caps text-[8.5px]">or</span>
+      <div className="h-px flex-1 bg-[#262143]/15" />
     </div>
   );
 }
@@ -124,11 +123,11 @@ export default function LoginForm() {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="text-center"
       >
-        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
-          Welcome <GradientText className="italic">back</GradientText>.
+        <h1 className="font-display text-[30px] font-medium leading-[1.12] tracking-[-0.02em] ink-title">
+          Return to your <span className="italic text-[#8a7bd6]">universe</span>.
         </h1>
-        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
-          Your universe is still here.
+        <p className="mt-3 text-[14px] leading-relaxed ink-body">
+          It was never gone. It was keeping your place.
         </p>
       </motion.div>
 
@@ -163,9 +162,9 @@ export default function LoginForm() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-[11px] text-gray-500/50"
+            className="text-center text-[11px] ink-faint"
           >
-            Connecting to {oauthLoading}…
+            Opening the {oauthLoading} gate…
           </motion.p>
         )}
       </motion.div>
@@ -205,18 +204,18 @@ export default function LoginForm() {
       />
 
       <div className="flex items-center justify-between gap-3">
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-400">
+        <label className="flex cursor-pointer items-center gap-2 text-[13px] ink-body">
           <input
             type="checkbox"
             checked={remember}
             onChange={(event) => setRemember(event.target.checked)}
-            className="h-4 w-4 rounded border-white/10 bg-white/5 accent-emerald-400"
+            className="h-4 w-4 rounded-full border-white/70 bg-white/60 accent-[#7c6ce0]"
           />
           Remember me
         </label>
         <Link
           href="/forgot-password"
-          className="text-sm font-medium text-gray-400 transition hover:text-emerald-300"
+          className="text-[13px] font-medium ink-body transition hover:text-[#7c6ce0]"
         >
           Forgot password?
         </Link>
@@ -225,15 +224,11 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="crystal-press crystal-focus relative mt-2 w-full overflow-hidden rounded-2xl py-3.5 text-[13px] font-semibold text-white"
-        style={{
-          background: "linear-gradient(135deg, rgba(var(--mood-rgb),0.95), rgba(var(--mood-rgb),0.75))",
-          boxShadow: "0 8px 28px rgba(var(--mood-rgb),0.35), inset 0 1px 0 rgba(255,255,255,0.4)",
-        }}
+        className="pill-lit crystal-press crystal-focus relative mt-2 w-full py-3.5 text-[13px] font-semibold"
       >
         {loading ? (
           <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white/80" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#392f66]/25 border-t-[#392f66]/85" />
             Entering…
           </span>
         ) : (
@@ -241,10 +236,10 @@ export default function LoginForm() {
         )}
       </button>
 
-      <p className="text-center text-sm text-gray-400">
+      <p className="text-center text-[13px] ink-body">
         New to WithIn?{" "}
-        <Link href="/signup" className="font-semibold text-white transition hover:text-emerald-300">
-          Create an account
+        <Link href="/signup" className="font-semibold ink-title transition hover:text-[#7c6ce0]">
+          Begin your story
         </Link>
       </p>
     </form>

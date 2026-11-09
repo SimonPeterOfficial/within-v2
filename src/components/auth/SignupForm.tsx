@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import AuthInput from "@/components/auth/AuthInput";
 import FormStatus from "@/components/auth/FormStatus";
 import PasswordStrength from "@/components/auth/PasswordStrength";
-import GradientText from "@/components/ui/GradientText";
 import { useSession } from "@/lib/auth/session";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
@@ -32,9 +31,11 @@ function OAuthButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] py-3 text-[13px] font-medium text-white/70 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-white active:scale-[0.98] disabled:opacity-40"
+      className="pill-glass w-full px-5 py-3 text-[13px] font-medium disabled:opacity-40"
     >
-      <span className="text-base">{icon}</span>
+      <span aria-hidden className="chip-glass h-7 w-7 text-[11px]">
+        {icon}
+      </span>
       Continue with {provider}
     </button>
   );
@@ -44,11 +45,9 @@ function OAuthButton({
 function AuthDivider() {
   return (
     <div className="relative flex items-center gap-4">
-      <div className="h-px flex-1 bg-white/[0.06]" />
-      <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-500/50">
-        or
-      </span>
-      <div className="h-px flex-1 bg-white/[0.06]" />
+      <div className="h-px flex-1 bg-[#262143]/15" />
+      <span className="tagline-caps text-[8.5px]">or</span>
+      <div className="h-px flex-1 bg-[#262143]/15" />
     </div>
   );
 }
@@ -122,12 +121,11 @@ export default function SignupForm() {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="text-center"
       >
-        <h1 className="font-display text-3xl font-medium tracking-[-0.02em]">
-          Come a little further{" "}
-          <GradientText className="italic">Within</GradientText>.
+        <h1 className="font-display text-[30px] font-medium leading-[1.12] tracking-[-0.02em] ink-title">
+          Begin your <span className="italic text-[#8a7bd6]">story</span>.
         </h1>
-        <p className="mt-2.5 text-[14px] leading-relaxed text-gray-400/70">
-          A few quiet questions, then the world tunes itself to you.
+        <p className="mt-3 text-[14px] leading-relaxed ink-body">
+          Every voice adds a world.
         </p>
       </motion.div>
 
@@ -162,7 +160,7 @@ export default function SignupForm() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-[11px] text-gray-500/50"
+            className="text-center text-[11px] ink-faint"
           >
             Connecting to {oauthLoading}…
           </motion.p>
@@ -223,11 +221,11 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-emerald-500 py-3.5 text-[13px] font-semibold text-white transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
+        className="pill-lit crystal-press crystal-focus relative mt-2 w-full py-3.5 text-[13px] font-semibold"
       >
         {loading ? (
           <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white/60" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#392f66]/25 border-t-[#392f66]/85" />
             Creating your sanctuary…
           </span>
         ) : (
@@ -235,9 +233,9 @@ export default function SignupForm() {
         )}
       </button>
 
-      <p className="text-center text-sm text-gray-400">
+      <p className="text-center text-[13px] ink-body">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-white transition hover:text-emerald-300">
+        <Link href="/login" className="font-semibold ink-title transition hover:text-[#7c6ce0]">
           Log in
         </Link>
       </p>
