@@ -8,6 +8,7 @@ import FeedPanel from "@/components/home/FeedPanel";
 import MessagesPanel from "@/components/home/MessagesPanel";
 import SanctuaryPanel from "@/components/home/SanctuaryPanel";
 import ReturningGreeting from "@/components/sanctuary/ReturningGreeting";
+import WhileYouWereAway from "@/components/sanctuary/WhileYouWereAway";
 import AuriOrb from "@/components/sanctuary/AuriOrb";
 import HomeDock from "@/components/home/HomeDock";
 import MicroDiscoveries from "@/components/effects/MicroDiscoveries";
@@ -72,6 +73,10 @@ export default async function HomePage() {
 
       <AppShell items={shellItems}>
         <TopBar />
+
+        {/* Continuity — renders only when something real happened since the
+            last visit; silence otherwise. */}
+        <WhileYouWereAway />
 
         {/* ═══ Hero + right rail — spatial composition ═══ */}
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-4 xl:px-6 lg:grid-cols-[1fr_300px]">

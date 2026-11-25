@@ -28,6 +28,15 @@ import { useEntrance } from "@/components/entrance/EntranceProvider";
  * Auri is deliberately absent here — she lives in the corner orb
  * (AuriOrb) and appears only as a presence, never as a permanent
  * mascot pasted onto the hero (BRAND.md).
+ *
+ * STATUS (2026-11-13): Not mounted on any current route. The root /
+ * page uses a simpler module-grid landing (src/app/page.tsx). This
+ * component requires <EntranceProvider> in the tree above it; it uses
+ * `useEntrance()` to coordinate with CinematicLoader. When the entry
+ * architecture decision is made (whether the cinematic belongs on /
+ * or on /home), this hero is the intended companion. Do not delete
+ * without a founder decision. CinematicLoader is currently gated off
+ * via src/components/loader/loader-config.ts.
  */
 export default function Hero() {
   const prefersReducedMotion = useReducedMotionSafe();

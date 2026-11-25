@@ -1,10 +1,16 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
+import {
+  getSoundPreferences,
+  saveSoundPreferences,
+  playInterfaceTick,
+} from "@/lib/within-sound";
 import { AURI_OPEN_EVENT } from "@/components/sanctuary/AuriOrb";
 
 /* Hydration-safe ambient line — day-stable, whispered quietly. */
@@ -23,19 +29,45 @@ const DOCK: DockItem[] = [
   { label: "Profile", href: "/profile", icon: "profile" },
 ];
 
+const SOUND_EVENT = "within:sound-changed";
+
+function subscribeSound(callback: () => void) {
+  window.addEventListener(SOUND_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(SOUND_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
 /**
  * HomeDock — the illustrated footer line of the home.
  *
  *  LEFT    the ambient line — a quiet horizon whisper
  *  CENTER  the floating dock — four doors + the Auri orb at heart,
  *          the orb blooming with the live mood light
- *  RIGHT   the now-playing pill — "Golden Hour · Luna Riven"
+ *  RIGHT   the real sound control — reflects the opt-in master switch
  *
  * Desktop-only chrome (mobile keeps the standard BottomNav).
  */
 export default function HomeDock() {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotionSafe();
+
+  // The preference lives on the device. Server snapshot is off; the client
+  // snapshot reads storage, so SSR and hydration stay identical.
+  const soundOn = useSyncExternalStore(
+    subscribeSound,
+    () => getSoundPreferences().master,
+    () => false,
+  );
+
+  const toggleSound = () => {
+    const next = { ...getSoundPreferences(), master: !soundOn };
+    saveSoundPreferences(next);
+    window.dispatchEvent(new Event(SOUND_EVENT));
+    if (next.master) playInterfaceTick();
+  };
 
   const openAuri = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,7 +98,7 @@ export default function HomeDock() {
             ☀️
           </span>
           <span className="truncate text-[12px] font-medium text-[#44435e]">
-            The horizon looks beautiful today…
+            Auri is here, quietly…
           </span>
         </motion.button>
 
@@ -136,7 +168,7 @@ export default function HomeDock() {
           })}
         </motion.nav>
 
-        {/* ── RIGHT — now playing ─────────────────────────────────────── */}
+        {/* ── RIGHT — sound control ────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,20 +183,21 @@ export default function HomeDock() {
               boxShadow: "inset 0 1px 3px rgba(255,255,255,0.6), 0 2px 8px rgba(120,110,200,0.3)",
             }}
           >
-            🎵
+            <Icon name="headphones" size={14} className="text-[#2c2a48]" />
           </span>
           <span className="leading-tight">
-            <span className="block text-[11.5px] font-semibold text-[#2c2a48]">Golden Hour</span>
-            <span className="block text-[9.5px] text-[#8b8aa0]">Luna Riven</span>
+            <span className="block text-[11.5px] font-semibold text-[#2c2a48]">Sound</span>
+            <span className="block text-[9.5px] text-[#8b8aa0]">{soundOn ? "On" : "Off"}</span>
           </span>
-          <span className="ml-1 flex items-center gap-1 text-[#5f5e74]">
-            <button type="button" aria-label="Play or pause" className="crystal-focus rounded-full p-1.5 transition hover:bg-white/60">
-              <Icon name="pause" size={13} />
-            </button>
-            <button type="button" aria-label="Next track" className="crystal-focus rounded-full p-1.5 transition hover:bg-white/60">
-              <Icon name="forward" size={13} />
-            </button>
-          </span>
+          <button
+            type="button"
+            onClick={toggleSound}
+            aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
+            aria-pressed={soundOn}
+            className="crystal-focus ml-1 rounded-full p-1.5 text-[#5f5e74] transition hover:bg-white/60"
+          >
+            <Icon name={soundOn ? "pause" : "play"} size={13} />
+          </button>
         </motion.div>
       </div>
     </div>

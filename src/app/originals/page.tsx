@@ -22,7 +22,7 @@ export default function OriginalsPage() {
         subtitle={copy.originals.subtitle}
         worldClass="world-originals"
       />
-      <OriginalsShowcase trailerHref="/originals/salt-stars" />
+      <OriginalsShowcase />
       <OriginalsGrid />
       <OriginalsComingSoon />
       <OriginalsSpotlight />

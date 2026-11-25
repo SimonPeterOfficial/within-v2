@@ -12,6 +12,14 @@ import { staggerContainer } from "@/lib/animations";
  * scene, personality, and emotional atmosphere. The grid is
  * intentionally irregular — some worlds are larger, some smaller,
  * creating a sense of organic exploration rather than a dashboard.
+ *
+ * STATUS (2026-11-13): Not mounted on any current route. It was replaced
+ * by ModuleShelf on /home (commit 54be383) which uses keyboard navigation
+ * and an availability-aware grid. WorldPortals is intentionally preserved
+ * rather than deleted — it may return when the visual reference artwork
+ * (docs/vision/sanctuary-implementation-plan.md §1 D-5) lands and the
+ * portal scenes can be tied to the approved concept. Do not delete without
+ * a founder decision.
  */
 
 const PORTALS: WorldPortalData[] = [

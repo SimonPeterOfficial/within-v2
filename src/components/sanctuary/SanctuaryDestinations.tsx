@@ -83,6 +83,7 @@ const DESTINATIONS: Destination[] = [
     title: "Daily Check-in",
     line: "Reconnect with yourself.",
     icon: "sparkles",
+    href: "/sanctuary#reflection",
     wide: true,
     wash: "linear-gradient(100deg, rgba(var(--within-violet-rgb),0.12) 0%, rgba(var(--within-gold-rgb),0.1) 100%)",
   },
@@ -107,34 +108,34 @@ function DestinationCard({ destination: d }: { destination: Destination }) {
 
       <span
         aria-hidden
-        className="absolute right-5 top-4 text-[11px] font-semibold tracking-[0.3em] text-ui-faint"
+        className="absolute right-4 top-3 text-[10px] font-semibold tracking-[0.3em] text-ui-faint"
       >
         {d.number}
       </span>
 
-      <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-ui-raised ring-1 ring-ui-line">
+      <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-ui-raised ring-1 ring-ui-line">
         <Icon
           name={d.icon}
-          size={17}
+          size={16}
           strokeWidth={1.6}
           className="text-[rgba(var(--within-gold-rgb),0.9)]"
         />
       </span>
 
-      <h3 className="relative mt-5 font-display text-[19px] leading-snug text-ui-ink sm:text-[21px]">
+      <h3 className="relative mt-4 font-display text-[17px] leading-snug text-ui-ink sm:text-[18px]">
         {d.title}
       </h3>
-      <p className="relative mt-1.5 max-w-[36ch] text-[13px] leading-relaxed text-ui-soft sm:text-[13.5px]">
+      <p className="relative mt-1.5 text-[12px] leading-relaxed text-ui-soft sm:text-[12.5px]">
         {d.line}
       </p>
 
-      <div className="relative mt-auto flex items-center justify-between pt-5">
+      <div className="relative mt-auto flex items-center justify-between pt-4">
         {open ? (
-          <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-full border border-ui-line text-[rgba(var(--within-gold-rgb),0.85)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5">
-            <Icon name="chevronRight" size={13} />
+          <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full border border-ui-line text-[rgba(var(--within-gold-rgb),0.85)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5">
+            <Icon name="chevronRight" size={12} />
           </span>
         ) : (
-          <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em] text-ui-faint">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ui-faint">
             Quiet for now
           </span>
         )}
@@ -145,7 +146,7 @@ function DestinationCard({ destination: d }: { destination: Destination }) {
   if (!open) {
     // A named, unlit door — truthful about what is not yet built.
     return (
-      <div className="relative flex min-h-[215px] flex-col overflow-hidden rounded-[26px] border border-ui-line bg-ui-surface p-6 backdrop-blur-md opacity-90 sm:min-h-[240px]">
+      <div className="relative flex h-[200px] w-[160px] flex-col overflow-hidden rounded-[22px] border border-ui-line bg-ui-surface p-5 backdrop-blur-md opacity-90 sm:h-[220px] sm:w-[180px]">
         {body}
       </div>
     );
@@ -154,7 +155,7 @@ function DestinationCard({ destination: d }: { destination: Destination }) {
   return (
     <Link
       href={d.href as string}
-      className="group relative flex min-h-[215px] flex-col overflow-hidden rounded-[26px] border border-ui-line bg-ui-surface p-6 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-[2px] hover:border-[rgba(var(--within-gold-rgb),0.35)] hover:bg-ui-raised hover:shadow-[0_20px_50px_-20px_rgba(112,72,190,0.42)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--within-gold-rgb),0.55)] sm:min-h-[240px]"
+      className="group relative flex h-[200px] w-[160px] flex-col overflow-hidden rounded-[22px] border border-ui-line bg-ui-surface p-5 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-[2px] hover:border-[rgba(var(--within-gold-rgb),0.35)] hover:bg-ui-raised hover:shadow-[0_18px_45px_-18px_rgba(112,72,190,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--within-gold-rgb),0.55)] sm:h-[220px] sm:w-[180px]"
     >
       {body}
     </Link>
@@ -162,49 +163,53 @@ function DestinationCard({ destination: d }: { destination: Destination }) {
 }
 
 /**
- * The seven doors of Sanctuary — the founder's exact order preserved.
+ * The seven doors of Sanctuary — pinned to the bottom edge, horizontal scroll.
  *
  * Open rooms carry honest destinations; the rooms still being written
- * (Emotional Space, Meditation, Daily Check-in) hold their place with the
- * words "Quiet for now" instead of pretending (Law 16 — no fake success).
- * Their experiences arrive in Phase B/C per the implementation plan.
+ * (Emotional Space, Meditation) hold their place with the words "Quiet for
+ * now" instead of pretending (Law 16 — no fake success). Their experiences
+ * arrive in Phase B/C per the implementation plan.
+ *
+ * Layout per the approved visual reference: a horizontal row of frosted glass
+ * cards anchored at the bottom of the viewport, scrollable when needed, so
+ * the immersive scene can breathe above.
  */
 export default function SanctuaryDestinations() {
   const prefersReducedMotion = useReducedMotionSafe();
 
   return (
-    <section id="rooms" aria-label="The rooms of Sanctuary" className="scroll-mt-20 pb-24 pt-4">
-      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6">
-        <motion.div
-          variants={staggerContainer(0.07, 0.05)}
-          initial={prefersReducedMotion ? false : "hidden"}
-          whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
-        >
-          <motion.p
+    <div
+      id="rooms"
+      aria-label="The rooms of Sanctuary"
+      className="fixed inset-x-0 bottom-0 z-30 pb-[calc(env(safe-area-inset-bottom,0px)+88px)] pt-4 lg:pb-6"
+    >
+      {/* Fade-out edges for the scroll (left/right) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-black/40 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-black/40 to-transparent"
+      />
+
+      {/* Horizontal scrolling row */}
+      <motion.div
+        variants={staggerContainer(0.06, 0.04)}
+        initial={prefersReducedMotion ? false : "hidden"}
+        animate="show"
+        className="flex gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:justify-center md:px-8"
+      >
+        {DESTINATIONS.map((destination) => (
+          <motion.div
+            key={destination.number}
             variants={prefersReducedMotion ? undefined : blurUp}
-            className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[rgba(var(--within-gold-rgb),0.7)]"
+            className="shrink-0"
           >
-            The rooms
-          </motion.p>
-
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-            {DESTINATIONS.map((destination) => (
-              <motion.div
-                key={destination.number}
-                variants={prefersReducedMotion ? undefined : blurUp}
-                className={destination.wide ? "xl:col-span-2" : undefined}
-              >
-                <DestinationCard destination={destination} />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        <p className="mt-12 text-center text-xs leading-relaxed text-ui-faint">
-          Everything here stays yours — private to your account.
-        </p>
-      </div>
-    </section>
+            <DestinationCard destination={destination} />
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   );
 }

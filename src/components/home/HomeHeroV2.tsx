@@ -34,6 +34,14 @@ const getServerGreeting = () => "Good evening";
  *   - Weather window floating in the upper-right
  *   - The world extends beyond the viewport
  *
+ * STATUS (2026-11-13): Not mounted on any current route. HomeHero.tsx
+ * is the active /home hero (a restrained dark surface with an optional
+ * featured content overlay). HomeHeroV2 is the full cinematic floating-
+ * island scene intended as the future /home hero once the visual
+ * reference concept (D-5) has landed and the weather integration is
+ * confirmed real (not fabricated data). Do not delete without a founder
+ * decision — this is finished product work awaiting its moment.
+ *
  * Material: glass-crystal (Level 2) for the hero container
  * Motion: motion-medium for content, motion-slow for environment
  */

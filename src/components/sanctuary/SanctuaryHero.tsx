@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Icon from "@/components/ui/Icon";
 import StarField from "@/components/sanctuary/StarField";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 import { blurUp, staggerContainer } from "@/lib/animations";
@@ -77,16 +76,6 @@ export default function SanctuaryHero() {
           {SUPPORTING}
         </motion.p>
 
-        {/* A quiet descent — the rooms wait below, honestly labeled */}
-        <motion.div variants={prefersReducedMotion ? undefined : blurUp}>
-          <a
-            href="#rooms"
-            aria-label="Continue to the rooms"
-            className="mt-14 inline-flex h-10 w-10 items-center justify-center rounded-full border border-ui-line bg-ui-surface text-ui-ink-soft transition-colors duration-200 hover:border-[rgba(var(--within-gold-rgb),0.4)] hover:text-ui-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--within-gold-rgb),0.55)]"
-          >
-            <Icon name="chevronRight" size={15} className="rotate-90" />
-          </a>
-        </motion.div>
       </motion.div>
     </section>
   );

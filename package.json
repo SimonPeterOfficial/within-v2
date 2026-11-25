@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "smoke": "node scripts/smoke-test.mjs",
+    "test:mirror": "tsx --test src/lib/__tests__/mirror-view.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
     "seed:dev": "tsx scripts/seed-dev.ts"
   },
   "dependencies": {

@@ -1,10 +1,6 @@
 /**
  * Admin real-data service — fetches live data from the database.
  *
- * This module replaces the mock data in src/lib/admin/data.ts with real
- * database queries. The admin dashboard components can switch from
- * MOCK_* constants to these functions without changing their structure.
- *
  * All functions are server-side only and should be called from
  * server components or API routes.
  */

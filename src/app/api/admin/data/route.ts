@@ -1,11 +1,13 @@
 /**
  * GET /api/admin/data
  *
- * Returns real platform data for the admin dashboard.
- * This endpoint is protected by the admin middleware.
+ * Returns real platform data for the admin dashboard. Authenticated here —
+ * the middleware matcher does not include API routes.
  */
 
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyAdminSession, ADMIN_SESSION_COOKIE } from "@/lib/admin/auth";
 
 export const dynamic = "force-dynamic";
 import { db } from "@/lib/db";
@@ -20,6 +22,22 @@ import {
 import { eq, desc, count, and, gte } from "drizzle-orm";
 
 export async function GET() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get(ADMIN_SESSION_COOKIE);
+  if (!sessionCookie?.value) {
+    return NextResponse.json(
+      { ok: false, error: "Admin authentication required." },
+      { status: 401 }
+    );
+  }
+  const session = await verifyAdminSession(sessionCookie.value);
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, error: "Admin authentication required." },
+      { status: 401 }
+    );
+  }
+
   try {
     const [
       totalUsersResult,

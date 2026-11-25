@@ -13,21 +13,16 @@ import { staggerContainer } from "@/lib/animations";
 import { fireRipple } from "@/lib/ripple";
 
 const featured = ORIGINALS[0];
-const FEATURED_PROGRESS = 0.42;
-
-type OriginalsShowcaseProps = {
-  trailerHref?: string;
-};
 
 /**
  * Cinematic Originals showcase — the flagship content section.
  *
  * A spotlight feature card dominates the view with cinematic depth,
- * a "Now streaming" editorial card beside it, and an auto-scrolling
- * marquee of all originals below. The featured card should feel like
- * a portal into the film — not a generic card.
+ * a featured-original card beside it, and an auto-scrolling marquee of
+ * all originals below. Every control opens the work's real page; there is
+ * no invented watch progress.
  */
-export default function OriginalsShowcase({ trailerHref = "#memories" }: OriginalsShowcaseProps) {
+export default function OriginalsShowcase() {
   const prefersReducedMotion = useReducedMotionSafe();
 
   return (
@@ -74,9 +69,9 @@ export default function OriginalsShowcase({ trailerHref = "#memories" }: Origina
 
                 {/* Play — the door into the original */}
                 <a
-                  href={trailerHref}
+                  href={`/originals/${featured.id}`}
                   onClick={(e) => fireRipple(e)}
-                  aria-label={`Play ${featured.title}`}
+                  aria-label={`Open ${featured.title}`}
                   className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                 >
                   <motion.span
@@ -106,21 +101,9 @@ export default function OriginalsShowcase({ trailerHref = "#memories" }: Origina
                     <p className="mt-0.5 text-xs text-white/40">
                       A {featured.type.toLowerCase()} by {featured.creator}
                     </p>
-                    {/* Progress */}
-                    <div className="mt-5 max-w-xs">
-                      <div className="flex items-center justify-between text-[11px] text-white/60">
-                        <span className="font-medium text-white/90">
-                          {Math.round(FEATURED_PROGRESS * 100)}% watched
-                        </span>
-                        <span>{featured.duration}</span>
-                      </div>
-                      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/15">
-                        <div
-                          className="h-full rounded-full bg-linear-to-r from-purple-300 to-emerald-300"
-                          style={{ width: `${FEATURED_PROGRESS * 100}%` }}
-                        />
-                      </div>
-                    </div>
+                    <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+                      {featured.description}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -130,14 +113,14 @@ export default function OriginalsShowcase({ trailerHref = "#memories" }: Origina
           <BentoCard size="tall" className="md:col-span-1">
             <div className="flex h-full flex-col gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 backdrop-blur-xl">
               <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-400/70">
-                Now streaming
+                Featured original
               </p>
-              <h4 className="font-display text-lg font-medium leading-snug">A feature-length emotional original</h4>
+              <h4 className="font-display text-lg font-medium leading-snug">{featured.title}</h4>
               <p className="text-sm leading-relaxed text-gray-500">
-                Shot entirely within the sanctuary — every frame responds to how you feel right now.
+                {featured.description}
               </p>
-              <Button href={trailerHref} variant="primary" size="md" className="mt-auto w-fit">
-                Watch the trailer
+              <Button href={`/originals/${featured.id}`} variant="primary" size="md" className="mt-auto w-fit">
+                Open the original
               </Button>
             </div>
           </BentoCard>
@@ -163,8 +146,8 @@ export default function OriginalsShowcase({ trailerHref = "#memories" }: Origina
                     {original.cover.emoji}
                   </span>
                   <a
-                    href={trailerHref}
-                    aria-label={`Play ${original.title}`}
+                    href={`/originals/${original.id}`}
+                    aria-label={`Open ${original.title}`}
                     className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 focus-visible:opacity-100 group-hover:opacity-100"
                   >
                     <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white shadow-orb backdrop-blur-md transition duration-300 group-hover:scale-110">

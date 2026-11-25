@@ -10,6 +10,7 @@ import {
   dayCharacter,
 } from "@/lib/atlas/sky";
 import { useEnvironment } from "@/lib/environment";
+import { useMountedSafe } from "@/lib/useMountedSafe";
 
 const subscribeAlways = () => () => {};
 const getClientLocale = () => Intl.DateTimeFormat().resolvedOptions().locale;
@@ -27,6 +28,9 @@ export default function WeatherPanel() {
   const now = useAtlasTime();
   const locale = useSyncExternalStore(subscribeAlways, getClientLocale, getServerLocale);
   const { weather } = useEnvironment();
+  // Clock-derived text only resolves after mount so the static HTML and the
+  // hydration render agree (WeatherPanel sits on statically prerendered pages).
+  const mounted = useMountedSafe();
 
   const sun = sunPosition(now);
   const climate = climateEstimate(now);
@@ -66,8 +70,11 @@ export default function WeatherPanel() {
       ? "🌙"
       : "☀️";
 
-  const dayLabels = ["Today", "Thu", "Fri", "Sat", "Sun"];
-  const startIndex = 0;
+  // Real weekday names for the next four days — never a fixed label list.
+  const weekday = (offsetDays: number) =>
+    new Date(now.getTime() + offsetDays * 86400000).toLocaleDateString(locale, {
+      weekday: "short",
+    });
 
   return (
     <aside
@@ -104,21 +111,23 @@ export default function WeatherPanel() {
                 boxShadow: "0 3px 12px rgba(255,220,160,0.35), inset 0 1px 0 rgba(255,255,255,0.6)",
               }}
             >
-              {glyph}
+              {mounted ? glyph : "·"}
             </span>
             <div>
               <p className="font-display text-[26px] font-medium leading-none text-ui-ink">
-                {currentC}°C
+                {mounted ? `${currentC}°C` : "—"}
               </p>
-              <p className="mt-1 text-[11.5px] font-medium text-ui-ink-soft">{condition}</p>
+              <p className="mt-1 text-[11.5px] font-medium text-ui-ink-soft">
+                {mounted ? condition : "Reading the sky"}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Location — WithIn's home shore */}
+        {/* Location — named only when a real fix exists */}
         <p className="mt-3 flex items-center gap-1.5 text-[12px] font-medium text-ui-ink-soft">
           <span aria-hidden>📍</span>
-          Moonlight Bay
+          {hasLiveWeather ? "Your location" : "Temperate estimate"}
         </p>
 
         {/* The 4-day estimate strip */}
@@ -126,22 +135,28 @@ export default function WeatherPanel() {
           {forecast.slice(0, 4).map((day, index) => (
             <div key={index} className="text-center">
               <p className="text-[10.5px] font-semibold text-ui-ink-soft">
-                {dayLabels[startIndex + index + 1] ?? new Date(now.getTime() + (index + 1) * 86400000).toLocaleDateString(locale, { weekday: "short" })}
+                {mounted ? weekday(index + 1) : "···"}
               </p>
               <p aria-hidden className="mt-1 text-base">
                 {clouds > 0.5 ? "⛅" : "☀️"}
               </p>
               <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-ui-ink">
-                {day.highC}°
+                {mounted ? `${day.highC}°` : "—"}
               </p>
-              <p className="text-[10px] tabular-nums text-ui-faint">{day.lowC}°</p>
+              <p className="text-[10px] tabular-nums text-ui-faint">
+                {mounted ? `${day.lowC}°` : "—"}
+              </p>
             </div>
           ))}
         </div>
 
         {/* The honesty line — labels the source so nothing is misrepresented */}
         <p className="mt-3.5 text-[9.5px] leading-relaxed text-ui-faint">
-          {hasLiveWeather ? "Live weather · Open-Meteo" : `${PHASE_LABEL[sun.phase]} · ${climate.label.toLowerCase()} climate estimate — not a live forecast.`}
+          {!mounted
+            ? "Climate estimate — not a live forecast."
+            : hasLiveWeather
+              ? "Live weather · Open-Meteo"
+              : `${PHASE_LABEL[sun.phase]} · ${climate.label.toLowerCase()} climate estimate — not a live forecast.`}
         </p>
       </div>
     </aside>

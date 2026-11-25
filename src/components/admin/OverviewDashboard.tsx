@@ -3,14 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  OVERVIEW_METRICS,
-  MOCK_ACTIVITY,
-  MOCK_USER_GROWTH,
-  MOCK_CONTENT_ENGAGEMENT,
-} from "@/lib/admin/data";
 import { getUniverseState, getUniverseDepth, getDominantInterest } from "@/lib/universe/state";
 import { getGraphStats } from "@/lib/explore/graph";
+
 type RealOverviewMetrics = {
   totalUsers: number;
   activeUsers: number;
@@ -60,110 +55,65 @@ const stagger = {
   show: { transition: { staggerChildren: 0.05 } },
 };
 
-/**
- * Mini bar chart — pure CSS, no chart library.
- * Lightweight, editorial, premium.
- */
-function MiniChart({
-  data,
-  color = "rgba(168, 85, 247, 0.6)",
-}: {
-  data: { label: string; value: number }[];
-  color?: string;
-}) {
-  const max = Math.max(...data.map((d) => d.value));
-  return (
-    <div className="flex items-end gap-1 h-24">
-      {data.map((point, i) => (
-        <div key={i} className="flex flex-col items-center gap-1 flex-1">
-          <div
-            className="w-full rounded-t-sm transition-all duration-500"
-            style={{
-              height: `${(point.value / max) * 100}%`,
-              background: color,
-              minHeight: 2,
-            }}
-          />
-          <span className="text-[9px] text-gray-600">{point.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
+const METRIC_DEFS: Array<{
+  key: keyof RealOverviewMetrics;
+  label: string;
+  icon: string;
+}> = [
+  { key: "totalUsers", label: "Total Users", icon: "👥" },
+  { key: "activeUsers", label: "Active (30d)", icon: "🟢" },
+  { key: "totalCreators", label: "Creators", icon: "✨" },
+  { key: "publishedContent", label: "Published Content", icon: "📚" },
+  { key: "totalCommunities", label: "Communities", icon: "🤝" },
+  { key: "openReports", label: "Open Reports", icon: "⚠️" },
+  { key: "totalSubscriptions", label: "Subscriptions", icon: "💳" },
+  { key: "totalViews", label: "Total Views", icon: "👁️" },
+];
 
 /**
  * The first screen — answers: "How is WithIn doing?"
- *
- * Top: greeting + status.
- * Then: 8 key metrics.
- * Then: activity + mini charts.
- * Then: moderation queue summary.
+ * Every number comes from the database via /api/admin/data.
  */
 export default function OverviewDashboard() {
   const [realMetrics, setRealMetrics] = useState<RealOverviewMetrics | null>(null);
   const [realActivity, setRealActivity] = useState<RealActivityEvent[]>([]);
-  const [, setLoading] = useState(true);
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     async function loadRealData() {
       try {
         const res = await fetch("/api/admin/data", { cache: "no-store" });
-        if (res.ok) {
-          const data: AdminDataResponse = await res.json();
-          setRealMetrics(data.metrics);
-          // Build activity from recent users and content
-          const activity: RealActivityEvent[] = [
-            ...data.recentUsers.map((u) => ({
-              id: `user-${u.id}`,
-              type: "user_joined",
-              title: "New user joined",
-              entity: u.name,
-              timestamp: u.createdAt,
-            })),
-            ...data.recentContent.map((c) => ({
-              id: `content-${c.id}`,
-              type: "content_created",
-              title: "Content created",
-              entity: c.title,
-              timestamp: c.createdAt,
-            })),
-          ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-          setRealActivity(activity);
-        }
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const data: AdminDataResponse = await res.json();
+        setRealMetrics(data.metrics);
+        const activity: RealActivityEvent[] = [
+          ...data.recentUsers.map((u) => ({
+            id: `user-${u.id}`,
+            type: "user_joined",
+            title: "New user joined",
+            entity: u.name,
+            timestamp: u.createdAt,
+          })),
+          ...data.recentContent.map((c) => ({
+            id: `content-${c.id}`,
+            type: "content_created",
+            title: "Content created",
+            entity: c.title,
+            timestamp: c.createdAt,
+          })),
+        ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setRealActivity(activity);
+        setState("ready");
       } catch (error) {
         console.error("[ADMIN] Failed to load real data:", error);
-      } finally {
-        setLoading(false);
+        setState("error");
       }
     }
     loadRealData();
   }, []);
 
-  // Use real data if available, fall back to mock
-  const metrics = realMetrics
-    ? [
-        { label: "Total Users", value: realMetrics.totalUsers.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "👥" },
-        { label: "Active Users", value: realMetrics.activeUsers.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "🟢" },
-        { label: "Creators", value: realMetrics.totalCreators.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "✨" },
-        { label: "Published Content", value: realMetrics.publishedContent.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "📚" },
-        { label: "Communities", value: realMetrics.totalCommunities.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "🤝" },
-        { label: "Open Reports", value: realMetrics.openReports.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "⚠️" },
-        { label: "Subscriptions", value: realMetrics.totalSubscriptions.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "💳" },
-        { label: "Total Views", value: realMetrics.totalViews.toLocaleString(), change: "—", changeType: "neutral" as const, icon: "👁️" },
-      ]
-    : OVERVIEW_METRICS;
-
-  const activity = realActivity.length > 0 ? realActivity : MOCK_ACTIVITY;
-  const userGrowth = MOCK_USER_GROWTH;
-  const contentEngagement = MOCK_CONTENT_ENGAGEMENT;
-
   return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
+    <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
       {/* Header greeting */}
       <motion.div variants={fadeUp} className="mb-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-400/70">
@@ -173,18 +123,17 @@ export default function OverviewDashboard() {
           WithIn is alive.
         </h2>
         <p className="mt-2 text-sm text-gray-500">
-          {realMetrics ? "Live platform data from the database." : "Real-time overview of the platform."}
+          {state === "error"
+            ? "Live data is unavailable right now."
+            : "Live platform data from the database."}
         </p>
       </motion.div>
 
       {/* Metric cards */}
-      <motion.div
-        variants={stagger}
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {metrics.map((metric) => (
+      <motion.div variants={stagger} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {METRIC_DEFS.map((metric) => (
           <motion.div
-            key={metric.label}
+            key={metric.key}
             variants={fadeUp}
             className="group relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
           >
@@ -194,88 +143,94 @@ export default function OverviewDashboard() {
                   {metric.label}
                 </p>
                 <p className="mt-2 text-2xl font-semibold text-white">
-                  {metric.value}
+                  {realMetrics ? realMetrics[metric.key].toLocaleString() : "—"}
                 </p>
               </div>
               <span className="text-xl opacity-60">{metric.icon}</span>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <span
-                className={`text-[11px] font-medium ${
-                  metric.changeType === "up"
-                    ? "text-emerald-400"
-                    : metric.changeType === "down"
-                    ? "text-rose-400"
-                    : "text-gray-400"
-                }`}
-              >
-                {metric.changeType === "up" ? "↑" : metric.changeType === "down" ? "↓" : "→"}{" "}
-                {metric.change}
+              <span className="text-[11px] font-medium text-gray-400">
+                {realMetrics ? "live" : state === "error" ? "unavailable" : "loading"}
               </span>
-              <span className="text-[10px] text-gray-600">
-                {realMetrics ? "live data" : "vs last month"}
-              </span>
+              <span className="text-[10px] text-gray-600">from the database</span>
             </div>
-            {/* Subtle glow on hover */}
             <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/[0.02] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Activity + Charts row */}
+      {/* Activity + summary row */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Activity feed */}
         <motion.div
           variants={fadeUp}
           className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">Recent Activity</h3>
-            <Link href="/admin/audit" className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
+            <Link
+              href="/admin/audit"
+              className="text-[11px] text-gray-500 transition-colors hover:text-gray-300"
+            >
               View all →
             </Link>
           </div>
-          <div className="space-y-3">
-            {activity.slice(0, 6).map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-white/[0.02]"
-              >
-                <span className="mt-0.5 text-sm">
-                  {"icon" in event ? (event as { icon: string }).icon : "•"}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-white/90">{event.title}</p>
-                  <p className="text-[11px] text-gray-500 truncate">{event.entity}</p>
+          {realActivity.length === 0 ? (
+            <p className="py-6 text-center text-[13px] text-gray-500">
+              {state === "error" ? "Couldn't load activity." : "No activity yet."}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {realActivity.slice(0, 6).map((event) => (
+                <div
+                  key={event.id}
+                  className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-white/[0.02]"
+                >
+                  <span className="mt-0.5 text-sm">•</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-white/90">{event.title}</p>
+                    <p className="truncate text-[11px] text-gray-500">{event.entity}</p>
+                  </div>
+                  <span className="whitespace-nowrap text-[10px] text-gray-600">
+                    {event.timestamp.slice(0, 10)}
+                  </span>
                 </div>
-                <span className="text-[10px] text-gray-600 whitespace-nowrap">
-                  {"timestamp" in event ? (event as { timestamp: string }).timestamp : ""}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
-        {/* Analytics preview */}
+        {/* Analytics summary */}
         <motion.div
           variants={fadeUp}
           className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">Analytics</h3>
-            <Link href="/admin/analytics" className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
+            <Link
+              href="/admin/analytics"
+              className="text-[11px] text-gray-500 transition-colors hover:text-gray-300"
+            >
               Full report →
             </Link>
           </div>
-          <div className="space-y-5">
-            <div>
-              <p className="text-[11px] text-gray-500 mb-2">User Growth</p>
-              <MiniChart data={userGrowth} color="rgba(52, 211, 153, 0.5)" />
-            </div>
-            <div>
-              <p className="text-[11px] text-gray-500 mb-2">Content Engagement</p>
-              <MiniChart data={contentEngagement} color="rgba(168, 85, 247, 0.5)" />
-            </div>
+          <div className="space-y-3">
+            {[
+              { label: "Published content", value: realMetrics?.publishedContent },
+              { label: "Creators", value: realMetrics?.totalCreators },
+              { label: "Content views", value: realMetrics?.totalViews },
+              { label: "Communities", value: realMetrics?.totalCommunities },
+            ].map((row) => (
+              <div
+                key={row.label}
+                className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.01] px-3 py-2.5"
+              >
+                <span className="text-[12px] text-gray-400">{row.label}</span>
+                <span className="text-sm font-semibold text-white">
+                  {row.value === undefined ? "—" : row.value.toLocaleString()}
+                </span>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -283,30 +238,25 @@ export default function OverviewDashboard() {
       {/* Universe State — dev observability */}
       <UniverseStatePanel />
 
-      {/* Moderation queue summary */}
+      {/* Moderation summary */}
       <motion.div
         variants={fadeUp}
         className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Moderation Queue</h3>
-          <Link href="/admin/moderation" className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors">
+          <Link
+            href="/admin/moderation"
+            className="text-[11px] text-gray-500 transition-colors hover:text-gray-300"
+          >
             Manage →
           </Link>
         </div>
-        <div className="flex gap-4">
-          <div className="flex-1 rounded-lg border border-amber-500/20 bg-amber-500/[0.05] p-4 text-center">
-            <p className="text-2xl font-semibold text-amber-400">3</p>
-            <p className="mt-1 text-[11px] text-gray-500">Needs Review</p>
-          </div>
-          <div className="flex-1 rounded-lg border border-rose-500/20 bg-rose-500/[0.05] p-4 text-center">
-            <p className="text-2xl font-semibold text-rose-400">1</p>
-            <p className="mt-1 text-[11px] text-gray-500">Escalated</p>
-          </div>
-          <div className="flex-1 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.05] p-4 text-center">
-            <p className="text-2xl font-semibold text-emerald-400">2</p>
-            <p className="mt-1 text-[11px] text-gray-500">Resolved Today</p>
-          </div>
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.05] p-4 text-center">
+          <p className="text-2xl font-semibold text-amber-400">
+            {realMetrics ? realMetrics.openReports : "—"}
+          </p>
+          <p className="mt-1 text-[11px] text-gray-500">Open reports awaiting review</p>
         </div>
       </motion.div>
     </motion.div>
@@ -344,7 +294,7 @@ function UniverseStatePanel() {
       variants={fadeUp}
       className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-white">Universe State</h3>
           <p className="text-[10px] text-gray-600">Local browser state — not production data</p>
@@ -402,9 +352,7 @@ function StatBox({
         <span className="text-sm opacity-50">{icon}</span>
         <span className="text-[10px] font-medium text-gray-500">{label}</span>
       </div>
-      <p className={`mt-1.5 ${sizeClass} font-semibold text-white/85`}>
-        {display}
-      </p>
+      <p className={`mt-1.5 ${sizeClass} font-semibold text-white/85`}>{display}</p>
     </div>
   );
 }

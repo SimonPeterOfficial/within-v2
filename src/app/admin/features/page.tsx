@@ -1,65 +1,54 @@
-"use client";
+import { CINEMATIC_LOADER_ENABLED } from "@/components/loader/loader-config";
 
-import { useState } from "react";
-import { MOCK_FEATURES } from "@/lib/admin/data";
+export const dynamic = "force-dynamic";
 
-const CATEGORY_STYLES: Record<string, string> = {
-  core: "text-purple-400 bg-purple-400/10",
-  content: "text-emerald-400 bg-emerald-400/10",
-  social: "text-cyan-400 bg-cyan-400/10",
-  experimental: "text-amber-400 bg-amber-400/10",
-};
+/**
+ * Feature flags in WithIn are build-time constants, not a runtime service.
+ * This page reports their real values so nobody is misled by a toggle that
+ * cannot actually change anything.
+ */
+const FLAGS = [
+  {
+    id: "cinematic-loader",
+    name: "Cinematic entrance loader",
+    description: "Gates the landing entrance behind the cinematic loader sequence.",
+    enabled: CINEMATIC_LOADER_ENABLED,
+  },
+];
 
 export default function FeaturesPage() {
-  const [flags, setFlags] = useState(() =>
-    MOCK_FEATURES.reduce((acc, f) => ({ ...acc, [f.id]: f.enabled }), {} as Record<string, boolean>)
-  );
-
-  const toggle = (id: string) => setFlags((f) => ({ ...f, [id]: !f[id] }));
-
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-400/70 mb-2">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-400/70">
         Feature Flags
       </p>
-      <h2 className="font-display text-2xl font-medium tracking-[-0.02em] text-white mb-2">
+      <h2 className="mb-2 font-display text-2xl font-medium tracking-[-0.02em] text-white">
         Feature Flags
       </h2>
-      <p className="text-sm text-gray-500 mb-8">
-        Control feature availability. All flags are local/mock — ready for a real feature flag service.
+      <p className="mb-8 text-sm text-gray-500">
+        Flags are build-time constants in this repository — there is no runtime flag
+        service. Values shown here are read directly from the source.
       </p>
 
       <div className="space-y-2">
-        {MOCK_FEATURES.map((feature) => (
+        {FLAGS.map((flag) => (
           <div
-            key={feature.id}
-            className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-200 hover:border-white/[0.12] hover:bg-white/[0.04]"
+            key={flag.id}
+            className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
           >
-            <button
-              type="button"
-              onClick={() => toggle(feature.id)}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-300 ${
-                flags[feature.id] ? "bg-emerald-500" : "bg-gray-600"
+            <span
+              className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                flag.enabled ? "bg-emerald-400" : "bg-gray-600"
               }`}
-            >
-              <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                  flags[feature.id] ? "translate-x-[22px]" : "translate-x-0.5"
-                }`}
-              />
-            </button>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-white">{feature.name}</p>
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${CATEGORY_STYLES[feature.category]}`}>
-                  {feature.category}
-                </span>
-                <span className="text-[10px] text-gray-600">{feature.environment}</span>
-              </div>
-              <p className="text-[12px] text-gray-500 mt-0.5">{feature.description}</p>
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-white">{flag.name}</p>
+              <p className="mt-0.5 text-[12px] text-gray-500">{flag.description}</p>
             </div>
-            <span className={`text-[11px] font-medium ${flags[feature.id] ? "text-emerald-400" : "text-gray-500"}`}>
-              {flags[feature.id] ? "ON" : "OFF"}
+            <span
+              className={`text-[11px] font-medium ${flag.enabled ? "text-emerald-400" : "text-gray-500"}`}
+            >
+              {flag.enabled ? "ON" : "OFF"}
             </span>
           </div>
         ))}

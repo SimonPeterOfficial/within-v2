@@ -20,7 +20,7 @@ const ROUTES = [
   { path: "/", markers: ["Find your WithIn.", "Enter WithIn", "Explore the universe"] },
   { path: "/home", markers: ["Welcome", "sanctuary", "Discover"] },
   { path: "/login", markers: ["Welcome", "Log in", "Forgot password?"] },
-  { path: "/signup", markers: ["Come a little further", "Enter WithIn"] },
+  { path: "/signup", markers: ["Begin your", "Enter WithIn"] },
   { path: "/forgot-password", markers: ["Find your way", "Send reset link"] },
   { path: "/onboarding", markers: ["Entering your sanctuary"] },
   { path: "/discover", markers: ["A universe, waiting", "Search"] },

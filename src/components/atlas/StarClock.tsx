@@ -35,14 +35,22 @@ export default function StarClock() {
         line="Sidereal time — the hours the stars keep."
       />
 
-      {/* The sidereal readout — the big instrument number */}
+      {/* The sidereal readout — the big instrument number.
+          Held neutral until mount: /atlas is statically prerendered, so the
+          build-time minute can never match the visitor's minute. */}
       <div className="mt-6 tabular-nums">
         <p className="font-display text-4xl font-medium tracking-tight text-white">
-          {String(lstHours).padStart(2, "0")}
-          <span className="text-white/40">:</span>
-          {String(lstMinutes).padStart(2, "0")}
-          <span className="text-white/40">:</span>
-          <span className="text-[rgba(var(--mood-rgb),0.9)]">{String(lstSeconds).padStart(2, "0")}</span>
+          {mounted ? (
+            <>
+              {String(lstHours).padStart(2, "0")}
+              <span className="text-white/40">:</span>
+              {String(lstMinutes).padStart(2, "0")}
+              <span className="text-white/40">:</span>
+              <span className="text-[rgba(var(--mood-rgb),0.9)]">{String(lstSeconds).padStart(2, "0")}</span>
+            </>
+          ) : (
+            <span className="text-white/30">···</span>
+          )}
         </p>
         <p className="mt-1 text-[11px] uppercase tracking-[0.25em] text-gray-600">
           Local sidereal time
@@ -60,9 +68,11 @@ export default function StarClock() {
       {/* Culminating constellation */}
       <div className="mt-4 rounded-2xl border border-[rgba(var(--mood-rgb),0.12)] bg-[rgba(var(--mood-rgb),0.05)] px-4 py-3">
         <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">Highest in the sky</p>
-        <p className="mt-1 font-display text-lg text-white">{culminating.name}</p>
+        <p className="mt-1 font-display text-lg text-white">
+          {mounted ? culminating.name : "···"}
+        </p>
         <p className="mt-0.5 text-[12px] italic leading-snug text-gray-400/85">
-          {culminating.story}
+          {mounted ? culminating.story : "\u00a0"}
         </p>
       </div>
     </GlassCard>
