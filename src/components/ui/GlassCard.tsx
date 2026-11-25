@@ -7,7 +7,12 @@ type GlassTone =
   | "clay"
   | "paper"
   | "cinematic"
-  | "dark";
+  | "dark"
+  | "crystal-clear"
+  | "deep-glass"
+  | "iridescent-glass"
+  | "soft-glass"
+  | "crystal-focus";
 
 export type GlassCardProps = {
   children: React.ReactNode;
@@ -16,7 +21,8 @@ export type GlassCardProps = {
   /**
    * Surface material. The dreamscape tones (aurora/tactile/clay/paper/
    * cinematic/dark) carry the tactile language of the visual engine;
-   * default/soft/strong are the original quiet glass.
+   * default/soft/strong are the original quiet glass; the crystal tones
+   * describe distinct dark-world materials with restrained refraction.
    */
   tone?: GlassTone;
   /** A soft diagonal light reflection across the surface — reserve for premium moments */
@@ -33,7 +39,12 @@ const tones: Record<GlassTone, string> = {
   clay: "material-soft-clay",
   paper: "material-paper",
   cinematic: "material-cinematic",
-  dark: "material-dark-tactile"
+  dark: "material-dark-tactile",
+  "crystal-clear": "material-crystal-clear",
+  "deep-glass": "material-deep-glass",
+  "iridescent-glass": "material-iridescent-glass",
+  "soft-glass": "material-soft-glass",
+  "crystal-focus": "material-crystal-focus"
 };
 
 /**

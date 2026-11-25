@@ -1,9 +1,10 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import CinematicLoader from "@/components/loader/CinematicLoader";
 import { useCinematicIntro } from "@/lib/useCinematicIntro";
 import { useEntrance } from "@/components/entrance/EntranceProvider";
+import { CINEMATIC_LOADER_ENABLED } from "@/components/loader/loader-config";
 
 /**
  * Client-side gate for the cinematic loader.
@@ -15,12 +16,9 @@ import { useEntrance } from "@/components/entrance/EntranceProvider";
  * hidden and the landing page blank. Mark readiness explicitly when the
  * cinematic is not played.
  */
-const CinematicLoader = dynamic(() => import("@/components/loader/CinematicLoader"), {
-  ssr: false,
-});
-
 export default function CinematicLoaderGate() {
-  const { play } = useCinematicIntro();
+  const intro = useCinematicIntro();
+  const play = CINEMATIC_LOADER_ENABLED && intro.play;
   const { markReady } = useEntrance();
 
   useEffect(() => {
@@ -32,5 +30,11 @@ export default function CinematicLoaderGate() {
   }, [play, markReady]);
 
   if (!play) return null;
-  return <CinematicLoader />;
+  return (
+    <CinematicLoader
+      reduced={intro.reduced}
+      returning={intro.returning}
+      markSeen={intro.markSeen}
+    />
+  );
 }

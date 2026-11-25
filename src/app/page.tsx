@@ -4,6 +4,10 @@ import AppShell from "@/components/layout/AppShell";
 import Button from "@/components/ui/Button";
 import WithinMark from "@/components/ui/WithinMark";
 import { UNIVERSE_NAV } from "@/lib/navigation";
+import { EntranceProvider } from "@/components/entrance/EntranceProvider";
+import CinematicLoaderGate from "@/components/loader/CinematicLoaderGate";
+import CrystalAtmosphere from "@/components/effects/CrystalAtmosphere";
+import GlassCard from "@/components/ui/GlassCard";
 
 export const metadata: Metadata = {
   title: "WithIn — A place to be",
@@ -21,62 +25,92 @@ const primaryModules = [
 
 export default function LandingPage() {
   return (
-    <AppShell items={UNIVERSE_NAV}>
-      <div className="relative min-h-screen bg-[#050505] text-white">
-        <div className="mx-auto flex min-h-screen max-w-[1180px] items-center justify-center px-4 py-12 sm:px-6 lg:px-10">
-          <div className="w-full max-w-[880px]">
-            <div className="mb-8 flex items-center gap-4">
-              <WithinMark variant="mark" size={42} />
-              <div className="text-xs font-medium uppercase tracking-[0.34em] text-white/50">WithIn</div>
-            </div>
+    <EntranceProvider immediatelyReady={false}>
+      <div className="elysian-app">
+        <AppShell items={UNIVERSE_NAV}>
+          <div className="elysian-landing relative isolate min-h-screen overflow-hidden text-[var(--elysian-ink)]">
+            <CrystalAtmosphere />
+            <div className="relative z-10 mx-auto flex min-h-screen max-w-[1180px] items-center px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
+              <div className="mx-auto w-full max-w-[920px]">
+                <div className="mb-7 flex items-center gap-4 sm:mb-10">
+                  <WithinMark variant="mark" size={42} />
+                  <div className="text-[11px] font-medium uppercase tracking-[0.38em] text-[var(--elysian-ink-soft)]">
+                    WithIn
+                  </div>
+                </div>
 
-            <header className="mb-8">
-              <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.28em] text-[rgba(var(--mood-rgb),0.8)]">
-                Enter the room
-              </p>
-              <h1 className="max-w-2xl text-[clamp(2.2rem,6vw,4.4rem)] font-display font-semibold leading-[0.96] tracking-[-0.06em] text-white">
-                The world is loud.
-                <span className="block text-white/85">Find your WithIn.</span>
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-white/68">
-                A quieter place for stories, focus, and the moments that matter.
-              </p>
-            </header>
+                <header className="mb-7 max-w-3xl sm:mb-10">
+                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.36em] text-[rgba(var(--within-ivory-rgb),0.68)] sm:mb-5">
+                    A quieter place to begin
+                  </p>
+                  <h1 className="font-display text-[clamp(2.7rem,7.3vw,6.25rem)] font-medium leading-[0.98] tracking-[-0.055em] text-[var(--elysian-ink)]">
+                    The world is loud.
+                    <span className="mt-1 block text-[rgba(var(--within-ivory-rgb),0.76)]">
+                      Find your WithIn.
+                    </span>
+                  </h1>
+                  <p className="mt-4 max-w-xl text-[15px] leading-7 text-[var(--elysian-ink-soft)] sm:mt-6 sm:text-base sm:leading-8">
+                    A quieter place for stories, focus, and the moments that matter.
+                  </p>
+                </header>
 
-            <div className="mb-10 flex flex-wrap gap-3">
-              <Button href="/home" variant="gradient" size="lg">
-                Enter WithIn
-              </Button>
-              <Button href="/discover" variant="outline" size="lg">
-                Explore
-              </Button>
-            </div>
-
-            <section aria-label="Primary WithIn modules" className="rounded-[28px] border border-white/10 bg-white/[0.02] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] backdrop-blur-sm sm:p-5">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/55">Available spaces</h2>
-                <span className="text-xs text-white/40">Live routes</span>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {primaryModules.map((module) => (
-                  <Link
-                    key={module.href}
-                    href={module.href}
-                    className="group flex min-h-[124px] flex-col justify-between rounded-2xl border border-white/8 bg-[#0a0b11] p-4 transition-colors hover:border-white/15 hover:bg-[#10131a] focus:outline-none focus:ring-2 focus:ring-white/15"
+                <div className="mb-4 flex flex-wrap gap-3 sm:mb-12">
+                  <Button href="/home" variant="gradient" size="lg">
+                    Enter WithIn
+                  </Button>
+                  <Button
+                    href="/discover"
+                    variant="outline"
+                    size="lg"
+                    className="border-white/15 bg-white/[0.035] text-[var(--elysian-ink)] hover:bg-white/[0.07]"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-base font-semibold text-white">{module.label}</span>
-                      <span className="text-sm text-white/35 transition-transform group-hover:translate-x-0.5">→</span>
+                    Explore
+                  </Button>
+                </div>
+
+                <GlassCard tone="deep-glass" className="rounded-[28px] p-4 sm:p-5">
+                  <section aria-label="Primary WithIn modules">
+                    <div className="mb-4 flex items-center justify-between gap-3 px-1">
+                      <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[rgba(var(--within-ivory-rgb),0.72)]">
+                        Available spaces
+                      </h2>
+                      <span className="text-[11px] text-[rgba(var(--within-ivory-rgb),0.48)]">
+                        Live routes
+                      </span>
                     </div>
-                    <div className="mt-4 text-sm text-white/55">{module.summary}</div>
-                  </Link>
-                ))}
+
+                    <div className="grid grid-cols-2 gap-2.5 xl:grid-cols-3">
+                      {primaryModules.map((module) => (
+                        <Link
+                          key={module.href}
+                          href={module.href}
+                          className="elysian-door group flex min-h-[76px] flex-col justify-between rounded-[18px] p-3 transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(var(--within-ivory-rgb),0.72)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#08070d] sm:min-h-[112px] sm:p-4"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[15px] font-medium text-[var(--elysian-ink)]">
+                              {module.label}
+                            </span>
+                            <span
+                              aria-hidden
+                              className="text-sm text-[rgba(var(--within-ivory-rgb),0.42)] transition duration-300 group-hover:translate-x-1 group-hover:text-[var(--elysian-ink)]"
+                            >
+                              →
+                            </span>
+                          </div>
+                          <div className="mt-2 text-[12px] text-[var(--elysian-ink-soft)] sm:mt-4 sm:text-[13px]">
+                            {module.summary}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                </GlassCard>
               </div>
-            </section>
+            </div>
           </div>
-        </div>
+        </AppShell>
+        <CinematicLoaderGate />
       </div>
-    </AppShell>
+    </EntranceProvider>
   );
 }

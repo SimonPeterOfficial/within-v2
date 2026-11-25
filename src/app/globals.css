@@ -2916,3 +2916,249 @@ html[data-breath="awake"] .aurora-root {
   color: #2f2a55;
 }
 
+/* ── ELYSIAN entrance and crystal materials ────────────────────────────────
+   The shared atmosphere stays quiet behind each room. The material classes
+   are distinct surfaces for deliberate reuse, not a blanket card treatment. */
+.elysian-landing {
+  --elysian-bg: #050408;
+  --elysian-ink: #f6f0e5;
+  --elysian-ink-soft: #c9c3b8;
+  --elysian-glass-clear: rgba(246, 240, 229, 0.035);
+  --elysian-glass-deep: rgba(9, 8, 15, 0.72);
+  --elysian-glass-soft: rgba(246, 240, 229, 0.055);
+  --elysian-glass-edge: rgba(246, 240, 229, 0.14);
+  background: var(--elysian-bg);
+}
+
+.elysian-atmosphere {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 76% 58% at 61% 2%, rgba(86, 62, 125, 0.19), transparent 74%),
+    radial-gradient(ellipse 54% 36% at 8% 70%, rgba(194, 179, 153, 0.045), transparent 78%),
+    linear-gradient(156deg, #0b0911 0%, #07060b 42%, #040407 100%);
+}
+
+.elysian-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: -18% -10% 22%;
+  background: radial-gradient(ellipse 58% 35% at 74% 18%, rgba(157, 132, 196, 0.075), transparent 76%);
+  transform: rotate(-8deg);
+}
+
+.elysian-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  background: linear-gradient(132deg, transparent 0 49.88%, rgba(246, 240, 229, 0.045) 50%, transparent 50.12%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 72%);
+}
+
+.elysian-atmosphere__horizon {
+  position: absolute;
+  right: 8%;
+  bottom: 21%;
+  left: 8%;
+  height: 1px;
+  opacity: 0.68;
+  background: linear-gradient(90deg, transparent, rgba(246, 240, 229, 0.035) 24%, rgba(193, 172, 224, 0.14) 62%, transparent);
+  box-shadow: 0 0 36px rgba(142, 114, 184, 0.13);
+}
+
+.elysian-atmosphere__facet {
+  position: absolute;
+  top: 0;
+  right: 14%;
+  width: min(34vw, 420px);
+  height: 56%;
+  opacity: 0.34;
+  transform: skewX(-24deg);
+  transform-origin: top;
+  border-right: 1px solid rgba(246, 240, 229, 0.06);
+  border-left: 1px solid rgba(178, 157, 210, 0.035);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.elysian-door {
+  border: 1px solid rgba(246, 240, 229, 0.095);
+  background: linear-gradient(145deg, rgba(246, 240, 229, 0.045), rgba(246, 240, 229, 0.018) 58%, rgba(139, 111, 176, 0.025));
+  box-shadow: inset 0 1px 0 rgba(246, 240, 229, 0.06), 0 12px 34px rgba(0, 0, 0, 0.14);
+}
+
+.elysian-door:hover {
+  transform: translateY(-2px);
+  border-color: rgba(246, 240, 229, 0.18);
+  background: linear-gradient(145deg, rgba(246, 240, 229, 0.07), rgba(246, 240, 229, 0.028) 58%, rgba(139, 111, 176, 0.045));
+  box-shadow: inset 0 1px 0 rgba(246, 240, 229, 0.09), 0 16px 38px rgba(0, 0, 0, 0.2);
+}
+
+.material-crystal-clear {
+  border-color: rgba(246, 240, 229, 0.16);
+  background: var(--elysian-glass-clear, rgba(246, 240, 229, 0.035));
+  backdrop-filter: blur(8px) saturate(1.12);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 -1px 0 rgba(164, 143, 198, 0.045);
+}
+
+.material-deep-glass {
+  border-color: var(--elysian-glass-edge, rgba(246, 240, 229, 0.14));
+  background: linear-gradient(145deg, rgba(246, 240, 229, 0.055), var(--elysian-glass-deep, rgba(9, 8, 15, 0.72)) 36%, rgba(16, 13, 24, 0.78));
+  backdrop-filter: blur(18px) saturate(1.16);
+  -webkit-backdrop-filter: blur(18px) saturate(1.16);
+  box-shadow: inset 0 1px 0 rgba(246, 240, 229, 0.12), inset 0 -1px 0 rgba(130, 107, 162, 0.08), 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.material-iridescent-glass {
+  border-color: rgba(220, 210, 237, 0.18);
+  background:
+    linear-gradient(118deg, rgba(246, 240, 229, 0.075), transparent 34%, rgba(152, 128, 189, 0.07) 70%, rgba(171, 188, 180, 0.035)),
+    rgba(11, 9, 17, 0.72);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+
+.material-soft-glass {
+  border-color: rgba(246, 240, 229, 0.1);
+  background: var(--elysian-glass-soft, rgba(246, 240, 229, 0.055));
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  box-shadow: inset 0 1px 0 rgba(246, 240, 229, 0.07);
+}
+
+.material-crystal-focus {
+  border-color: rgba(196, 177, 221, 0.24);
+  background: linear-gradient(145deg, rgba(125, 100, 158, 0.13), rgba(12, 10, 18, 0.86) 58%);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgba(246, 240, 229, 0.16), 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 34px rgba(132, 104, 174, 0.075);
+}
+
+.elysian-loader {
+  isolation: isolate;
+  color: var(--elysian-ink, #f6f0e5);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 38%, rgba(65, 49, 91, 0.22), transparent 74%),
+    linear-gradient(155deg, #08070d 0%, #040407 55%, #030306 100%);
+}
+
+.elysian-loader__light {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 38% 34% at 50% 44%, rgba(186, 163, 218, 0.09), transparent 76%),
+    radial-gradient(ellipse 76% 26% at 50% 100%, rgba(179, 159, 133, 0.035), transparent 78%);
+}
+
+.elysian-loader__emblem {
+  overflow: hidden;
+  border: 1px solid rgba(246, 240, 229, 0.13);
+  border-radius: 9999px;
+  background: linear-gradient(152deg, rgba(246, 240, 229, 0.075), rgba(246, 240, 229, 0.012) 52%, rgba(125, 99, 157, 0.045));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -18px 42px rgba(5, 4, 9, 0.25), 0 18px 64px rgba(0, 0, 0, 0.28);
+}
+
+.elysian-loader__inner-light {
+  position: absolute;
+  inset: 12%;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 45% 38%, rgba(246, 240, 229, 0.11), rgba(143, 119, 175, 0.045) 38%, transparent 72%);
+}
+
+.elysian-loader__reflection {
+  position: absolute;
+  z-index: 20;
+  top: -12%;
+  bottom: -12%;
+  left: 40%;
+  width: 18%;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), rgba(220, 208, 240, 0.1), transparent);
+  pointer-events: none;
+}
+
+/* The public landing shares AppShell navigation, while using its own dusk
+   environment. Keep the shared shell's light painted scene off this route. */
+.elysian-app > .crystal-world,
+.elysian-app > .crystal-world-calm {
+  color: var(--elysian-ink);
+  background: #050408;
+  --ui-ink: var(--elysian-ink);
+  --ui-ink-soft: var(--elysian-ink-soft);
+  --ui-ink-faint: var(--elysian-ink-faint);
+  --ui-surface: var(--elysian-glass-clear);
+  --ui-raised: var(--elysian-glass-soft);
+  --ui-line: var(--elysian-glass-edge);
+}
+.elysian-app > .crystal-world > .worldscape,
+.elysian-app > .crystal-world > .spatial-layer {
+  display: none;
+}
+.elysian-app nav[aria-label="Primary"],
+.elysian-app aside[aria-label="Menu"] {
+  color: var(--elysian-ink);
+  border-color: rgba(246, 240, 229, 0.12);
+  background: linear-gradient(155deg, rgba(25, 22, 32, 0.88), rgba(8, 7, 12, 0.91) 62%, rgba(17, 13, 24, 0.9));
+  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.4), inset 0 1px rgba(255, 255, 255, 0.07);
+}
+.elysian-app nav[aria-label="Primary"] .ink-title,
+.elysian-app nav[aria-label="Primary"] .ink-body,
+.elysian-app nav[aria-label="Primary"] .tagline-caps,
+.elysian-app nav[aria-label="Primary"] p,
+.elysian-app aside[aria-label="Menu"] .ink-title,
+.elysian-app aside[aria-label="Menu"] .ink-body,
+.elysian-app aside[aria-label="Menu"] .tagline-caps,
+.elysian-app aside[aria-label="Menu"] p {
+  color: var(--elysian-ink-soft);
+}
+.elysian-app nav[aria-label="Primary"] .chip-glass,
+.elysian-app aside[aria-label="Menu"] .chip-glass,
+.elysian-app button[aria-label="Open menu"] {
+  color: var(--elysian-ink);
+  border-color: rgba(246, 240, 229, 0.16);
+  background: rgba(246, 240, 229, 0.065);
+}
+.elysian-app nav[aria-label="Primary"] .pill-glow {
+  background: linear-gradient(135deg, rgba(166, 137, 239, 0.17), rgba(246, 240, 229, 0.045));
+  box-shadow: inset 0 0 0 1px rgba(220, 205, 255, 0.15), 0 5px 22px rgba(112, 81, 180, 0.12);
+}
+.elysian-app nav[aria-label="Primary navigation"] > div {
+  border: 1px solid rgba(246, 240, 229, 0.13);
+  color: var(--elysian-ink);
+  background: linear-gradient(155deg, rgba(25, 22, 32, 0.93), rgba(8, 7, 12, 0.96) 62%, rgba(17, 13, 24, 0.94));
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px rgba(255, 255, 255, 0.07);
+}
+.elysian-app nav[aria-label="Primary navigation"] a > span:nth-child(2) {
+  color: var(--elysian-ink-soft);
+}
+.elysian-app nav[aria-label="Primary navigation"] a > span:first-child {
+  color: rgba(246, 240, 229, 0.55);
+}
+.elysian-app nav[aria-label="Primary navigation"] a[aria-current="page"] > span {
+  color: var(--elysian-ink);
+}
+.elysian-app nav[aria-label="Primary navigation"] .absolute.inset-x-0.bottom-0 {
+  display: none;
+}
+.elysian-app nav[aria-label="Primary"] .border-t,
+.elysian-app aside[aria-label="Menu"] .border-t {
+  border-color: rgba(246, 240, 229, 0.12);
+}
+@media (max-width: 1023px) {
+  .elysian-app button[aria-label="Open menu"] {
+    top: 1rem;
+    right: 1rem;
+    bottom: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .elysian-door:hover { transform: none; }
+}
+

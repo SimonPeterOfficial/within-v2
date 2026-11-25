@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useReducedMotionSafe } from "@/lib/useReducedMotionSafe";
 
 /**
@@ -64,7 +64,7 @@ export function useCinematicIntro() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const markSeen = () => {
+  const markSeen = useCallback(() => {
     try {
       sessionStorage.setItem(GATE_KEY, "true");
       // After one full Genesis, this browser earns the short reveal.
@@ -72,7 +72,7 @@ export function useCinematicIntro() {
     } catch {
       /* storage unavailable — the gate simply never persists */
     }
-  };
+  }, []);
 
   return { play, decided, reduced: prefersReducedMotion, returning, markSeen };
 }

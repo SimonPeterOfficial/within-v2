@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { useId } from "react";
 
 /**
  * The WithIn mark — one symbol, many sizes.
@@ -33,15 +34,12 @@ type WithinMarkProps = {
 };
 
 /** The brand sweep as SVG stops — same violet→emerald as --mood-rgb defaults. */
-const GRADIENT_ID = "within-mark-sweep";
-const DIAMOND_ID = "within-mark-diamond";
-
 /** The illustrated glyph — a four-point diamond of light, per the mockups. */
-function DiamondGlyph({ size }: { size: number }) {
+function DiamondGlyph({ size, id }: { size: number; id: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden className="shrink-0">
       <defs>
-        <linearGradient id={DIAMOND_ID} x1="30" y1="10" x2="72" y2="92" gradientUnits="userSpaceOnUse">
+        <linearGradient id={id} x1="30" y1="10" x2="72" y2="92" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#f0dcae" />
           <stop offset="0.55" stopColor="#cfa8e2" />
           <stop offset="1" stopColor="#9d8fe8" />
@@ -49,14 +47,14 @@ function DiamondGlyph({ size }: { size: number }) {
       </defs>
       <path
         d="M50 6 Q55 42 94 50 Q55 58 50 94 Q45 58 6 50 Q45 42 50 6 Z"
-        fill={`url(#${DIAMOND_ID})`}
+        fill={`url(#${id})`}
       />
       <circle cx="50" cy="50" r="9" fill="#fffdf4" opacity="0.85" />
     </svg>
   );
 }
 
-function MarkGlyph({ size, mono }: { size: number; mono: boolean }) {
+function MarkGlyph({ size, mono, id }: { size: number; mono: boolean; id: string }) {
   // Geometry is expressed in a 100-unit viewbox and scaled by size.
   return (
     <svg
@@ -69,11 +67,11 @@ function MarkGlyph({ size, mono }: { size: number; mono: boolean }) {
     >
       {!mono && (
         <defs>
-          <linearGradient id={GRADIENT_ID} x1="12" y1="8" x2="88" y2="92" gradientUnits="userSpaceOnUse">
+          <linearGradient id={`${id}-sweep`} x1="12" y1="8" x2="88" y2="92" gradientUnits="userSpaceOnUse">
             <stop offset="0" stopColor="#a78bfa" />
             <stop offset="1" stopColor="#34d399" />
           </linearGradient>
-          <radialGradient id="within-mark-core" cx="0.5" cy="0.5" r="0.5">
+          <radialGradient id={`${id}-core`} cx="0.5" cy="0.5" r="0.5">
             <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
             <stop offset="0.45" stopColor="#a78bfa" stopOpacity="0.55" />
             <stop offset="1" stopColor="#a78bfa" stopOpacity="0" />
@@ -87,7 +85,7 @@ function MarkGlyph({ size, mono }: { size: number; mono: boolean }) {
         cx="50"
         cy="50"
         r="34"
-        stroke={mono ? "currentColor" : `url(#${GRADIENT_ID})`}
+        stroke={mono ? "currentColor" : `url(#${id}-sweep)`}
         strokeWidth="6"
         strokeLinecap="round"
         strokeDasharray="188 26"
@@ -100,7 +98,7 @@ function MarkGlyph({ size, mono }: { size: number; mono: boolean }) {
         <circle cx="50" cy="50" r="10" fill="currentColor" />
       ) : (
         <>
-          <circle cx="50" cy="50" r="17" fill="url(#within-mark-core)" />
+          <circle cx="50" cy="50" r="17" fill={`url(#${id}-core)`} />
           <circle cx="50" cy="50" r="7.5" fill="#ffffff" opacity="0.92" />
         </>
       )}
@@ -119,6 +117,7 @@ export default function WithinMark({
   className = "",
   tone = "white",
 }: WithinMarkProps) {
+  const id = useId().replace(/:/g, "");
   const wordInk =
     tone === "white"
       ? "text-white"
@@ -129,7 +128,7 @@ export default function WithinMark({
   if (variant === "diamond") {
     return (
       <span className={clsx("inline-flex items-center gap-2.5", className)}>
-        <DiamondGlyph size={size} />
+        <DiamondGlyph size={size} id={`${id}-diamond`} />
         <span
           className={clsx(
             "font-display text-[20px] font-semibold tracking-[-0.01em]",
@@ -145,7 +144,7 @@ export default function WithinMark({
   if (variant === "mark") {
     return (
       <span className={clsx("inline-flex", className)}>
-        <MarkGlyph size={size} mono={false} />
+        <MarkGlyph size={size} mono={false} id={id} />
       </span>
     );
   }
@@ -153,7 +152,7 @@ export default function WithinMark({
   if (variant === "mono") {
     return (
       <span className={clsx("inline-flex", className)}>
-        <MarkGlyph size={size} mono />
+        <MarkGlyph size={size} mono id={id} />
       </span>
     );
   }
@@ -161,7 +160,7 @@ export default function WithinMark({
   if (variant === "stacked") {
     return (
       <span className={clsx("inline-flex flex-col items-center gap-3", className)}>
-        <MarkGlyph size={size} mono={false} />
+        <MarkGlyph size={size} mono={false} id={id} />
         <span className="text-sm font-semibold uppercase tracking-[0.5em] text-white/85">
           WithIn
         </span>
@@ -172,7 +171,7 @@ export default function WithinMark({
   // wordmark — the default nav identity
   return (
     <span className={clsx("inline-flex items-center gap-2.5", className)}>
-      <MarkGlyph size={size} mono={false} />
+      <MarkGlyph size={size} mono={false} id={id} />
       <span className="text-xl font-extrabold tracking-tight text-white">
         WithIn
       </span>
